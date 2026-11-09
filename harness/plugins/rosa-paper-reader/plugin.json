@@ -1,0 +1,13 @@
+{
+  "id": "rosa-paper-reader",
+  "version": "1.0.0",
+  "description": "Read PDFs and research papers: highlight, take notes, search, and ask Rosalena about any passage.",
+  "bundled": true,
+  "ui": {
+    "title": "Paper Reader",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "files.save", "chat.compose"],
+    "libs": ["pdfjs"]
+  }
+}

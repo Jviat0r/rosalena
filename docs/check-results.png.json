@@ -1,0 +1,43 @@
+{
+  "chip": "manual",
+  "chipSource": "manual",
+  "gpu": "GeForce RTX 3060",
+  "vram": "12 GB",
+  "ram": "about 32 GiB (the browser rounds this figure)",
+  "webgpu": "shader-f16 · no subgroups · 2 GiB max buffer",
+  "summary": "The 12 GB card you picked can run 4 of these 10 models comfortably; the biggest that fits is Qwen3-8B at Q5_K_M. 5 more would run with CPU offload.",
+  "trust": "You set this VRAM figure yourself, so it is only as good as what you picked; nothing on this page measured your card.",
+  "pickerNote": "Using 12 GB for GeForce RTX 3060, which you set yourself. This result is labelled manual, not detected.",
+  "notes": [
+    "GeForce RTX 3060 at 12 GB is what you chose, so the card and its VRAM were not measured by this page",
+    "navigator.deviceMemory is rounded to a power of two, so the RAM figure is approximate"
+  ],
+  "groups": [
+    {
+      "verdict": "fits",
+      "rows": 4
+    },
+    {
+      "verdict": "tight",
+      "rows": 5
+    },
+    {
+      "verdict": "tooBig",
+      "rows": 1
+    }
+  ],
+  "rowCount": 10,
+  "firstRow": {
+    "name": "Qwen3-8B",
+    "meta": "Q5_K_M5.85 GB download·needs 10.4 GiB of 12 GB",
+    "why": "Fits your 12 GB card with 1.6 GiB to spare."
+  },
+  "commands": 9,
+  "cmd": "llama-server -m models\\Qwen3-8B-Q5_K_M.gguf -c 32768 -ngl 99",
+  "summaryText": "More: all 3 quants, the model card and what it is for",
+  "overflow": false,
+  "docWidth": 1440,
+  "winWidth": 1440,
+  "pageHeight": 4254,
+  "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-"
+}

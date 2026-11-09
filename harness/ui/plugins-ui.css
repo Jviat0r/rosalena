@@ -1,0 +1,131 @@
+/* Sidebar plugins and the plugin page (plugins-ui.js). Uses the app's own tokens, so a
+   skin a plugin applies repaints this too. */
+
+/* The plugin page takes the rows the chat view, the tabs and the composer use. */
+.plugin-view {
+  grid-row: 3 / -1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--line-soft);
+}
+.plugin-view[hidden] { display: none; }
+html[data-plugin-open] .main > .view-tabs,
+html[data-plugin-open] #log,
+html[data-plugin-open] #trail,
+html[data-plugin-open] .composer,
+html[data-plugin-open] #jump,
+html[data-plugin-open] #stats { display: none !important; }
+
+.plugin-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--panel);
+  flex-wrap: nowrap;
+}
+.plugin-bar .mini-btn { padding: 3px 9px; border-color: var(--line-soft); white-space: nowrap; flex: none; }
+.plugin-heading { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; margin-left: 6px; }
+.plugin-heading strong { font-size: 14px; color: var(--text); }
+.plugin-meta { font-size: 11.5px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plugin-bar-spacer { display: none; }
+
+.plugin-versions-wrap { position: relative; }
+.plugin-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 40;
+  min-width: 260px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  display: grid;
+}
+.plugin-menu[hidden] { display: none; }
+.plugin-menu-item {
+  text-align: left;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.plugin-menu-item:hover { background: var(--accent-soft); }
+.plugin-menu-item.danger { color: var(--bad); }
+
+.plugin-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bad) 14%, var(--panel));
+  border-bottom: 1px solid color-mix(in srgb, var(--bad) 45%, var(--line));
+}
+.plugin-banner[hidden] { display: none; }
+.plugin-banner > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plugin-banner .mini-btn { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); padding: 2px 9px; }
+
+.plugin-stage { position: relative; flex: 1; min-height: 0; background: var(--bg); }
+.plugin-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+.plugin-off { padding: 48px; color: var(--dim); text-align: center; }
+/* OmniRoute's dashboard: its own web app, framed edge to edge with its own background. */
+.omni-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+.omni-note p { max-width: 52ch; margin: 0 auto 14px; }
+
+/* Sidebar rows: a chat row's shape, with the plugin's own icon instead of the chat glyph. */
+.chat-item.plugin-item { grid-template-columns: 18px minmax(0, 1fr) auto; justify-items: start; }
+.chat-item.plugin-item::before,
+.chat-item.plugin-item::after { content: none; display: none; }
+.plugin-item .plugin-badge { justify-self: end; }
+.plugin-item.active { background: var(--accent-soft); color: var(--text); }
+.plugin-item.is-off { opacity: 0.6; }
+.plugin-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plugin-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  border-radius: 4px;
+}
+.plugin-icon:not(.has-mask) { background: var(--accent-soft); }
+.plugin-icon.has-mask {
+  background: currentColor;
+  -webkit-mask: var(--plugin-icon) center / contain no-repeat;
+  mask: var(--plugin-icon) center / contain no-repeat;
+}
+.plugin-badge {
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--dim);
+}
+.plugin-badge.mine { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+[data-group="apps"] { position: relative; }
+/* The last row of the list: a quieter link to the Plugins page. */
+.plugin-manage { color: var(--dim); text-decoration: none; }
+.plugin-manage:hover { color: var(--text); }
+.plugin-manage .plugin-icon { font-size: 13px; }
+/* Left of the fold arrow, which sits at the summary's right edge. */
+[data-group="apps"] > .group-action { right: 28px; }
+
+/* Creator mode in the composer */
+.creator-toggle[aria-pressed="true"] {
+  color: var(--btn-ink);
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #c18cff));
+  border-color: var(--accent);
+}
+html[data-creator] .composer textarea { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "name": "rosalena-store",
+  "modules": {
+    "clock": {
+      "description": "Tells the model what time it is, in any IANA time zone.",
+      "latest": "1.1.0",
+      "versions": {
+        "1.0.0": {
+          "shape": "folder",
+          "source": "modules/clock/1.0.0",
+          "description": "Tells the model what time it is, in the machine's own zone.",
+          "files": {
+            "plugin.json": "4b55ab92002b99c6c7cc1ce98e076b91f878e969c985b2f39de90a6ab82014f1",
+            "plugin.mjs": "0a2825a46fbbbcac4d2a0fe06ba5fd8c381769457898410404c1885d331591af"
+          }
+        },
+        "1.1.0": {
+          "shape": "folder",
+          "source": "modules/clock/1.1.0",
+          "description": "Tells the model what time it is, in any IANA time zone.",
+          "files": {
+            "plugin.json": "45478effa199474dfe37251a0111a314cd5e7a5002d7829ab98acb4705a63717",
+            "plugin.mjs": "7ab1c63e3a0b31ba2661877a62b61e5157cdddb10e9911261bed6da91dfe39e8"
+          }
+        }
+      }
+    },
+    "scratchpad": {
+      "description": "A per-session notepad the model can write to and read back. Ships as a single .mjs file, so it also shows the store's other module shape.",
+      "latest": "1.0.0",
+      "versions": {
+        "1.0.0": {
+          "shape": "file",
+          "source": "modules/scratchpad/1.0.0",
+          "description": "A per-session notepad the model can write to and read back. Ships as a single .mjs file, so it also shows the store's other module shape.",
+          "files": {
+            "scratchpad.mjs": "66b6aeaf6c720104a22f373926fbff81a33222b62e9ce39c6ecdc52dcd10dedb"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "rosa-rate-limit-failover",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Remembers which provider route ran out of budget or fell over, reports it, and keeps the next call off it - the router already fails over; this is the memory it lacks",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "stateFile": "",
+    "resetHours": 24,
+    "cooldownMinutes": 10,
+    "fallback": "",
+    "pinWhenLimited": false,
+    "patterns": []
+  }
+}

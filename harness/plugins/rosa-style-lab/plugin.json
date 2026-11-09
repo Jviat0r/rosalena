@@ -1,0 +1,19 @@
+{
+  "id": "rosa-style-lab",
+  "version": "1.0.0",
+  "bundled": true,
+  "core": true,
+  "description": "Repaint the whole Rosalena app: its own look (light or dark, palette, accent, text size, density, what the window shows), 11 contrast-checked skins, a custom skin editor, and JSON import and export.",
+  "ui": {
+    "title": "Style Lab",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": [
+      "theme",
+      "storage",
+      "files.save",
+      "appearance"
+    ],
+    "libs": []
+  }
+}

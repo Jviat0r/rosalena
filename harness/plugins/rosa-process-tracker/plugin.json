@@ -1,0 +1,15 @@
+{
+  "id": "rosa-process-tracker",
+  "version": "0.1.1",
+  "bundled": true,
+  "core": true,
+  "description": "Finds work a run left running outside the harness, ledgers it, and tells the model to stop it",
+  "config": {
+    "ledgerFile": null,
+    "sweepEveryMs": 60000,
+    "keepDays": 1,
+    "maxEntries": 200,
+    "ignore": [],
+    "excludeCommandPatterns": []
+  }
+}

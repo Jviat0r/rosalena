@@ -1,0 +1,43 @@
+{
+  "$about": "The llama.cpp build the starter-model installer downloads when this PC has no llama-server of its own. DATA: src/starter-model.mjs picks one asset by platform and GPU, checks its sha256 and unpacks it into ~/.rosalena/llama.cpp. Pinned on purpose: a build at least two weeks old, with the digest GitHub reports for the asset, so a re-tagged or tampered file is refused rather than run.",
+  "tag": "b11601",
+  "published": "2026-10-13",
+  "assets": {
+    "win32-x64-cpu": {
+      "name": "llama-b11601-bin-win-cpu-x64.zip",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-win-cpu-x64.zip",
+      "bytes": 19514716,
+      "sha256": "60527cc9e834d322b6bad3656aee50a18694f7fd50803fbe85e19f15981eb129"
+    },
+    "win32-x64-vulkan": {
+      "name": "llama-b11601-bin-win-vulkan-x64.zip",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-win-vulkan-x64.zip",
+      "bytes": 32127278,
+      "sha256": "359929570bc52f14e0cde7e63ce3198f4cdeb655316bd190dedc02a8f3c4ef0b"
+    },
+    "darwin-arm64": {
+      "name": "llama-b11601-bin-macos-arm64.tar.gz",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-macos-arm64.tar.gz",
+      "bytes": 12116256,
+      "sha256": "4d9adaeea017af50a47e27e49af50e72296de9effc2dac21fe62027b0803fb3b"
+    },
+    "darwin-x64": {
+      "name": "llama-b11601-bin-macos-x64.tar.gz",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-macos-x64.tar.gz",
+      "bytes": 11614096,
+      "sha256": "46c468fe73e87914fd4a117fc405bcc9f0f8979e130dc880108e36c02d6bf843"
+    },
+    "linux-x64-cpu": {
+      "name": "llama-b11601-bin-ubuntu-x64.tar.gz",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-ubuntu-x64.tar.gz",
+      "bytes": 17735120,
+      "sha256": "b80e570e081046abf732a46872c213b33768df7358929ee1dc998dbbcb5a70b6"
+    },
+    "linux-x64-vulkan": {
+      "name": "llama-b11601-bin-ubuntu-vulkan-x64.tar.gz",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11601/llama-b11601-bin-ubuntu-vulkan-x64.tar.gz",
+      "bytes": 30359991,
+      "sha256": "2ed39e9bb90581c0a877f5824cf7010ebf4d8a4adc8f3b9ca68d51263935f416"
+    }
+  }
+}

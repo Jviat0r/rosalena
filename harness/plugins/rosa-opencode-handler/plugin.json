@@ -1,0 +1,20 @@
+{
+  "id": "rosa-opencode-handler",
+  "version": "1.0.0",
+  "bundled": true,
+  "description": "OpenCode Zen's free tier: probe it, list its free models, explain a 403/429, and pin one in a router class. The wire gates themselves live in router/src/providers.mjs.",
+  "author": "Rosalena",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "probeModel": "deepseek-v4.1-flash-free",
+    "timeoutMs": 20000,
+    "defaultClass": "fast",
+    "keyEnv": "OPENCODE_API_KEY",
+    "includeDsh": false,
+    "stateFile": "",
+    "routerFile": "",
+    "dshRateLimitsFile": "",
+    "dshCredentialsFile": ""
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "rosa-skill-autoload",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Loads a skill by itself when the request or the files being edited call for it",
+  "config": {
+    "maxChars": 6000,
+    "workers": true,
+    "rules": {}
+  }
+}

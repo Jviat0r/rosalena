@@ -1,0 +1,22 @@
+{
+  "id": "rosa-local-model-host",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Start, stop and switch the local llama.cpp server: the action half of local-model-switch, so a GGUF on this PC can be loaded, unloaded, or swapped in automatically when a run is pointed at local/<model>",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "baseUrl": "http://127.0.0.1:8080",
+    "planContext": 16384,
+    "timeoutMs": 1500,
+    "startTimeoutMs": 180000,
+    "extraFlags": [
+      "-fa",
+      "on",
+      "--parallel",
+      "1",
+      "--jinja"
+    ]
+  }
+}

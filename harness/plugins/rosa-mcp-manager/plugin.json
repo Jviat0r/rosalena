@@ -1,0 +1,13 @@
+{
+  "id": "rosa-mcp-manager",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Registry and client for MCP servers the harness calls (the mirror of mcp-server)",
+  "config": {
+    "registryFile": null,
+    "stateFile": null,
+    "timeoutMs": 20000,
+    "allowCall": true
+  }
+}

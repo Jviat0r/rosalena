@@ -1,0 +1,13 @@
+{
+  "id": "rosa-transformer-3d",
+  "version": "1.0.0",
+  "description": "Step through a real tiny transformer in 3D: embeddings, attention, FFN and next-word logits, every number computed live.",
+  "bundled": true,
+  "ui": {
+    "title": "Transformer 3D Lab",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "chat.compose"],
+    "libs": ["three"]
+  }
+}

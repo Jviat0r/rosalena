@@ -1,0 +1,15 @@
+{
+  "id": "rosa-local-model-monitor",
+  "version": "0.1.1",
+  "bundled": true,
+  "core": true,
+  "description": "Read-only live view of the local llama.cpp server: health, model and context size, busy slots and how far each is through reading its prompt, the queue, and recently finished requests",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "baseUrl": "http://127.0.0.1:8080",
+    "timeoutMs": 1500,
+    "recentLimit": 12,
+    "logFiles": null
+  }
+}

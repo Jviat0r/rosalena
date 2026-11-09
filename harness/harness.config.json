@@ -1,0 +1,77 @@
+{
+  "$comment": "Harness config. This is the override layer: a plugin's own plugin.json holds its defaults, and entries here win. Set enabled:false to switch a plugin off entirely.",
+  "$messageLog": "During early access (SHARING_IS_OPTIONAL false in telemetry.mjs) every call to a Rosalena cloud model (GLM, DeepSeek, Rosalena) is sent to the site's database with the app's early-build tracking (telemetry.mjs): the exact prompt and answer, timing, usage and error. With sharing optional, words are sent only after the person chose 'Share chats' (Account > Sharing, asked once on the welcome screen). Local models are never recorded. Nothing is written on this machine unless `local:true` (a developer's offline copy in <ROSALENA_HOME>/logs). `enabled:false` switches it off, and ROSALENA_MESSAGE_LOG=off does the same for one launch.",
+  "messageLog": {
+    "enabled": true,
+    "local": false,
+    "maxChars": 4000,
+    "maxFileBytes": 33554432
+  },
+  "plugins": {
+    "rosa-mcp-server": {
+      "enabled": true,
+      "config": {
+        "tools": ["read_file", "list_dir", "search"]
+      }
+    },
+    "rosa-local-llm": {
+      "enabled": true,
+      "config": {
+        "modelDirs": ["D:\\Models"],
+        "serverRoots": ["D:\\llama.cpp"],
+        "baseUrl": "http://127.0.0.1:8080"
+      }
+    },
+    "rosa-local-model-host": {
+      "$comment": "This machine only (the release build ships a neutral config, so testers keep plugin.json's 16384). 2026-10-29: Rosalena loaded qwen3.8-27b at 16384 on the shared :8080, DSH took it as already loaded, and a 68k DSH session could neither answer nor compact. Load at the same 131072 window and q8_0 KV cache as D:\\llama.cpp\\start-qwen.ps1, which is what fits it on the 3090.",
+      "enabled": true,
+      "config": {
+        "planContext": 131072,
+        "extraFlags": ["-fa", "on", "--parallel", "1", "--jinja", "--cache-type-k", "q8_0", "--cache-type-v", "q8_0"]
+      }
+    },
+    "rosa-comfyui": {
+      "$comment": "The local renderer on :8188. Nothing here starts it: one GPU holds one big model, and whatever owns the card (ContentFarm's gpu-switch.ps1) decides when the writer is unloaded. The presets point at ContentFarm's API-format graphs on this machine because those name model files that actually exist here - copy a JSON anywhere and change `workflow` if you move them. comfy_generate fills the placeholders: {{prompt}} and {{negative}} from the tool call, everything else from `params` (an exact placeholder keeps its JSON type, so {{steps}} stays a number).",
+      "enabled": true,
+      "config": {
+        "baseUrl": "http://127.0.0.1:8188",
+        "allowGenerate": true,
+        "outputDir": "comfyui",
+        "pollMs": 1000,
+        "timeoutMs": 900000,
+        "presets": {
+          "image": {
+            "label": "Image - Qwen-Image 2.1 (1024 square)",
+            "kind": "image",
+            "workflow": "D:\\AppDev\\Ai Ecosystem\\ContentFarm\\workflows\\image-qwen.json",
+            "params": { "width": 1024, "height": 1024, "resolution": 1024, "steps": 25, "cfg": 1.0, "seed": 42, "prefix": "rosalena", "negative": "" }
+          },
+          "image-vertical": {
+            "label": "Image - Qwen-Image 2.1 (768x1344)",
+            "kind": "image",
+            "workflow": "D:\\AppDev\\Ai Ecosystem\\ContentFarm\\workflows\\image-qwen.json",
+            "params": { "width": 768, "height": 1344, "resolution": 1024, "steps": 25, "cfg": 1.0, "seed": 42, "prefix": "rosalena-vertical", "negative": "" }
+          },
+          "image-wide": {
+            "label": "Image - Qwen-Image 2.1 (1344x768)",
+            "kind": "image",
+            "workflow": "D:\\AppDev\\Ai Ecosystem\\ContentFarm\\workflows\\image-qwen.json",
+            "params": { "width": 1344, "height": 768, "resolution": 1024, "steps": 25, "cfg": 1.0, "seed": 42, "prefix": "rosalena-wide", "negative": "" }
+          },
+          "video": {
+            "label": "Video - LTX-2.3 vertical, 2s with audio (448x768)",
+            "kind": "video",
+            "workflow": "D:\\AppDev\\Ai Ecosystem\\ContentFarm\\workflows\\video-ltx.json",
+            "params": { "width": 448, "height": 768, "frames": 49, "steps": 20, "cfg": 3.0, "seed": 42, "prefix": "rosalena-video", "negative": "" }
+          },
+          "music": {
+            "label": "Music - MiniMax music3, 15s instrumental",
+            "kind": "audio",
+            "workflow": "D:\\AppDev\\Ai Ecosystem\\ContentFarm\\workflows\\music-minimax.json",
+            "params": { "seconds": 15, "steps": 8, "seed": 42, "prefix": "rosalena-music", "lyrics": "[Instrumental]" }
+          }
+        }
+      }
+    }
+  }
+}

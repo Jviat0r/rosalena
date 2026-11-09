@@ -1,0 +1,6 @@
+{
+  "id": "clock",
+  "version": "1.1.0",
+  "description": "Tells the model what time it is, in any IANA time zone.",
+  "config": {}
+}

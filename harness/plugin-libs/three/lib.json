@@ -1,0 +1,7 @@
+{
+  "name": "three",
+  "version": "0.187.0",
+  "license": "MIT",
+  "files": ["three.module.js", "three.core.js", "OrbitControls.js"],
+  "usage": "import * as THREE from \"/plugin-lib/three/three.module.js\"; import { OrbitControls } from \"/plugin-lib/three/OrbitControls.js\";"
+}

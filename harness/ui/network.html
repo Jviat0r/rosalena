@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="rosalena-token" content="__ROSALENA_TOKEN__" />
+    <title>Wi-Fi - Rosalena</title>
+    <!-- The theme choice is applied before the body paints, so a light-theme person
+         does not get a dark flash on the way in. It is the same key the chat page
+         writes; this page owns no theme of its own. -->
+    <script>
+      try {
+        const saved = localStorage.getItem("rosalena-theme");
+        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+      } catch {}
+    </script>
+    <style>
+      /* Self-contained on purpose: one file, no stylesheet request, no build step.
+         The tokens are the chat page's palette, copied rather than imported so the
+         page renders if it is ever opened on its own. */
+      :root {
+        color-scheme: dark;
+        --bg: #0e1116;
+        --bg-2: #12161d;
+        --panel: #161b23;
+        --panel-2: #1b212b;
+        --panel-3: #222a36;
+        --line: #262f3d;
+        --line-soft: #1e252f;
+        --text: #e6edf6;
+        --text-2: #b8c4d4;
+        --dim: #8593a6;
+        --dim-2: #64748b;
+        --accent: #6ea8fe;
+        --accent-2: #4f8ef7;
+        --accent-soft: #16283f;
+        --ok: #4ade80;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+        --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+      }
+      html[data-theme="light"] {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --bg-2: #eef1f5;
+        --panel: #ffffff;
+        --panel-2: #f4f6f9;
+        --panel-3: #e9edf3;
+        --line: #d9e0ea;
+        --line-soft: #e6ebf2;
+        --text: #16202c;
+        --text-2: #3c4a5a;
+        --dim: #5f6f80;
+        --dim-2: #8695a6;
+        --accent: #1f6feb;
+        --accent-2: #1a60d0;
+        --accent-soft: #e7effd;
+        --ok: #17803d;
+        --warn: #a16207;
+        --bad: #b42318;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+      a { color: var(--accent); }
+
+      .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+      .head h1 { font-size: 19px; margin: 0; letter-spacing: -0.01em; }
+      .back { color: var(--dim); text-decoration: none; font-size: 13px; border: 1px solid var(--line);
+              padding: 4px 10px; border-radius: 999px; }
+      .back:hover { color: var(--text); border-color: var(--accent); }
+      .badge { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line);
+               color: var(--dim); font-family: var(--mono); }
+      .badge.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+      .badge.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+      .badge.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+      .meta { margin-left: auto; color: var(--dim); font-size: 12px; font-family: var(--mono); }
+
+      .lede { color: var(--dim); font-size: 12.5px; line-height: 1.55; margin: 10px 0 18px;
+              border-left: 2px solid var(--line); padding-left: 10px; }
+      .lede b { color: var(--text-2); font-weight: 600; }
+
+      /* The one large statement on the page: the network this machine is on now. */
+      .headline { font-family: var(--serif); font-weight: 500; font-size: 27px; line-height: 1.25;
+                  margin: 0 0 2px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+      .headline.ok { color: var(--text); }
+      .headline.off { color: var(--dim); }
+      .detail { color: var(--dim); font-size: 12.5px; margin: 0 0 14px; font-family: var(--mono); }
+
+      .status { margin: 0 0 16px; min-height: 1.2em; font-size: 13px; line-height: 1.5;
+                border-left: 2px solid var(--line); padding: 2px 0 2px 10px; color: var(--dim); }
+      .status.ok { border-left-color: var(--ok); color: var(--text-2); }
+      .status.bad { border-left-color: var(--bad); color: var(--text); }
+      .status.busy { border-left-color: var(--warn); color: var(--text-2); }
+
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }
+      .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim);
+                 margin: 0 0 10px; font-weight: 600; }
+      .card p { margin: 0; }
+
+      table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      th { text-align: left; color: var(--dim); font-weight: 500; padding: 4px 8px 6px 0; font-size: 11px;
+           text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--line); }
+      td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+      tr:last-child td { border-bottom: 0; }
+      td.name { font-family: var(--mono); overflow-wrap: anywhere; }
+      td.num, td.sec, td.band { font-family: var(--mono); white-space: nowrap; }
+      td.band { color: var(--dim); }
+      td.action { text-align: right; padding-right: 0; }
+      .tag { font-family: var(--sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em;
+             color: var(--dim-2); border: 1px solid var(--line); border-radius: 999px; padding: 0 6px; margin-left: 7px; }
+      .tag.saved { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+      .tag.live { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+
+      .bar { display: inline-block; width: 58px; height: 6px; border-radius: 3px; background: var(--panel-3);
+             overflow: hidden; vertical-align: middle; margin-right: 8px; }
+      .bar > i { display: block; height: 100%; border-radius: 3px; background: var(--ok); }
+      .bar.warn > i { background: var(--warn); }
+      .bar.bad > i { background: var(--bad); }
+      .bar.none > i { width: 0; }
+
+      .btn { font: inherit; font-size: 12.5px; color: var(--text-2); background: var(--panel-2);
+             border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+      .btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+      .btn:disabled { color: var(--dim-2); cursor: default; opacity: 0.75; }
+      .btn.primary { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); }
+      .btn.ghost { background: transparent; }
+      .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+      /* The password row lives inside the table, under the network it belongs to. */
+      tr.join > td { background: var(--panel-2); border-bottom: 1px solid var(--line); padding: 10px 12px; }
+      .join-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .join-box label.pw { color: var(--dim); font-size: 12.5px; }
+      .join-box input[type="password"], .join-box input[type="text"] {
+        font: inherit; font-size: 13px; font-family: var(--mono); color: var(--text);
+        background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+        padding: 5px 9px; width: 240px; max-width: 60vw;
+      }
+      .join-box input:focus { outline: none; border-color: var(--accent); }
+      .join-box .show { display: inline-flex; align-items: center; gap: 5px; color: var(--dim);
+                        font-size: 12.5px; user-select: none; }
+      .join-box .show input { accent-color: var(--accent); }
+
+      .empty { color: var(--dim); font-size: 13px; line-height: 1.6; margin: 2px 0 0; }
+      .empty b { color: var(--text-2); font-weight: 600; }
+      .errors { margin: 10px 0 0; padding-left: 18px; color: var(--dim); font-size: 12px; font-family: var(--mono); }
+      .errors li { margin: 2px 0; overflow-wrap: anywhere; }
+
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; max-height: 168px; overflow: auto; padding-right: 4px; }
+      .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line);
+              border-radius: 999px; padding: 3px 4px 3px 11px; background: var(--panel-2); font-size: 12.5px; }
+      .chip span { font-family: var(--mono); overflow-wrap: anywhere; }
+      .chip .btn { padding: 2px 10px; font-size: 11.5px; }
+      .hint { color: var(--dim); font-size: 12px; margin: 8px 0 0; }
+
+      .foot { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line);
+              display: flex; gap: 16px; flex-wrap: wrap; align-items: baseline;
+              color: var(--dim); font-size: 12.5px; }
+      .foot a { color: var(--dim); text-decoration: none; }
+      .foot a:hover { color: var(--text); }
+      .foot .why { margin-left: auto; color: var(--dim-2); font-size: 11.5px; }
+      @media (max-width: 640px) {
+        .meta { margin-left: 0; }
+        td.band, th.band { display: none; }
+        .headline { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <a class="back" href="/">&larr; Chats</a>
+        <h1>Wi-Fi</h1>
+        <span class="badge" id="badge">checking</span>
+        <button class="btn ghost" id="refresh" type="button">Refresh</button>
+        <span class="meta" id="meta"></span>
+      </header>
+
+      <p class="lede" id="lede">
+        What this machine can see and join, read straight from Windows with
+        <b>netsh wlan</b>. A saved network connects with its stored key; a new one
+        asks for its password here. The password is used once to write the Windows
+        profile and is never kept by this page.
+      </p>
+
+      <h2 class="headline" id="headline">Checking&hellip;</h2>
+      <p class="detail" id="detail"></p>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+
+      <!-- Drawn only when Windows cannot switch Wi-Fi here: a machine without an
+           adapter, or a platform that has no netsh. It is a deliberate panel, not
+           an error, because nothing on the page is broken. -->
+      <section class="card" id="unavailable" hidden>
+        <h2 id="unavailable-title">Wi-Fi is not available here</h2>
+        <p class="empty" id="unavailable-text"></p>
+        <p class="hint" id="unavailable-hint"></p>
+        <ul class="errors" id="unavailable-errors" hidden></ul>
+      </section>
+
+      <section class="card" id="networks-card" hidden>
+        <h2>Visible networks</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Network</th>
+              <th>Signal</th>
+              <th>Security</th>
+              <th class="band">Band</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="network-rows"></tbody>
+        </table>
+        <p class="empty" id="networks-empty" hidden></p>
+      </section>
+
+      <section class="card" id="saved-card" hidden>
+        <h2>Saved profiles</h2>
+        <div class="chips" id="saved-chips"></div>
+        <p class="hint">
+          Windows already holds the key for these, so reconnecting one needs no
+          password &mdash; even when the network is not in the list above.
+        </p>
+      </section>
+
+      <p class="errors" id="errors" hidden></p>
+
+      <footer class="foot">
+        <a href="/">&#9673; Rosalena harness</a>
+        <a href="/monitor">&#9673; Local model monitor</a>
+        <span class="why">Read-only until you press Connect. Windows only.</span>
+      </footer>
+    </div>
+
+    <noscript>
+      <p style="max-width: 720px; margin: 20px auto; color: #8593a6; font-family: system-ui, sans-serif">
+        This page reads the Wi-Fi adapter with JavaScript. Without it, use the page
+        again in a browser with scripts enabled, or Windows' own Wi-Fi list.
+      </p>
+    </noscript>
+
+    <script type="module">
+      // A second page, not a second application: one route to read, one route to
+      // act, and no framework in between. The token comes from the meta tag the UI
+      // server substitutes, exactly as the chat page does it.
+      const token = document.querySelector('meta[name="rosalena-token"]')?.getAttribute("content") ?? "";
+      const POLL_MS = 5000;
+      const $ = (id) => document.getElementById(id);
+
+      const SECURITY = {
+        open: "open",
+        wep: "WEP",
+        wpa: "WPA",
+        wpa2: "WPA2",
+        wpa3: "WPA3",
+        "wpa-enterprise": "WPA-Enterprise",
+        "wpa2-enterprise": "WPA2-Enterprise",
+        "wpa3-enterprise": "WPA3-Enterprise",
+      };
+
+      // The last probe, the SSID whose password row is open (if any), and whether a
+      // request of ours is in flight. Nothing else is state: the password is never
+      // stored anywhere, only read out of the input at submit time.
+      let latest = null;
+      let joining = null;
+      let reading = false;
+      let joiningBusy = false;
+
+      function setStatus(text, kind = "") {
+        const el = $("status");
+        el.textContent = text ?? "";
+        el.className = `status${kind ? ` ${kind}` : ""}`;
+      }
+
+      function clock(ms) {
+        try {
+          return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        } catch {
+          return "";
+        }
+      }
+
+      // ---------------------------------------------------------------- reading
+
+      async function refresh() {
+        if (reading) return;
+        reading = true;
+        try {
+          const res = await fetch("/api/wifi", { headers: { accept: "application/json" }, cache: "no-store" });
+          if (!res.ok) throw new Error(`the harness answered HTTP ${res.status}`);
+          const data = await res.json();
+          latest = data;
+          // While a password is being typed, the table is left alone: a poll every
+          // five seconds must not wipe the field out from under the person. The
+          // headline and the badge still update, so the page is never stale.
+          render(data, { rows: joining === null });
+        } catch (err) {
+          $("badge").className = "badge bad";
+          $("badge").textContent = "ui unreachable";
+          setStatus(`The harness UI did not answer: ${err?.message ?? err}. This page keeps trying every five seconds.`, "bad");
+        } finally {
+          reading = false;
+        }
+      }
+
+      // --------------------------------------------------------------- drawing
+
+      function signalBar(network) {
+        const percent = Number.isFinite(network.signalPercent) ? network.signalPercent : null;
+        const bar = document.createElement("span");
+        bar.className = `bar${percent === null ? " none" : percent >= 70 ? "" : percent >= 40 ? " warn" : " bad"}`;
+        const fill = document.createElement("i");
+        fill.style.width = `${percent === null ? 0 : Math.max(2, Math.min(100, percent))}%`;
+        bar.append(fill);
+        return bar;
+      }
+
+      function button(label, action, ssid, { disabled = false, primary = false } = {}) {
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = `btn${primary ? " primary" : ""}`;
+        el.textContent = label;
+        if (disabled) el.disabled = true;
+        else {
+          el.dataset.action = action;
+          el.dataset.ssid = ssid;
+        }
+        return el;
+      }
+
+      function rowFor(network) {
+        const row = document.createElement("tr");
+
+        const name = document.createElement("td");
+        name.className = "name";
+        // textContent, never innerHTML: an SSID is whatever a neighbour chose to
+        // broadcast, so it is data and never markup.
+        const label = document.createElement("span");
+        label.textContent = network.ssid;
+        name.append(label);
+        if (network.connected) {
+          const tag = document.createElement("span");
+          tag.className = "tag live";
+          tag.textContent = "connected";
+          name.append(tag);
+        } else if (network.saved) {
+          const tag = document.createElement("span");
+          tag.className = "tag saved";
+          tag.textContent = "saved";
+          name.append(tag);
+        }
+
+        const signal = document.createElement("td");
+        signal.className = "num";
+        if (Number.isFinite(network.signalPercent)) {
+          signal.append(signalBar(network));
+          signal.append(document.createTextNode(network.signal || `${network.signalPercent}%`));
+        } else {
+          signal.append(document.createTextNode("not reported"));
+        }
+
+        const security = document.createElement("td");
+        security.className = "sec";
+        security.textContent = SECURITY[network.security] ?? network.security ?? "not reported";
+
+        const band = document.createElement("td");
+        band.className = "band";
+        band.textContent = `${network.band || "—"}${network.channel ? ` · ch ${network.channel}` : ""}`;
+
+        const action = document.createElement("td");
+        action.className = "action";
+        if (network.connected) action.append(button("Connected", null, network.ssid, { disabled: true }));
+        else if (network.saved) action.append(button("Connect", "connect", network.ssid));
+        else action.append(button("Join", "join", network.ssid, { primary: true }));
+
+        row.append(name, signal, security, band, action);
+        return row;
+      }
+
+      function joinRowFor(network) {
+        const row = document.createElement("tr");
+        row.className = "join";
+        const cell = document.createElement("td");
+        cell.colSpan = 5;
+
+        const box = document.createElement("div");
+        box.className = "join-box";
+
+        const label = document.createElement("label");
+        label.className = "pw";
+        label.textContent = `Password for "${network.ssid}"`;
+        label.htmlFor = "join-password";
+
+        const input = document.createElement("input");
+        input.type = "password";
+        input.id = "join-password";
+        input.autocomplete = "current-password";
+        input.spellcheck = false;
+        input.setAttribute("aria-label", `Password for ${network.ssid}`);
+
+        const show = document.createElement("label");
+        show.className = "show";
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        // Browsers cannot unmask a password without this; a typed password that the
+        // person cannot check is a wrong password they cannot see.
+        check.addEventListener("change", () => {
+          input.type = check.checked ? "text" : "password";
+        });
+        show.append(check, document.createTextNode("Show"));
+
+        const go = button("Connect", "submit", network.ssid, { primary: true });
+        go.removeAttribute("data-action");
+        go.removeAttribute("data-ssid");
+        const cancel = button("Cancel", "cancel", network.ssid, {});
+        cancel.classList.add("ghost");
+        // It closes the row through its own listener; the table's delegation must
+        // not see it, because "cancel" is not an action on a network.
+        cancel.removeAttribute("data-action");
+        cancel.removeAttribute("data-ssid");
+
+        const submit = () => {
+          if (!joiningBusy) submitJoin(network, input, go);
+        };
+        go.addEventListener("click", submit);
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            submit();
+          }
+          if (event.key === "Escape") closeJoin();
+        });
+        cancel.addEventListener("click", () => closeJoin());
+
+        box.append(label, input, show, go, cancel);
+        cell.append(box);
+        row.append(cell);
+        return row;
+      }
+
+      function render(state, { rows = true } = {}) {
+        $("meta").textContent = state?.at ? `checked ${clock(state.at)}` : "";
+
+        const supported = state?.supported !== false;
+        const available = state?.available === true;
+        const iface = state?.interface ?? null;
+        const connected = iface?.state === "connected" && Boolean(iface.ssid);
+
+        const badge = $("badge");
+        if (!supported) {
+          badge.className = "badge warn";
+          badge.textContent = "windows only";
+        } else if (!available) {
+          badge.className = "badge warn";
+          badge.textContent = "no adapter";
+        } else if (state.radio === "off" || state.radio === "service") {
+          badge.className = "badge warn";
+          badge.textContent = state.radio === "service" ? "service stopped" : "radio off";
+        } else if (connected) {
+          badge.className = "badge ok";
+          badge.textContent = "connected";
+        } else {
+          badge.className = "badge";
+          badge.textContent = "not connected";
+        }
+
+        const headline = $("headline");
+        if (!supported) {
+          headline.textContent = "Wi-Fi switching needs Windows";
+          headline.className = "headline off";
+        } else if (!available) {
+          headline.textContent = "No wireless adapter on this machine";
+          headline.className = "headline off";
+        } else if (connected) {
+          headline.textContent = `Connected to ${iface.ssid}`;
+          headline.className = "headline ok";
+        } else {
+          headline.textContent = "Not connected";
+          headline.className = "headline off";
+        }
+
+        const facts = connected
+          ? [iface.auth || null, iface.cipher ? `cipher ${iface.cipher}` : null, iface.signal || null, iface.band || null, iface.channel ? `channel ${iface.channel}` : null]
+          : [];
+        if (connected && state.metered?.metered) facts.push(`metered (${state.metered.cost})`);
+        $("detail").textContent = facts.filter(Boolean).join("  ·  ");
+
+        // The three states a person can actually be in, each with its own panel.
+        $("networks-card").hidden = !(supported && available);
+        $("saved-card").hidden = !(supported && available && Array.isArray(state.saved) && state.saved.length > 0);
+        $("unavailable").hidden = supported && available;
+
+        if (!supported || !available) {
+          const unavailable = $("unavailable");
+          unavailable.hidden = false;
+          $("unavailable-title").textContent = supported ? "No wireless adapter on this machine" : "Wi-Fi switching needs Windows";
+          $("unavailable-text").textContent = state?.note || "Windows did not report an adapter.";
+          $("unavailable-hint").textContent = supported
+            ? "Nothing here is broken. This page asks Windows for a wireless interface with netsh wlan, and this machine reports none — a desktop without a Wi-Fi card looks exactly like this."
+            : "Everything else in the harness is unaffected: this is the only page that needs netsh wlan.";
+          const list = $("unavailable-errors");
+          const errors = Array.isArray(state?.errors) ? state.errors : [];
+          list.replaceChildren(...errors.map((line) => {
+            const item = document.createElement("li");
+            item.textContent = line;
+            return item;
+          }));
+          list.hidden = errors.length === 0;
+        }
+
+        if (supported && available && rows) renderNetworks(state);
+        renderSaved(state);
+        renderErrors(state);
+      }
+
+      function renderNetworks(state) {
+        const body = $("network-rows");
+        body.replaceChildren();
+        const networks = Array.isArray(state.networks) ? state.networks : [];
+
+        const empty = $("networks-empty");
+        if (!networks.length) {
+          empty.hidden = false;
+          empty.textContent = state.note
+            ? state.note
+            : "No networks are visible right now. Windows lists only what its WLAN service last scanned; move closer, then press Refresh.";
+          return;
+        }
+        empty.hidden = true;
+
+        for (const network of networks) {
+          body.append(rowFor(network));
+          // The password row is rebuilt on a poll only for the network the person
+          // was already typing into, and only because `rows` is false while that
+          // row is open - so this branch exists for the first render after a click.
+          if (joining && joining === network.ssid) body.append(joinRowFor(network));
+        }
+      }
+
+      function renderSaved(state) {
+        const chips = $("saved-chips");
+        chips.replaceChildren();
+        const saved = Array.isArray(state.saved) ? state.saved : [];
+        const connected = state.interface?.state === "connected" ? state.interface.ssid : null;
+        for (const name of saved) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          const label = document.createElement("span");
+          label.textContent = name;
+          chip.append(label);
+          if (connected && name.toLowerCase() === String(connected).toLowerCase()) {
+            const tag = document.createElement("span");
+            tag.className = "tag live";
+            tag.textContent = "on";
+            chip.append(tag);
+          } else {
+            chip.append(button("Reconnect", "connect", name));
+          }
+          chips.append(chip);
+        }
+      }
+
+      function renderErrors(state) {
+        const list = $("errors");
+        const errors = Array.isArray(state?.errors) ? state.errors : [];
+        list.replaceChildren(...errors.map((line) => {
+          const item = document.createElement("li");
+          item.textContent = line;
+          return item;
+        }));
+        list.hidden = errors.length === 0;
+      }
+
+      // ----------------------------------------------------------------- acting
+
+      function openJoin(ssid) {
+        joining = ssid;
+        render(latest ?? {}, { rows: true });
+        const input = $("join-password");
+        if (input) {
+          input.focus();
+          input.select?.();
+        }
+        setStatus(`Type the password for "${ssid}", then press Connect. Nothing is sent until you do.`, "");
+      }
+
+      function closeJoin() {
+        joining = null;
+        render(latest ?? {}, { rows: true });
+      }
+
+      async function submitJoin(network, input, go) {
+        const ssid = network.ssid;
+        const password = input.value;
+        if (network.needsPassword && !password) {
+          setStatus(`Type the password for "${ssid}" first, then press Connect.`, "bad");
+          input.focus();
+          return;
+        }
+        joiningBusy = true;
+        go.disabled = true;
+        go.textContent = "Connecting…";
+        // Clear the field before the request leaves: the password is in this call
+        // and nowhere else, not in a variable that outlives it, not in the DOM.
+        input.value = "";
+        setStatus(`Asking Windows to join "${ssid}"…`, "busy");
+        try {
+          const res = await fetch("/api/wifi/connect", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-rosalena-token": token },
+            body: JSON.stringify({ ssid, password }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || `the harness answered HTTP ${res.status}`);
+          if (data.ok) {
+            joining = null;
+            setStatus(data.message || `Connected to "${ssid}".`, "ok");
+            await refresh();
+          } else {
+            // The refusal is a sentence from the plugin: show it, keep the row open
+            // so a retyped password is one click away.
+            setStatus(data.message || `Windows did not connect to "${ssid}".`, "bad");
+            const fresh = $("join-password");
+            if (fresh) fresh.focus();
+            else if (joining === null) render(latest ?? {}, { rows: true });
+          }
+        } catch (err) {
+          setStatus(`The join request failed: ${err?.message ?? err}`, "bad");
+        } finally {
+          joiningBusy = false;
+          go.disabled = false;
+          go.textContent = "Connect";
+        }
+      }
+
+      async function reconnect(ssid) {
+        setStatus(`Asking Windows to reconnect "${ssid}" from its saved profile…`, "busy");
+        try {
+          const res = await fetch("/api/wifi/connect", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-rosalena-token": token },
+            body: JSON.stringify({ ssid }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || `the harness answered HTTP ${res.status}`);
+          setStatus(data.message || (data.ok ? `Connected to "${ssid}".` : `Windows did not connect to "${ssid}".`), data.ok ? "ok" : "bad");
+        } catch (err) {
+          setStatus(`The reconnect request failed: ${err?.message ?? err}`, "bad");
+        }
+        await refresh();
+      }
+
+      $("network-rows").addEventListener("click", (event) => {
+        const target = event.target.closest("button[data-action]");
+        if (!target) return;
+        const ssid = target.dataset.ssid;
+        const action = target.dataset.action;
+        if (action === "join") {
+          // One password row at a time: switching rows drops the old field, and
+          // with it anything typed into it.
+          openJoin(ssid);
+          return;
+        }
+        if (action === "connect") reconnect(ssid);
+      });
+
+      $("saved-chips").addEventListener("click", (event) => {
+        const target = event.target.closest("button[data-action='connect']");
+        if (target) reconnect(target.dataset.ssid);
+      });
+
+      $("refresh").addEventListener("click", () => refresh());
+
+      // A hidden tab is a tab nobody is reading: stop asking every five seconds,
+      // and catch up the moment it is visible again.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") refresh();
+      });
+
+      await refresh();
+      setInterval(() => {
+        if (document.visibilityState === "visible") refresh();
+      }, POLL_MS);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+# Dependencies and runtimes that are installed, not authored.
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Machine-specific runtime state: run logs, spend ledgers, scratch space.
+router/state/
+router/logs/
+router/data/
+harness/.scratch/
+*.log
+# The dev launcher's local bridge token: a secret for this machine, never committed.
+data/bridge-token.txt
+# The root shortcuts point at this machine's paths (packaging/make-shortcuts.ps1).
+/*.lnk
+
+# Release output (produced by packaging/release/build.mjs and the CI workflow).
+build/release/
+packaging/release/build/
+packaging/release/out/
+dist/
+
+# The local plugin store's lock is regenerated on every resolve.
+harness/plugins/store.lock.json
+
+# A plugin's own observation record: rebuilds itself, and would otherwise dirty
+# the tree with a new timestamp after every probe. `loadState` treats it as empty
+# when it is absent, so a fresh clone loses nothing.
+harness/.opencode-handler.json
+harness/.opencode-freeaccess.json
+
+# Editor and OS noise.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# NOTE: build/ at the repository root is NOT ignored on purpose - electron-builder
+# reads build/icon.ico, build/icon.icns and the entitlements plist from there, so
+# those files are source, not output.
+#
+# The one exception is the scratch folder the release check downloads published
+# installers into to compare them with the manifest. Those are copies of release
+# assets, hundreds of megabytes each, and verified by hash rather than by review.
+build/downloads/
+
+# scratch TAP dumps from a test run (never part of the app)
+tap-*.txt
+
+# Scratch left in build/ by working sessions: commit-message drafts, screenshots,
+# probe scripts. The source files in build/ (icons, entitlements) are none of these.
+build/*.png
+build/*.txt
+build/*.js
+build/*.mjs
+build/*.json
+
+# Wrangler's local state and bundles (site/.wrangler, and the account cache at the root).
+.wrangler/
+site/.wrangler/
+
+# This machine's window preferences and a plugin's root-level observation record.
+data/ui-prefs.json
+.opencode-handler.json
+.opencode-freeaccess.json

@@ -1,0 +1,11 @@
+{
+  "id": "rosa-mcp-server",
+  "version": "0.1.0",
+  "bundled": true,
+  "description": "Serve the harness and its tools over MCP (stdio JSON-RPC) so any MCP client can drive it.",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "tools": ["read_file", "list_dir", "search"]
+  }
+}

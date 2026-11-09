@@ -1,0 +1,6 @@
+{
+  "id": "clock",
+  "version": "1.0.0",
+  "description": "Tells the model what time it is, in the machine's own zone.",
+  "config": {}
+}

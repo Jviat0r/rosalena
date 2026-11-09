@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "product": "Rosalena Harness",
+  "version": "0.1.13",
+  "updated": "2026-11-08",
+  "generatedBy": "packaging/release/manifest.mjs",
+  "summary": "One entry per downloadable file. available:true means the release workflow produced exactly this file and measured its size and SHA-256; available:false means no such file exists yet, and the download page shows no link for it.",
+  "platforms": [
+    {
+      "id": "windows",
+      "label": "Windows",
+      "requirement": "Windows 10 or 11, 64-bit",
+      "status": "available",
+      "availableCount": 2,
+      "artifactCount": 2,
+      "note": "Unsigned: no code-signing certificate was available when this was built, so Windows SmartScreen shows \"Windows protected your PC\". Choose More info, then Run anyway."
+    },
+    {
+      "id": "macos",
+      "label": "macOS",
+      "requirement": "macOS 11 or newer, Apple silicon or Intel",
+      "status": "available",
+      "availableCount": 4,
+      "artifactCount": 4,
+      "note": "Unsigned and not notarized: no Apple Developer certificate was available when this was built, so macOS quarantines the download. Right-click the app, choose Open, then Open again, or run xattr -dr com.apple.quarantine \"/Applications/Rosalena Harness.app\" once."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "windows-x64-installer",
+      "platform": "windows",
+      "arch": "x64",
+      "kind": "installer",
+      "fileName": "Rosalena-Harness-Setup-0.1.13-x64.exe",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-Setup-0.1.13-x64.exe",
+      "sha256": "35ae539af77307f96cc4890e6ccfa4cf4efc600caa5fd6428af5a4d6dcbec61b",
+      "size": 112945038,
+      "note": ""
+    },
+    {
+      "id": "windows-x64-portable",
+      "platform": "windows",
+      "arch": "x64",
+      "kind": "portable",
+      "fileName": "Rosalena-Harness-0.1.13-x64-portable.exe",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64-portable.exe",
+      "sha256": "5d873ab3ccb0cfd3f62f9e0d5c23cb67ac14651ecaad3325c07a1de2e7395ab7",
+      "size": 112732147,
+      "note": ""
+    },
+    {
+      "id": "macos-arm64-dmg",
+      "platform": "macos",
+      "arch": "arm64",
+      "kind": "dmg",
+      "fileName": "Rosalena-Harness-0.1.13-arm64.dmg",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-arm64.dmg",
+      "sha256": "1f6b787a7f545ae219af45b9781d020629478934324e9881619859fc0cce8d0a",
+      "size": 130513131,
+      "note": ""
+    },
+    {
+      "id": "macos-arm64-zip",
+      "platform": "macos",
+      "arch": "arm64",
+      "kind": "zip",
+      "fileName": "Rosalena-Harness-0.1.13-arm64.zip",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-arm64.zip",
+      "sha256": "dcf514d8b0fe549ee4876f7f6d34d3e88ad0ad650477ce071d205e1c63e47f09",
+      "size": 130787925,
+      "note": ""
+    },
+    {
+      "id": "macos-x64-dmg",
+      "platform": "macos",
+      "arch": "x64",
+      "kind": "dmg",
+      "fileName": "Rosalena-Harness-0.1.13-x64.dmg",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64.dmg",
+      "sha256": "6e7b42423182aba70fca80b45d1728c085d37e95ff6da86518c97ed711a4a031",
+      "size": 134287067,
+      "note": ""
+    },
+    {
+      "id": "macos-x64-zip",
+      "platform": "macos",
+      "arch": "x64",
+      "kind": "zip",
+      "fileName": "Rosalena-Harness-0.1.13-x64.zip",
+      "version": "0.1.13",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64.zip",
+      "sha256": "4b0bcf62db23d7509841100ab201ed9c8b8a289b2741a216f5bc51209efcc9de",
+      "size": 134591806,
+      "note": ""
+    }
+  ]
+}

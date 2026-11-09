@@ -1,0 +1,8 @@
+{
+  "id": "rosa-creator-mode",
+  "version": "1.0.0",
+  "bundled": true,
+  "core": true,
+  "description": "Creator mode: the agent builds sidebar plugins in drafts, verifies them, installs only what passed, and can roll any install back",
+  "config": {}
+}

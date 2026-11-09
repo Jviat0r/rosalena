@@ -1,0 +1,14 @@
+{
+  "id": "rosa-finish-loop-guard",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Warns once, then ends the run, when the model loops on its final steps",
+  "config": {
+    "models": [],
+    "textRepeats": 3,
+    "doneStreak": 3,
+    "sameToolRepeats": 3,
+    "hardStop": true
+  }
+}

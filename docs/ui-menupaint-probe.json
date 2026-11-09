@@ -1,0 +1,53 @@
+{
+  "url": "http://127.0.0.1:8095/",
+  "steps": {
+    "menuState": {
+      "rect": {
+        "x": 242,
+        "y": 30.5,
+        "w": 216,
+        "h": 311.3
+      },
+      "hidden": false,
+      "style": {
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "zIndex": "70",
+        "position": "fixed",
+        "transform": "none",
+        "animation": "none 0s"
+      },
+      "animations": [],
+      "elementAtCenter": [
+        "h3#.",
+        "div#view-menu.view-menu",
+        "body#.",
+        "html#."
+      ],
+      "menuIsTopAtCenter": true
+    },
+    "shotBeforeFrames": {
+      "name": "a-before-frames",
+      "w": 1440,
+      "h": 900,
+      "png": 130849
+    },
+    "shotAfterFrames": {
+      "name": "b-after-frames",
+      "w": 1440,
+      "h": 900,
+      "png": 141371
+    },
+    "menuStillOpen": {
+      "hidden": false,
+      "rect": {
+        "x": 242,
+        "y": 30.5,
+        "w": 216,
+        "h": 311.3
+      }
+    }
+  },
+  "pageErrors": []
+}

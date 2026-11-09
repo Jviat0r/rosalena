@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "SolBrowser Bridge",
+  "version": "0.2.0",
+  "description": "Frame-aware browser control bridge for the SolBrowser MCP server. Thin relay: logic lives server-side.",
+  "minimum_chrome_version": "125",
+  "permissions": ["debugger", "tabs", "webNavigation", "scripting", "alarms", "storage", "offscreen", "clipboardRead", "clipboardWrite"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "sw.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "run_at": "document_start",
+      "js": [
+        "content/core.js",
+        "content/find.js",
+        "content/clipboard.js",
+        "content/snapshot.js",
+        "content/actions.js",
+        "content/wait.js",
+        "content/overlay.js"
+      ]
+    }
+  ],
+  "action": { "default_title": "SolBrowser Bridge", "default_popup": "popup.html" }
+}

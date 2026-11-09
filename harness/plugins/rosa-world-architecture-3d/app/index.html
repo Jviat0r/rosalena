@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>World Architecture 3D</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="stage" aria-label="3D exhibit">
+      <div id="canvas-host"></div>
+      <div id="labels" aria-hidden="true"></div>
+
+      <header id="topbar">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 L10.6 9 L8.6 15 L6 21.5 M12 2.5 L13.4 9 L15.4 15 L18 21.5 M9.6 12 H14.4 M8.2 17 Q12 13.6 15.8 17 M3 21.5 H21" /></svg>
+          <div>
+            <strong>World Architecture 3D</strong>
+            <span>Landmarks rebuilt to true scale</span>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Lighting">
+            <button type="button" data-light="day" title="Day lighting (D)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg>Day
+            </button>
+            <button type="button" data-light="dusk" title="Dusk lighting (K)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h18M6.5 17a5.5 5.5 0 0 1 11 0M12 6v2.5M4.6 9.6l1.7 1.7M19.4 9.6l-1.7 1.7M7 21h10" /></svg>Dusk
+            </button>
+            <button type="button" data-light="night" title="Night lighting (N)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /></svg>Night
+            </button>
+          </div>
+          <button type="button" id="btn-rotate" class="toggle" aria-pressed="false" title="Auto-rotate (A)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4h-4" /></svg>Auto-rotate
+          </button>
+          <button type="button" id="btn-labels" class="toggle" aria-pressed="true" title="Annotations (L)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v10H9l-5 4z" /><path d="M8 9h8M8 12h5" /></svg>Annotations
+          </button>
+          <button type="button" id="btn-reset" title="Reset view (R)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6" /></svg>Reset view
+          </button>
+        </div>
+      </header>
+
+      <div id="scalebar" aria-label="Scale bar"><div class="bar"></div><span>50 m</span></div>
+      <div id="hint">Drag to orbit <i></i> Scroll to zoom <i></i> Double-click to reset <i></i> <kbd>1</kbd>-<kbd>4</kbd> switch</div>
+      <nav id="gallery" aria-label="Landmarks"></nav>
+      <div id="veil"></div>
+      <div id="toast" role="status" aria-live="polite"></div>
+      <div id="fallback" hidden></div>
+      <div id="loading">Building the exhibit...</div>
+    </section>
+
+    <aside id="panel" aria-label="Fact sheet">
+      <div class="panel-scroll">
+        <p class="eyebrow" id="fact-place"></p>
+        <h1 id="fact-title"></h1>
+        <p class="alias" id="fact-alias"></p>
+        <div class="keystat"><strong id="fact-stat"></strong><span id="fact-stat-label"></span></div>
+        <p class="lede" id="fact-lede"></p>
+
+        <h2>Fact sheet</h2>
+        <dl id="fact-list"></dl>
+
+        <h2>What to notice</h2>
+        <ol id="notice-list"></ol>
+
+        <h2>Relative height</h2>
+        <div id="size-strip"></div>
+
+        <h2>Visit notes</h2>
+        <ul id="visit-list"></ul>
+      </div>
+      <div class="panel-foot">
+        <button type="button" id="ask" class="primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H10l-4 3.5V16H4z" /><path d="M9.5 9.2a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.7-.9 1.3M12 14.6v.2" /></svg>
+          Ask Rosalena about this landmark
+        </button>
+      </div>
+    </aside>
+  </main>
+  <script src="/plugin-sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

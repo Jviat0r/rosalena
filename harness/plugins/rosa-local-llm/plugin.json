@@ -1,0 +1,12 @@
+{
+  "id": "rosa-local-llm",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Find and inspect the local model stack (llama.cpp binary, GGUF files, live server slots).",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "baseUrl": "http://127.0.0.1:8080"
+  }
+}

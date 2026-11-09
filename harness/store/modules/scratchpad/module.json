@@ -1,0 +1,3 @@
+{
+  "description": "A per-session notepad the model can write to and read back. Ships as a single .mjs file, so it also shows the store's other module shape."
+}

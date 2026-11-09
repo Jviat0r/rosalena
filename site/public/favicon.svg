@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<title>Rosalena</title>
+<!-- The Rosalena mark: a crowned rose. Source for the app icon (packaging/tools/render-icon.py then make-icon.mjs) and the website favicon. -->
+<defs>
+<linearGradient id="t" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#2ee6ee"/><stop offset="1" stop-color="#b9e4f2"/></linearGradient>
+<linearGradient id="cr" gradientUnits="userSpaceOnUse" x1="22" y1="6" x2="42" y2="22"><stop offset="0" stop-color="#8ff5f8"/><stop offset="1" stop-color="#1fc6d4"/></linearGradient>
+<linearGradient id="backP" gradientUnits="userSpaceOnUse" x1="0" y1="13" x2="0" y2="31"><stop offset="0" stop-color="#e2508f"/><stop offset="1" stop-color="#a92a63"/></linearGradient>
+<radialGradient id="cup" gradientUnits="userSpaceOnUse" cx="32" cy="24" r="12"><stop offset="0" stop-color="#8e2152"/><stop offset="1" stop-color="#c23a74"/></radialGradient>
+<linearGradient id="ring" gradientUnits="userSpaceOnUse" x1="0" y1="16" x2="0" y2="26"><stop offset="0" stop-color="#ff9cc4"/><stop offset="1" stop-color="#d2427f"/></linearGradient>
+<linearGradient id="ringL" gradientUnits="userSpaceOnUse" x1="0" y1="19" x2="0" y2="26"><stop offset="0" stop-color="#ffb3cf"/><stop offset="1" stop-color="#e05690"/></linearGradient>
+<linearGradient id="frontA" gradientUnits="userSpaceOnUse" x1="30" y1="24" x2="36" y2="41"><stop offset="0" stop-color="#f77fb0"/><stop offset="1" stop-color="#c63c78"/></linearGradient>
+<linearGradient id="frontB" gradientUnits="userSpaceOnUse" x1="22" y1="25" x2="32" y2="41"><stop offset="0" stop-color="#ffc2da"/><stop offset=".55" stop-color="#f784b3"/><stop offset="1" stop-color="#d14a86"/></linearGradient>
+<linearGradient id="low" gradientUnits="userSpaceOnUse" x1="0" y1="31" x2="0" y2="42"><stop offset="0" stop-color="#d9478a"/><stop offset="1" stop-color="#9e2659"/></linearGradient>
+<linearGradient id="leaf" gradientUnits="userSpaceOnUse" x1="18" y1="42" x2="46" y2="56"><stop offset="0" stop-color="#3cebf0"/><stop offset="1" stop-color="#1196a8"/></linearGradient>
+<linearGradient id="leafLight" gradientUnits="userSpaceOnUse" x1="18" y1="42" x2="34" y2="52"><stop offset="0" stop-color="#9ff6f8"/><stop offset="1" stop-color="#2ee6ee" stop-opacity="0"/></linearGradient>
+
+<g id="openRose">
+  <!-- outer petals flaring up and out, tucked just under the inner ring, narrow at the stem, tips rolled outward -->
+  <g transform="translate(30 39) scale(.86 .9) translate(-30 -39)">
+  <path d="M30 39 C22.4 37 17.4 30.6 15.8 22.4 C15.3 19.8 14.6 17.4 13.4 15.2 C16.6 14.8 19.8 15.4 22.2 17 C24.6 18.8 26.2 22 27.2 26 Z" fill="url(#backP)" stroke="url(#backP)" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M13.4 15.2 C16.6 14.8 19.8 15.4 22.2 17 C20 16.6 17.6 16.8 15.6 17.8 C15 17 14.2 16 13.4 15.2 Z" fill="#ffc4dc" stroke="#ffc4dc" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M15.2 19.6c.8 5.4 3.2 10.4 7 14" stroke="#ff9cc4" stroke-width=".7" fill="none" stroke-linecap="round" opacity=".7"/>
+  </g>
+  <g transform="translate(34 39) scale(.86 .9) translate(-34 -39)">
+  <path d="M 34 39 C 41.6 37 46.6 30.6 48.2 22.4 C 48.7 19.8 49.4 17.4 50.6 15.2 C 47.4 14.8 44.2 15.4 41.8 17 C 39.4 18.8 37.8 22 36.8 26 Z" fill="url(#backP)" stroke="url(#backP)" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M 50.6 15.2 C 47.4 14.8 44.2 15.4 41.8 17 C 44 16.6 46.4 16.8 48.4 17.8 C 49 17 49.8 16 50.6 15.2 Z" fill="#ffb3cf" stroke="#ffb3cf" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M48.8 19.6c-.8 5.4-3.2 10.4-7 14" stroke="#ff9cc4" stroke-width=".7" fill="none" stroke-linecap="round" opacity=".7"/>
+  </g>
+  <!-- inner petals filling the space behind the second ring -->
+  <path d="M18.6 28C18 18 23 13.6 32 13.6s14 4.4 13.4 14.4z" fill="#d84c88"/>
+  <path d="M21.6 19.2c1.4-1.8 3.4-2.8 5.8-3.2M42.4 19.2c-1.4-1.8-3.4-2.8-5.8-3.2" stroke="#ff9cc4" stroke-width=".6" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- a second ring of petals rising up on each side, broad at the top -->
+  <path d="M28.6 33.4 C23.4 31 20 26 19.2 20 C18.9 17.8 18.6 16.4 18 15.2 C21 14.6 24.4 15 26.8 16.4 C28.4 17.4 29.4 19 30 21 Z" fill="url(#sideL)" stroke="url(#sideL)" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M18 15.2 C21 14.6 24.4 15 26.8 16.4 C25 16.2 22.6 16.4 20.6 17.2 C19.8 17.6 19.2 18.2 18.8 19 C18.6 17.6 18.4 16.4 18 15.2 Z" fill="#ffd6e6" stroke="#ffd6e6" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M 35.4 33.4 C 40.6 31 44 26 44.8 20 C 45.1 17.8 45.4 16.4 46 15.2 C 43 14.6 39.6 15 37.2 16.4 C 35.6 17.4 34.6 19 34 21 Z" fill="url(#sideR)" stroke="url(#sideR)" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M 46 15.2 C 43 14.6 39.6 15 37.2 16.4 C 39 16.2 41.4 16.4 43.4 17.2 C 44.2 17.6 44.8 18.2 45.2 19 C 45.4 17.6 45.6 16.4 46 15.2 Z" fill="#ffcade" stroke="#ffcade" stroke-width="1.1" stroke-linejoin="round"/>
+  <!-- the back rim, behind the cup, where the crown rests -->
+  <path d="M19.8 24.4c0-5.6 5.6-9 12.2-9s12.2 3.4 12.2 9z" fill="url(#backP)"/>
+  <path d="M21.4 19.6c2.4-2.6 6.2-3.8 10.6-3.8s8.2 1.2 10.6 3.8" stroke="#ff9cc4" stroke-width=".7" fill="none" stroke-linecap="round" opacity=".8"/>
+  <!-- the cup, seen from above -->
+  <ellipse cx="32" cy="23.6" rx="11.6" ry="6.9" fill="url(#cup)"/>
+  <!-- the spiral: petals overlapping in one direction, each lit along its top edge -->
+  <path d="M20.6 24.4c.2-5.4 5.4-7.6 11.6-7.6 6 0 10.8 2 11.2 5.6-2.6-2.4-6.4-3.4-11.2-3.4-5.2 0-9.4 1.6-11.6 5.4z" fill="url(#ring)"/>
+  <path d="M21.6 21.4c2-2.6 5.8-3.8 10.6-3.8 4.6 0 8.4 1.2 10.4 3.4" stroke="#ffd1e3" stroke-width=".7" fill="none" stroke-linecap="round"/>
+  <path d="M22.2 23c1.4-4 6.8-5.2 12.2-4.4 5.2.8 8.2 3.6 7.2 7.2-1.4-2.6-4.6-4.6-9-4.8-4.6-.2-8 .6-10.4 2z" fill="url(#ringL)"/>
+  <path d="M23.2 21.6c2-2.2 6.2-3 10.6-2.4" stroke="#ffe1ec" stroke-width=".6" fill="none" stroke-linecap="round"/>
+  <path d="M40 25.2c-.6-3-4.2-4.2-8.4-3.8-4.2.4-7 2.4-6.6 5.2 1.4-1.8 3.6-2.8 6.4-3 3.4-.2 6.6.4 8.6 1.6z" fill="url(#ring)"/>
+  <path d="M27 23.6c1.6-1.4 3.8-2 6.2-2 2.4 0 4.6.6 5.8 1.8" stroke="#ffd1e3" stroke-width=".55" fill="none" stroke-linecap="round" opacity=".9"/>
+  <path d="M27.6 26.2c.2-2.2 2.4-3.2 4.8-3 2.6.2 4 1.6 3.6 3.2-1.2-1-2.6-1.4-4.2-1.2-1.6.2-3 .6-4.2 1z" fill="url(#ringL)"/>
+  <path d="M31.2 24.6c-1 .3-1.5 1.3-1 2.1.5.8 1.6 1 2.5.5 1-.6 1.2-1.9.4-2.8-.9-1-2.6-1.1-3.8-.3" stroke="#ffc4dc" stroke-width=".6" fill="none" stroke-linecap="round"/>
+  <!-- the front petals wrap the cup, crossing at an angle, their tips rolled back -->
+  <path d="M22 30c5-1.2 14-1.8 22.6-5.6.6 8.2-4.6 15.2-12 16-5.6.6-10-3.4-10.6-10.4z" fill="url(#frontA)"/>
+  <path d="M30.6 29c4.8-.6 9.6-1.8 14-4.6" stroke="#ffc4dc" stroke-width=".8" fill="none" stroke-linecap="round"/>
+  <path d="M44.6 24.4c.9.1 1.7.5 2.3 1.2-.9.1-1.7.5-2.2 1.2z" fill="#ffc4dc"/>
+  <path d="M18.4 24.6c3.6 3.4 9 7 15 8 3 .5 5.6 0 7.6-1.2-1.4 6.4-6.4 10.2-12.2 9.8-6-.4-10.2-7.4-10.4-16.6z" fill="url(#frontB)"/>
+  <path d="M18.7 25c3.4 3.2 8.6 6.6 14.4 7.6 2.8.4 5.3 0 7.3-1" stroke="#ffe6f0" stroke-width=".9" fill="none" stroke-linecap="round"/>
+  <path d="M18.4 24.6c-.9-.2-1.8 0-2.6.5.8.5 1.5 1.2 1.9 2z" fill="#ffd6e6"/>
+  <path d="M24.4 36.4c1.8 2.2 4.2 3.4 6.8 3.6" stroke="#c23a74" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".55"/>
+</g>
+
+<g id="openStem">
+  <path d="M32 40.6c-.5 4.6 0 8.6 1.4 12.6" stroke="url(#leaf)" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  <path d="M32 40.6c-2.6-.4-5 .4-7 2.4 2.6.4 5 0 7-2.4zM32 40.6c2.6-.4 5 .4 7 2.4-2.6.4-5 0-7-2.4zM32 40.4c-.6 1.2-.6 2.8 0 4 .6-1.2.6-2.8 0-4z" fill="url(#leaf)"/>
+  <path d="M32.6 49.6c-3.8-4.4-9-5.2-13-3.4 2.9 4.4 8.1 6 13 3.4z" fill="url(#leaf)"/>
+  <path d="M19.6 46.2c2.6-1.1 5.6-1 8.4.2" stroke="url(#leafLight)" stroke-width=".9" fill="none" stroke-linecap="round"/>
+  <path d="M21.4 46.6c3.8.2 7.4 1.3 11 3" stroke="#0a5a66" stroke-opacity=".55" stroke-width=".7" fill="none" stroke-linecap="round"/>
+  <path d="M33.2 46.6c3.3-3.8 7.9-4.5 11.4-3.1-2.5 3.8-7.1 5.2-11.4 3.1z" fill="url(#leaf)"/>
+  <path d="M43.4 43.8c-3.2.1-6.4 1-9.6 2.6" stroke="#0a5a66" stroke-opacity=".5" stroke-width=".7" fill="none" stroke-linecap="round"/>
+</g>
+
+<radialGradient id="pearl" cx=".35" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#ffe0ec"/><stop offset="1" stop-color="#f2a3c3"/></radialGradient>
+<radialGradient id="gem" cx=".38" cy=".34" r=".8"><stop offset="0" stop-color="#ffc2da"/><stop offset=".5" stop-color="#ff5c9c"/><stop offset="1" stop-color="#c22a69"/></radialGradient>
+<linearGradient id="crBand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8f8fb"/><stop offset="1" stop-color="#20bccb"/></linearGradient>
+<g id="tiaraO">
+  <path d="M-9.5 3.2c6.2-2.4 12.8-2.4 19 0l1.2-9.4-5.4 4.4L0-9.8l-5.3 8L-10.7-6.2z" fill="url(#cr)" stroke="#0b7f8c" stroke-width=".55" stroke-linejoin="round"/>
+  <path d="M-9.6-4.6l.9 6.4M0-7.6v6.2M9.6-4.6l-.9 6.4" stroke="#e6fdfe" stroke-width=".7" fill="none" stroke-linecap="round" opacity=".75"/>
+  <path d="M-5.3-1.8L-.4-9.2M5.3-1.8L.4-9.2" stroke="#16a3b3" stroke-width=".5" fill="none" stroke-linecap="round" opacity=".5"/>
+  <path d="M-9.6 3.4c6.2-2.4 13-2.4 19.2 0l-.3 2.2c-6-2.2-12.6-2.2-18.6 0z" fill="url(#crBand)" stroke="#0b7f8c" stroke-width=".45" stroke-linejoin="round"/>
+  <path d="M-9.2 3.6c6-2.2 12.4-2.2 18.4 0" stroke="#e9feff" stroke-width=".5" fill="none" opacity=".9"/>
+  <path d="M-9.3 5.6c6-2.2 12.6-2.2 18.6 0" stroke="#0f8796" stroke-width=".5" fill="none" opacity=".7"/>
+  <circle cx="-5.4" cy="3.3" r=".6" fill="#ffe0ec"/><circle cx="5.4" cy="3.3" r=".6" fill="#ffe0ec"/>
+  <circle cx="-2.7" cy="2.8" r=".45" fill="#ffffff" opacity=".9"/><circle cx="2.7" cy="2.8" r=".45" fill="#ffffff" opacity=".9"/>
+  <circle cx="-10.7" cy="-6.6" r="1.7" fill="url(#pearl)" stroke="#c9789b" stroke-width=".35"/><circle cx="0" cy="-10.4" r="2" fill="url(#pearl)" stroke="#c9789b" stroke-width=".35"/><circle cx="10.7" cy="-6.6" r="1.7" fill="url(#pearl)" stroke="#c9789b" stroke-width=".35"/>
+  <circle cx="-.6" cy="-11" r=".5" fill="#fff"/><circle cx="-11.2" cy="-7.1" r=".4" fill="#fff"/><circle cx="10.2" cy="-7.1" r=".4" fill="#fff"/>
+  <ellipse cx="0" cy="-.9" rx="1.7" ry="1.9" fill="url(#gem)" stroke="#8e1d4c" stroke-width=".35"/><circle cx="-.5" cy="-1.5" r=".45" fill="#fff" opacity=".9"/>
+</g>
+</defs>
+<rect x="2" y="2" width="60" height="60" rx="16" fill="#0c262f" stroke="url(#t)" stroke-width="2"/>
+<g transform="translate(0 3)"><use href="#openRose"/><use href="#openStem"/></g><path d="M24.6 21.2c4.8-1.6 10-1.6 14.8 0" stroke="#a92a63" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".55"/>
+<use href="#tiaraO" transform="translate(32 18.7) scale(.8)"/>
+<!-- the front edge of the top petal laps over the crown's band, so the crown sits in the rose -->
+<path d="M22.6 24.2c3.4-4 15.4-4 18.8 0-3.4-1.4-15.4-1.4-18.8 0z" fill="#a92a63" opacity=".35" transform="translate(0 1.6)"/>
+<path d="M22.6 24.2c3.4-4 15.4-4 18.8 0-3.4-1.5-15.4-1.5-18.8 0z" fill="url(#ring)" transform="translate(0 1)"/>
+<path d="M23.4 23.4c3.6-3 13.6-3 17.2 0" transform="translate(0 1)" stroke="#ffd1e3" stroke-width=".6" fill="none" stroke-linecap="round"/>
+<!-- petal edges curling in front of the crown's bottom corners, so the rose wraps it on both sides -->
+<path d="M21.6 25.6c-.2-2.6 1-4.6 3.2-5.6.2 1.4.6 2.8 1.4 4-1.6.2-3.2.8-4.6 1.6z" fill="url(#sideL)" stroke="url(#sideL)" stroke-width=".6" stroke-linejoin="round"/>
+<path d="M42.4 25.6c.2-2.6-1-4.6-3.2-5.6-.2 1.4-.6 2.8-1.4 4 1.6.2 3.2.8 4.6 1.6z" fill="url(#sideR)" stroke="url(#sideR)" stroke-width=".6" stroke-linejoin="round"/>
+</svg>

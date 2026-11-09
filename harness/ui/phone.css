@@ -1,0 +1,230 @@
+/* Phone access: the footer button, its panel, the settings page bits, and the layout a
+ * phone gets (phone.js; harness/src/remote.mjs). Colours come from the theme tokens in
+ * styles.css, so light, dark and every palette apply without a rule here. */
+
+/* ------------------------------------------------------------ footer button */
+.phone-open { position: relative; }
+.phone-open svg { display: block; }
+.phone-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warn);
+  box-shadow: 0 0 0 2px var(--bg-2);
+}
+.phone-dot[data-state="live"] { background: var(--ok); }
+.phone-dot[data-state="bad"] { background: var(--bad); }
+.phone-dot[hidden] { display: none; }
+
+/* --------------------------------------------------------------- the panel */
+.phone-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--scrim);
+  -webkit-app-region: no-drag;
+}
+.phone-scrim[hidden],
+.phone-panel[hidden] { display: none; }
+.phone-panel {
+  position: fixed;
+  z-index: 71;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(440px, calc(100vw - 24px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
+  -webkit-app-region: no-drag;
+}
+.phone-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line-soft);
+}
+.phone-head h2 { margin: 0; font-size: 15px; font-weight: 650; }
+.phone-close { margin-left: auto; }
+.phone-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  background: var(--panel-2);
+}
+.phone-pill[data-state="live"] { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 50%, var(--line)); }
+.phone-pill[data-state="starting"],
+.phone-pill[data-state="stopping"] { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 50%, var(--line)); }
+.phone-pill[data-state="failed"] { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 50%, var(--line)); }
+
+.phone-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow-y: auto;
+  min-height: 0;
+}
+.phone-body[hidden] { display: none; }
+
+.phone-switch { display: flex; align-items: center; gap: var(--space-3); }
+.phone-switch .switch { flex: 0 0 auto; }
+.phone-switch-label { display: grid; gap: 2px; cursor: pointer; }
+.phone-switch-label strong { font-size: 13.5px; font-weight: 600; }
+.phone-switch-label span { font-size: 12px; color: var(--dim); }
+
+.phone-reason { margin: 0; font-size: 12.5px; color: var(--text-2); overflow-wrap: anywhere; }
+.phone-reason:empty { display: none; }
+.phone-reason[data-tone="ok"],
+.phone-relay[data-tone="ok"],
+#phone-set-reason[data-tone="ok"] { color: var(--ok); }
+.phone-reason[data-tone="bad"],
+#phone-set-reason[data-tone="bad"] { color: var(--bad); }
+.phone-relay[data-tone="warn"] { color: var(--warn); }
+
+.phone-live { display: grid; gap: var(--space-2); justify-items: center; }
+.phone-live[hidden] { display: none; }
+.phone-qr-box {
+  /* A QR code needs a light quiet zone around dark modules whatever the theme is. */
+  background: #ffffff;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  line-height: 0;
+}
+.phone-qr {
+  width: 264px;
+  height: 264px;
+  max-width: calc(100vw - 96px);
+  max-height: calc(100vw - 96px);
+  image-rendering: pixelated;
+}
+.phone-scan { margin: 0; font-size: 12px; color: var(--dim); text-align: center; }
+.phone-link-row { display: flex; gap: var(--space-2); width: 100%; }
+.phone-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--bg-2);
+  color: var(--text);
+  font: 12px var(--mono, ui-monospace, Consolas, monospace);
+}
+.phone-relay { margin: 0; font-size: 12px; color: var(--dim); text-align: center; }
+.phone-relay:empty { display: none; }
+.phone-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; }
+
+.phone-btn {
+  appearance: none;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  border-radius: var(--radius-xs);
+  background: var(--panel-3);
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.phone-btn:hover:not(:disabled) { border-color: var(--accent); }
+.phone-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.phone-btn:disabled { opacity: 0.5; cursor: default; }
+.phone-btn.danger { color: var(--bad); }
+.phone-btn.ghost { background: transparent; }
+.phone-btn.small { min-height: 28px; font-size: 12px; }
+.phone-btn[hidden] { display: none; }
+
+.phone-devices { display: grid; gap: var(--space-2); border-top: 1px solid var(--line-soft); padding-top: var(--space-3); }
+.phone-devices h3 { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.phone-count { color: var(--dim); font-weight: 400; }
+.phone-device-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.phone-device {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-xs);
+  background: var(--panel-2);
+}
+.phone-device-text { display: grid; min-width: 0; flex: 1 1 auto; }
+.phone-device-text strong { font-size: 12.5px; font-weight: 600; }
+.phone-device-text span { font-size: 11.5px; color: var(--dim); }
+.phone-empty { font-size: 12px; color: var(--dim); }
+.phone-devices .danger { justify-self: start; }
+
+.phone-foot { display: flex; align-items: center; gap: var(--space-2); border-top: 1px solid var(--line-soft); padding-top: var(--space-3); }
+.phone-foot-note { font-size: 11px; color: var(--dim-2); }
+.phone-paired { margin: 0; font-size: 14px; }
+
+/* Settings > Phone access: the named-tunnel fields. */
+.phone-named-grid { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px var(--space-2); align-items: center; max-width: 520px; }
+.phone-named-grid label { font-size: 12px; color: var(--dim); }
+.phone-named-grid input { width: 100%; max-width: none; }
+.phone-days { max-width: 180px; }
+
+/* ------------------------------------------------------------- phone layout
+ * At phone width (the page opened through phone access, or a narrow window) the sidebar
+ * is already a drawer (styles.css, max-width 860px). This makes it a full-height drawer
+ * that fits the screen, gives touch-sized targets, keeps the composer usable above the
+ * on-screen keyboard and the iPhone home bar, and stops iOS zooming into inputs. */
+@media (max-width: 600px) {
+  .phone-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .phone-btn { min-height: 44px; padding: 0 14px; font-size: 14px; }
+  .phone-btn.small { min-height: 40px; }
+  .phone-link { min-height: 44px; font-size: 13px; }
+  .phone-close { width: 44px; height: 44px; }
+  .phone-named-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+  html[data-remote] .dock-left,
+  .dock-left {
+    width: min(88vw, 340px);
+  }
+  /* The inspector stays reachable as its 30 px rail on the right edge (styles.css), which is
+     position: fixed - so the page has to leave room for it, or the rail covers the composer's
+     Send button and the end of every line. */
+  .main { margin-right: 30px; }
+  /* The status bar's dozen readouts truncate to "V..." at this width; the phone drops it. */
+  html[data-remote] .statusbar { display: none; }
+  /* Touch targets: every button and select a finger lands on is at least 44 px. */
+  html[data-remote] .icon-btn,
+  html[data-remote] .foot-icon,
+  html[data-remote] .mini-btn { min-width: 44px; min-height: 44px; }
+  html[data-remote] .row,
+  html[data-remote] .side-list button,
+  html[data-remote] .more-item { min-height: 44px; }
+  html[data-remote] .composer textarea,
+  html[data-remote] input,
+  html[data-remote] select,
+  html[data-remote] textarea { font-size: 16px; }
+  html[data-remote] .composer { padding-bottom: max(var(--space-2), env(safe-area-inset-bottom)); }
+}
+
+@media (pointer: coarse) {
+  html[data-remote] .icon-btn,
+  html[data-remote] .phone-btn { min-height: 40px; }
+}

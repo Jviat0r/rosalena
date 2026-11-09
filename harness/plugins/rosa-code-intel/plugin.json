@@ -1,0 +1,10 @@
+{
+  "id": "rosa-code-intel",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Hash-anchored edits, ast-grep search/rewrite, language-server lookups and a Node debugger",
+  "config": {
+    "toolsDir": ""
+  }
+}

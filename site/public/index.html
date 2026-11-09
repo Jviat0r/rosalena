@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rosalena Harness: run free AI models on your own PC</title>
+<meta name="description" content="Rosalena Harness is a desktop app that runs AI models on your own PC and on free cloud tiers through one router. Try a small open model right in your browser. Built in public.">
+<link rel="canonical" href="https://rosalena.dev/">
+<link rel="alternate" hreflang="en" href="https://rosalena.dev/">
+<link rel="alternate" hreflang="es" href="https://rosalena.dev/es/">
+<link rel="alternate" hreflang="x-default" href="https://rosalena.dev/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rosalena.dev/">
+<meta property="og:title" content="Rosalena Harness: run free AI models on your own PC">
+<meta property="og:description" content="One desktop app for local and free AI models, with one router that picks the model and switches when one is busy. Try a small open model in your browser.">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#051217">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script src="/theme.js"></script>
+<script src="/lang.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Rosalena Harness",
+      "url": "https://rosalena.dev/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows 10, Windows 11, macOS 11",
+      "softwareVersion": "0.1.13",
+      "downloadUrl": "https://rosalena.dev/download/",
+      "description": "A desktop app that runs AI models on your own PC and on free cloud tiers through one OpenAI-compatible router. Early preview, built in public: version 0.1.13 is out for Windows and macOS, unsigned."
+    },
+    {
+      "@type": "WebSite",
+      "name": "Rosalena",
+      "url": "https://rosalena.dev/"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Rosalena home">
+      <img src="/favicon.svg" alt="" width="26" height="26">
+      Rosalena
+    </a>
+    <nav aria-label="Main">
+      <a class="hide-sm" href="#models">Free models</a>
+      <a class="hide-sm" href="#features">What it does</a>
+      <a href="/download/">Download</a>
+      <a class="nav-cta-ghost" href="#try">Try Local</a>
+      <a class="nav-cta" href="/harness/">Try Harness</a>
+      <a class="lang-switch" href="/es/" hreflang="es" lang="es" data-lang-switch="es" aria-label="Español: ver esta página en español" title="Ver esta página en español"><span class="lang-on">EN</span><span class="lang-sep" aria-hidden="true">/</span><span>ES</span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to the light theme" title="Light theme"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Building in public · early preview</span>
+      <h1>Run free AI models on <em>your own PC</em></h1>
+      <p class="lede">Rosalena Harness is a desktop app that runs AI models on your machine and on free cloud tiers, through one router that picks the model and switches when one is busy. Try the window in a browser first; nothing to install, no account, no key. I'm building it in public on one RTX 3090.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="/harness/">Try Harness</a>
+        <a class="btn btn-secondary" href="#try">Try Local</a>
+        <a class="btn btn-secondary" href="/download/">Download for PC</a>
+      </div>
+      <p class="hero-note"><strong>Try Harness</strong> opens the app's own layout with a chat box in it, answered by a free cloud window on this site. <strong>Try Local</strong> runs a small open model on your own graphics card, with nothing sent to a server. Want to know which bigger models your PC can hold? <a href="/check/">Check your PC</a>.</p>
+
+      <div class="window" role="img" aria-label="The Rosalena Harness window: runs on the left, a run log in the middle, a prompt box with a model picker at the bottom">
+        <div class="window-bar"><i></i><i></i><i></i><span>Rosalena Harness</span></div>
+        <div class="window-body">
+          <div class="win-side">
+            <h3>Your runs</h3>
+            <ul>
+              <li class="on">sum numbers.txt <span class="tag">done</span></li>
+              <li>summarize agent.mjs <span class="tag">done</span></li>
+              <li>draft release notes <span class="tag">running</span></li>
+            </ul>
+            <h3>Other harnesses</h3>
+            <ul>
+              <li>Claude Code <span class="tag">read-only</span></li>
+              <li>DSH <span class="tag">read-only</span></li>
+            </ul>
+          </div>
+          <div class="win-main">
+            <div class="win-log">
+              <div class="you">&gt; read numbers.txt and reply with only the sum</div>
+              <div class="route">router: code → local/qwen3.8-27b</div>
+              <div class="tool">tool read_file numbers.txt · 12 lines</div>
+              <div>4,182</div>
+              <div class="route">router: local busy → free cloud model</div>
+            </div>
+            <div class="win-composer"><span class="fake-input">Ask, attach a file, or start a task…</span><span class="picker">Qwen3.8 27B (this PC) ▾</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="frill" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <section id="try" aria-labelledby="try-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Try it</div>
+        <h2 id="try-h">Chat with a free open model, running in your browser</h2>
+        <p>Pick a model and press Load. It downloads once into your browser's cache and then runs on your own graphics card through WebGPU, so it works offline after that. Smaller models load faster; bigger ones answer better. This is a taste of local AI, not the full harness: the desktop app runs much larger models.</p>
+      </div>
+      <div class="try" id="try-app">
+        <div class="try-bar">
+          <label for="model">Model</label>
+          <select id="model" aria-describedby="model-note"></select>
+          <button class="btn btn-primary" id="load" type="button">Load model</button>
+          <div class="progress" id="progress" aria-hidden="true"><span></span></div>
+          <div class="status" id="status" role="status" aria-live="polite">Needs Chrome or Edge on a computer with a graphics card (WebGPU). Phones mostly can't run it yet.</div>
+        </div>
+        <div class="chat" id="chat" aria-live="polite">
+          <div class="msg note">Load a model, then ask it something. Try "explain what VRAM is in two sentences".</div>
+        </div>
+        <form class="composer" id="composer">
+          <label for="prompt" class="sr-only" style="position:absolute;left:-9999px">Your message</label>
+          <textarea id="prompt" rows="2" placeholder="Load a model first" disabled></textarea>
+          <button class="btn btn-primary" id="send" type="submit" disabled>Send</button>
+          <button class="btn btn-secondary" id="stop" type="button" hidden>Stop</button>
+        </form>
+      </div>
+      <p class="fine" id="model-note">Models come from the open-source WebLLM project and download from Hugging Face. Sizes shown are the graphics memory each one needs. Small models make mistakes, so check anything important.</p>
+    </div>
+  </section>
+
+  <section id="models" aria-labelledby="models-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Free models</div>
+        <h2 id="models-h">Free models the harness runs today</h2>
+        <p>These are the free entries in the harness router's model list as of October 2026. Paid models (Claude, GPT, Gemini) work too with your own API key, but you don't need one to start.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Model</th><th scope="col">Runs on</th><th scope="col">Good for</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Qwen3.8 27B</strong></td><td><span class="pill local">your GPU</span><small>About 20 GB of graphics memory on an RTX 3090</small></td><td>Writing, coding and agent tasks, fully private and free</td></tr>
+            <tr><td><strong>DeepSeek V4.1 Flash</strong></td><td><span class="pill">free cloud tier</span><small>A shared free window that can answer "busy"</small></td><td>Fast answers when you don't have a big GPU</td></tr>
+            <tr><td><strong>GLM-5.3 Flash</strong></td><td><span class="pill">free cloud tier</span><small>Same free window as DeepSeek</small></td><td>A second free option the router falls back to</td></tr>
+            <tr><td><strong>Kokoro</strong> and <strong>Qwen-Image</strong></td><td><span class="pill local">your GPU</span></td><td>Voice and pictures, through the ComfyUI plugin</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">What it does</div>
+        <h2 id="features-h">One window for local and cloud models</h2>
+        <p>Everything below works in the current build on my machine. What isn't built yet is on the download page.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><div class="icon" aria-hidden="true">⇄</div><h3>One router</h3><p>An OpenAI-compatible router on your PC. You ask for a job like "code", it picks the model, and if that model is busy or out of budget it falls back to the next one.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">▣</div><h3>Local first</h3><p>Your own GPU is the first choice: free, private, no per-token bill. Free cloud tiers come next, then paid models only if you add a key.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">✦</div><h3>An agent that does tasks</h3><p>It reads and writes files, runs tools, and hands parts of a job to subagents. Every run is logged so you can see what it did.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">◎</div><h3>Pictures, video, music</h3><p>A ComfyUI plugin renders images, short clips and music on the same GPU, from saved workflow presets.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">⌘</div><h3>MCP server</h3><p>Other tools can list your runs, read them, and start tasks through MCP. It can read your Claude Code and DSH sessions too, read-only.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">◉</div><h3>Voice input</h3><p>Talk to it instead of typing. Speech is turned into text locally with Whisper, and it knows your project's own words so it gets function names right.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">◧</div><h3>Your own browser</h3><p>With the SolBrowser extension the agent reads pages in your browser with your logins, and clicks and types there, even inside embedded frames. Public pages are read without opening a browser at all.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="benchmark" aria-labelledby="bench-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Measured</div>
+        <h2 id="bench-h">Same model, two harnesses</h2>
+        <p>I ran Rosalena and OpenCode on the same local model, Qwen3-Coder 30B on my RTX 3090, through the same llama.cpp server. Eight small coding tasks, each graded by tests the agent never saw, one run per task with a 6 minute limit. It's a small test on one machine, not a leaderboard, and I'm adding more harnesses to it.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Harness</th><th scope="col">Tasks passed</th><th scope="col">Median time per task</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Rosalena</strong></td><td>8 of 8</td><td>67 seconds</td></tr>
+            <tr><td><strong>OpenCode 2.0.32</strong></td><td>6 of 8</td><td>101 seconds</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">OpenCode was faster on four of the tasks they both passed. Its two misses were a CSV conversion that came out wrong and a test-writing task where it left the planted bug in, and two of its passes ran into the time limit. Measured November 4, 2026.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="cta-h">
+    <div class="wrap" style="text-align:center">
+      <h2 id="cta-h">Start with the free stuff</h2>
+      <p class="lede">Try the window in your browser now, answered by a free cloud model. Or run a small model on your own graphics card. The desktop app is out as an early preview, version 0.1.13 for Windows and Mac. It isn't signed yet, so your computer warns you the first time you open it.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="/harness/">Try Harness</a>
+        <a class="btn btn-secondary" href="#try">Try Local</a>
+        <a class="btn btn-secondary" href="/download/">See the download</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Rosalena Harness, built in public. Updated November 2026.</span>
+    <span><a href="/download/">Download</a> · <a href="/harness/">Try Harness</a> · <a href="/check/">What can my PC run?</a> · <a href="/preview/">See the app window</a> · <a href="#models">Free models</a></span>
+  </div>
+</footer>
+
+<script type="module" src="/try.js"></script>
+</body>
+</html>

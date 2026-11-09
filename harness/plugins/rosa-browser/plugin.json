@@ -1,0 +1,24 @@
+{
+  "id": "rosa-browser",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "A real Chrome/Edge the agent can open, read, click and screenshot to check its work; one page persists across calls",
+  "config": {
+    "headless": true,
+    "idleMinutes": 10,
+    "allowedDomains": [],
+    "profileDir": "",
+    "libDir": "",
+    "executablePath": "",
+    "autoInstall": true,
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "maxOutputChars": 4500,
+    "navTimeoutMs": 30000,
+    "actionTimeoutMs": 5000,
+    "registerWorkspaceTools": true
+  }
+}

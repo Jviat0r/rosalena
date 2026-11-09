@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat with Rosalena Harness on your own PC</title>
+<meta name="description" content="A chat window for the Rosalena Harness desktop app on your computer. The app answers from your own connection and nothing you type goes through this website. No app yet? The home page runs a small model on your graphics card in the browser.">
+<meta name="theme-color" content="#070c13">
+<meta name="color-scheme" content="dark light">
+<meta name="rosalena-turnstile-key" content="">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./try.css">
+<script src="/theme.js"></script>
+<script src="/lang.js" defer></script>
+<link rel="canonical" href="https://rosalena.dev/try/">
+<link rel="alternate" hreflang="en" href="https://rosalena.dev/try/">
+<link rel="alternate" hreflang="es" href="https://rosalena.dev/es/try/">
+<link rel="alternate" hreflang="x-default" href="https://rosalena.dev/try/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Chat with Rosalena Harness on your own PC",
+  "url": "https://rosalena.dev/try/",
+  "description": "A chat window for the Rosalena Harness desktop app on your computer. Nothing you type is sent to this website.",
+  "isPartOf": { "@type": "WebSite", "name": "Rosalena Harness", "url": "https://rosalena.dev/" }
+}
+</script>
+</head>
+<body class="rt-page">
+<a class="rt-skip" href="#rt-input">Skip to the message box</a>
+
+<header class="rt-header">
+  <div class="rt-header__inner">
+    <a class="rt-brand" href="../">
+      <img src="../favicon.svg" alt="" width="26" height="26">
+      <span class="rt-brand__name">Rosalena Harness</span>
+      <span class="rt-brand__tag">try it</span>
+    </a>
+
+    <div class="rt-header__status">
+      <!-- Ships the unknown state, not a loading state: if /api/quota never answers the
+           first paint is already telling the truth, and it becomes a meter once the
+           numbers arrive. -->
+      <div class="rt-quota rt-quota--unknown" id="rt-quota" role="img" aria-label="Free messages today: the count could not be read yet" hidden>
+        <span class="rt-quota__track" aria-hidden="true"><span class="rt-quota__fill" id="rt-quota-fill"></span></span>
+        <span class="rt-quota__text" id="rt-quota-text">Reading today's free messages…</span>
+        <span class="rt-tag rt-tag--sample" id="rt-sample-tag" hidden>sample</span>
+      </div>
+
+      <span class="rt-chip" id="rt-account" hidden>
+        <span class="rt-chip__label">signed in</span>
+        <span class="rt-chip__value" id="rt-account-email"></span>
+      </span>
+
+      <a class="rt-signin" id="rt-signin" hidden>Sign in</a>
+
+      <a class="lang-switch" href="/es/try/" hreflang="es" lang="es" data-lang-switch="es" aria-label="Español: ver esta página en español" title="Ver esta página en español"><span class="lang-on">EN</span><span class="lang-sep" aria-hidden="true">/</span><span>ES</span></a>
+      <button class="rt-icon" id="rt-theme" type="button" aria-pressed="false" aria-label="Switch to the light theme">◐</button>
+    </div>
+  </div>
+
+  <div class="rt-demo-wrap">
+    <p class="rt-demo-note" id="rt-demo-note" role="note" hidden>
+      <strong>Sample data.</strong> This page could not reach the demo API, so the quota and the answer are a scripted sample. Nothing on this page was measured.
+    </p>
+  </div>
+</header>
+
+<main class="rt-main" id="rt-main">
+  <div class="rt-shell">
+    <section class="rt-intro" aria-labelledby="rt-heading">
+      <h1 id="rt-heading">Try Rosalena Harness</h1>
+      <p class="rt-intro__lede">This page is a chat window for the Rosalena Harness desktop app running on your computer. When the app is open and paired, it answers from your own connection and nothing you type goes through this website. Don't have it? <a href="/download/">Download the app</a>, or use the <a href="/#try">in-browser demo on the home page</a>, which runs a small model on your own graphics card with nothing to install.</p>
+      <p class="rt-model" id="rt-model">Model: checking which small model is answering…</p>
+    </section>
+
+    <div class="rt-log" id="rt-log" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation">
+      <section class="rt-welcome" id="rt-welcome" aria-labelledby="rt-welcome-heading">
+        <p class="rt-welcome__eyebrow">Your machine · no server</p>
+        <h2 id="rt-welcome-heading">Ask it something</h2>
+        <p class="rt-welcome__lede">The answers come from the app on your computer. This website never sees what you type.</p>
+
+        <div class="rt-starters" id="rt-starters">
+          <button class="rt-starter" type="button" data-prompt="Explain what a token is in two sentences.">Explain a token</button>
+          <button class="rt-starter" type="button" data-prompt="Write a one-line commit message for a change that fixes a typo in a README.">Write a commit message</button>
+          <button class="rt-starter" type="button" data-prompt="Summarize why running a model locally is different from using a hosted API, in three bullet points.">Local versus hosted</button>
+        </div>
+
+        <ul class="rt-truth">
+          <li><strong>Nothing goes through this website.</strong> The page only talks to the app on your own computer, over 127.0.0.1.</li>
+          <li><strong>The app has to be running and paired.</strong> Open the pairing link the app prints when it starts.</li>
+          <li><strong>No app yet?</strong> The <a href="/#try">home page demo</a> runs a small model on your graphics card with nothing to install.</li>
+          <li><strong>No files, no tools, no browsing.</strong> This page can't read or write anything, and it can't run a task for you.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div class="rt-bottom">
+  <div class="rt-shell">
+    <section class="rt-upgrade" id="rt-upgrade" aria-labelledby="rt-upgrade-heading" hidden>
+      <h2 class="rt-upgrade__heading" id="rt-upgrade-heading">You have used today&#8217;s free messages</h2>
+      <p class="rt-upgrade__text">An account raises the daily limit on the same small model and keeps a longer history of what you asked. It does not add tools, file access or local models: those belong to the desktop app, not to this page.</p>
+      <p class="rt-upgrade__reset" id="rt-upgrade-reset"></p>
+      <p class="rt-upgrade__actions">
+        <a class="rt-action rt-action--primary" id="rt-upgrade-signin" hidden>Sign in for a larger slice</a>
+        <a class="rt-action" href="../download/">See the desktop app</a>
+      </p>
+    </section>
+
+    <section class="rt-check" id="rt-check" aria-labelledby="rt-check-heading" hidden>
+      <h2 class="rt-check__heading" id="rt-check-heading">Human check</h2>
+      <p class="rt-check__text">The server asked for this before it will answer. It runs only now, and only on Cloudflare&#8217;s domains.</p>
+      <div class="rt-check__widget" id="rt-turnstile"></div>
+    </section>
+
+    <form class="rt-composer" id="rt-form" novalidate>
+      <label class="rt-sr" for="rt-input">Your message</label>
+      <div class="rt-composer__row">
+        <textarea class="rt-input" id="rt-input" rows="1" placeholder="Ask the model something…" aria-describedby="rt-count rt-fine" enterkeyhint="send" spellcheck="true"></textarea>
+        <button class="rt-send" id="rt-send" type="submit" disabled>Send</button>
+        <button class="rt-stop" id="rt-stop" type="button" hidden>Stop</button>
+      </div>
+      <div class="rt-composer__foot">
+        <span class="rt-count" id="rt-count">0 / 1200</span>
+        <span class="rt-hint" id="rt-hint">Enter sends · Shift+Enter new line · Esc stops</span>
+      </div>
+      <p class="rt-fine" id="rt-fine">This page only talks to the Rosalena Harness app on this computer. Nothing you type is sent to this website. It can't read or write files, run tools or reach other apps.</p>
+    </form>
+  </div>
+</div>
+
+<footer class="rt-fine rt-foot">
+  <nav aria-label="Site"><a href="/">Home</a> · <a href="/check/">Check your PC</a> · <a href="/download/">Download</a> · <a href="/harness/">The window, with a prompt box</a></nav>
+</footer>
+
+<p class="rt-sr" id="rt-status" role="status" aria-live="polite"></p>
+
+<noscript>
+  <p class="rt-noscript">This demo needs JavaScript. The desktop app does not.</p>
+</noscript>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

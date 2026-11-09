@@ -1,0 +1,44 @@
+# Rosalena phone-access relay: https://<id>.rosalena.dev -> the install's current quick tunnel.
+# A separate Worker from the Pages project `rosalena`. Deploy steps: README.md in this folder.
+# Never deploy without Jayden saying so.
+
+name = "rosalena-relay"
+main = "worker.mjs"
+# The newest date the installed wrangler (4.139) can run locally; nothing here needs newer.
+compatibility_date = "2026-09-30"
+
+# Every subdomain of rosalena.dev comes here; the apex and www are excluded with routes that
+# have no Worker (README.md step 4), so the site itself is never touched.
+routes = [
+  { pattern = "*.rosalena.dev/*", zone_name = "rosalena.dev" },
+]
+
+[vars]
+RELAY_SUFFIX = ".rosalena.dev"
+API_HOST = "relay.rosalena.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rosalena-relay"
+# Replace with the id `npx wrangler d1 create rosalena-relay` prints (README.md step 1).
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# No Worker logs: a request URL can carry a pasted pairing code (?t=). Turn this on only while
+# debugging, and off again after.
+[observability]
+enabled = false
+
+# Local testing only: `npx wrangler dev --env dev`. No routes (wrangler dev would rewrite every
+# request to the route's zone), and *.localhost names, which browsers send to 127.0.0.1:
+# the API at http://localhost:8787, a phone link at http://<id>.localhost:8787/.
+[env.dev]
+routes = []
+
+[env.dev.vars]
+RELAY_SUFFIX = ".localhost"
+API_HOST = "localhost"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "rosalena-relay"
+database_id = "00000000-0000-0000-0000-000000000000"

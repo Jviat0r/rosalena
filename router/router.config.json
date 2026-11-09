@@ -1,0 +1,373 @@
+{
+  "$comment": "T0.1 Model Router v0. Everything here is deliberately data, not code: adding a provider or changing a chain must never require a code change. Model ids are provider-specific and MUST be verified against the live provider catalogue - a wrong id is not fatal, it just fails over down the chain, which is the router's whole job.",
+  "port": 8077,
+  "host": "127.0.0.1",
+  "logDir": "logs",
+  "stateFile": "state/ledger.json",
+  "requestTimeoutMs": 180000,
+  "$breaker": "Provider-level circuit breaker. A key cooldown protects the KEY; this protects the PROVIDER, which is the half that was missing: in the T0.1 acceptance run the rate-limited provider still took all 500 calls. It counts only failures that could not be escaped by trying another key, so a rate limit a second key absorbs never trips it. After `threshold` such failures the provider is skipped (logged as circuit_open) for the cooldown, then one probe call decides whether it comes back; each successive trip doubles the cooldown up to maxCooldownMs. In-memory on purpose - a provider that is down for this process is not necessarily down for the next one.",
+  "breaker": {
+    "enabled": true,
+    "threshold": 3,
+    "defaultCooldownMs": 30000,
+    "maxCooldownMs": 900000
+  },
+  "$auth": "Optional shared secret for everything that can spend money or reveal the provider layout (/v1/* and /admin/status; /health stays open for probes). With no token configured the router is open to any process that can reach the port - fine on a single-user loopback box, which is the default posture, and a real hole the moment anything else on the machine or a browser page can reach 127.0.0.1:8077. Set auth.tokenEnv (preferred) and export that variable; the harness sends it automatically as Authorization: Bearer <token> when ROSALENA_ROUTER_TOKEN is set, and the UI does the same for its health probe. When a token IS configured it is required from loopback callers too - exempting them would make the gate decorative.",
+  "auth": {
+    "tokenEnv": "ROSALENA_ROUTER_TOKEN"
+  },
+  "$budgets": "Monthly USD cap per provider, read in UTC. 0 or null means uncapped (use for local: it is free). When a provider is at or over cap it is skipped and the chain falls through to the next target.",
+  "$usage": "Token usage is a separate store from these budgets: one JSONL line per completed call in state/usage.jsonl (src/usage.mjs), rolled up by GET /admin/usage?days=N. A provider's `label` is the human name the panel shows; without one the first models[] entry for that provider is used, then the provider id. `streamUsage: true` makes the router add stream_options.include_usage to a streamed request so the provider reports real token counts (llama.cpp on this box answers the usage chunk and nothing otherwise; measured 2026-10-20) - only set it where the server is known to accept it.",
+  "budgets": {
+    "monthlyUsd": {
+      "local": 0,
+      "opencode-free": 0,
+      "omniroute": 0,
+      "anthropic": 80,
+      "openai": 25,
+      "google": 15,
+      "openrouter": 10,
+      "deepseek": 10,
+      "zai": 10,
+      "kimi": 10
+    }
+  },
+  "providers": {
+    "local": {
+      "kind": "openai",
+      "label": "Local (this PC)",
+      "baseUrl": "http://127.0.0.1:8080/v1",
+      "apiKeyEnv": null,
+      "prices": { "in": 0, "out": 0 },
+      "extraBody": { "chat_template_kwargs": { "enable_thinking": false } },
+      "streamUsage": true,
+      "efforts": ["low", "medium", "high"],
+      "defaultEffort": "off",
+      "$defaultEffortNote": "What 'Default' means when no effort is sent, shown in the effort picker. Here no effort keeps extraBody's enable_thinking false, so the model does not think at all. On the Claude rows it is the API's own default when output_config.effort is left out: medium on Opus 5.5 and Haiku 5.5, high on Sonnet 5.5 and Fable 5.1.",
+      "effortBody": { "chat_template_kwargs": { "enable_thinking": true } },
+      "$effortsNote": "Measured against the template this box actually serves (GET /props, 2026-10-20): it raises unless reasoning_effort is one of xhigh/medium/low, and maps 'high' onto 'xhigh'. So the public vocabulary is low|medium|high and the provider is told only what it accepts. That effort block sits behind enable_thinking, which extraBody holds at false, so effortBody turns thinking on for the one request that asked for an effort. effortBody is merged after extraBody on purpose - otherwise the field would be accepted and ignored, which is worse than not offering it.",
+      "$note": "llama.cpp / vLLM / Strata. No auth header is sent when apiKeyEnv is null. extraBody is merged into every request: this local model is a reasoning model, and with thinking on it spends the entire max_tokens on hidden reasoning and returns empty content. streamUsage is on because llama.cpp only reports usage on a streamed request when stream_options.include_usage is set: it then sends a final chunk with choices:[] and usage (including prompt_tokens_details.cached_tokens), which is what the usage panel counts."
+    },
+    "anthropic": {
+      "kind": "anthropic",
+      "label": "Anthropic",
+      "baseUrl": "https://api.anthropic.com/v1",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "prices": { "in": 3, "out": 15 },
+      "maxTokensDefault": 8192,
+      "promptCache": true,
+      "$models": "Current Claude models (2026-10 list prices, USD per million tokens; Haiku 5.5's rise to 0.5/2.5 past 100K-token prompts is not modelled). The 5.x models: no sampling settings (temperature/top_p are a 400, so `sampling: false` drops them), thinking always on (adaptive, left out of the request), effort in output_config (`efforts`), forced tool_choice is a 400 (src/providers.mjs sends auto), and `fallbacks` adds the server-side refusal fallback where the API offers it (not Haiku). A pinned older id (claude-sonnet-4-5) still works on the provider's own prices and settings; it is just no longer in the menu.",
+      "models": [
+        { "id": "claude-opus-5-5", "label": "Claude Opus 5.5", "prices": { "in": 4, "out": 20 }, "sampling": false, "efforts": ["low", "medium", "high", "xhigh", "max"], "defaultEffort": "medium", "fallbacks": true, "maxTokensDefault": 32000 },
+        { "id": "claude-sonnet-5-5", "label": "Claude Sonnet 5.5", "prices": { "in": 2, "out": 10 }, "sampling": false, "efforts": ["low", "medium", "high", "xhigh", "max"], "defaultEffort": "high", "fallbacks": true, "maxTokensDefault": 32000 },
+        { "id": "claude-haiku-5-5", "label": "Claude Haiku 5.5", "prices": { "in": 0.1, "out": 0.5 }, "sampling": false, "efforts": ["low", "medium", "high", "xhigh", "max"], "defaultEffort": "medium", "maxTokensDefault": 32000 },
+        { "id": "claude-fable-5-1", "label": "Claude Fable 5.1", "prices": { "in": 10, "out": 50 }, "sampling": false, "efforts": ["low", "medium", "high", "xhigh", "max"], "defaultEffort": "high", "fallbacks": true, "maxTokensDefault": 32000 }
+      ]
+    },
+    "openai": {
+      "kind": "openai",
+      "label": "OpenAI",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "prices": { "in": 2.5, "out": 10 }
+    },
+    "google": {
+      "kind": "openai",
+      "label": "Google",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "apiKeyEnv": "GOOGLE_API_KEY",
+      "prices": { "in": 0.3, "out": 2.5 }
+    },
+    "openrouter": {
+      "kind": "openai",
+      "label": "OpenRouter",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "prices": { "in": 1, "out": 3 },
+      "extraHeaders": {
+        "HTTP-Referer": "http://127.0.0.1:8077",
+        "X-Title": "Rosalena Harness Router"
+      }
+    },
+    "deepseek": {
+      "kind": "openai",
+      "label": "DeepSeek",
+      "$source": "api-docs.deepseek.com/quick_start/pricing (read 2026-11-09). OpenAI-format base URL; deepseek-flash is served by DeepSeek-V4.1-Flash-1017, deepseek-v4-pro by DeepSeek-V4-Pro-0813, both 1M context, tools, thinking on by default. Prices are the PEAK rates (01:00-04:00 and 06:00-10:00 UTC weekdays); every other hour is half, so the spend shown is an upper bound.",
+      "baseUrl": "https://api.deepseek.com",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "prices": { "in": 0.3, "out": 1.2 },
+      "streamUsage": true,
+      "efforts": ["low", "high", "max"],
+      "defaultEffort": "high",
+      "$thinking": "Thinking is on unless the request turns it off, and with tools in the request the API refuses a history whose assistant turns lack reasoning_content, so every model here sets requiresReasoningContent (withReasoningContent in src/providers.mjs). No effort sent means DeepSeek's own default, high.",
+      "requiresReasoningContent": true,
+      "models": [
+        { "id": "deepseek-flash", "label": "DeepSeek V4.1 Flash", "prices": { "in": 0.3, "out": 1.2 } },
+        { "id": "deepseek-v4-pro", "label": "DeepSeek V4 Pro", "prices": { "in": 1.32, "out": 3.96 } }
+      ]
+    },
+    "zai": {
+      "kind": "openai",
+      "label": "Z.AI",
+      "$source": "docs.z.ai (read 2026-11-09): pay-as-you-go base URL https://api.z.ai/api/paas/v4; GLM-5.3 $1.4/$4.4, GLM-5.3-Flash $0.15/$0.5, GLM-4.7-Flash free. GLM-5.3 always thinks (thinking.type disabled is no longer accepted) with reasoning_effort low|high|max, default max. A GLM Coding Plan key needs the separate coding endpoint (https://api.z.ai/api/coding/paas/v4), which this provider does not use.",
+      "baseUrl": "https://api.z.ai/api/paas/v4",
+      "apiKeyEnv": "ZAI_API_KEY",
+      "prices": { "in": 1.4, "out": 4.4 },
+      "efforts": ["low", "high", "max"],
+      "defaultEffort": "high",
+      "effortWhenUnset": "high",
+      "$effortWhenUnset": "Left to itself the API thinks at max on every step, which makes an agent slow and costly; the router sends high when the caller names no effort, and a level the person picks still wins.",
+      "requiresReasoningContent": true,
+      "models": [
+        { "id": "glm-5.3", "label": "GLM-5.3", "prices": { "in": 1.4, "out": 4.4 } },
+        { "id": "glm-5.3-flash", "label": "GLM-5.3 Flash", "prices": { "in": 0.15, "out": 0.5 } },
+        { "id": "glm-4.7-flash", "label": "GLM-4.7 Flash (free)", "prices": { "in": 0, "out": 0 }, "efforts": [], "effortWhenUnset": null, "defaultEffort": null }
+      ]
+    },
+    "kimi": {
+      "kind": "openai",
+      "label": "Kimi (Moonshot)",
+      "$source": "platform.kimi.ai/docs (read 2026-11-09): base URL https://api.moonshot.ai/v1, current models kimi-k3.1-pro, kimi-k3.1-pro-highspeed and kimi-k3 (1M context, always thinking, reasoning_effort low|high|max, default max). The K2 models are closed to new accounts and retire end of December 2026, so none are listed. The account needs a top-up (minimum $1) before K3 models answer. Prices came from price trackers (puter.com, layer3labs) because Kimi's own table renders in the browser; check platform.kimi.ai/docs/pricing/chat when updating them.",
+      "baseUrl": "https://api.moonshot.ai/v1",
+      "apiKeyEnv": "MOONSHOT_API_KEY",
+      "prices": { "in": 2, "out": 10 },
+      "efforts": ["low", "high", "max"],
+      "defaultEffort": "high",
+      "effortWhenUnset": "high",
+      "requiresReasoningContent": true,
+      "models": [
+        { "id": "kimi-k3.1-pro", "label": "Kimi K3.1 Pro", "prices": { "in": 2, "out": 10 } },
+        { "id": "kimi-k3.1-pro-highspeed", "label": "Kimi K3.1 Pro Highspeed", "prices": { "in": 4, "out": 20 } },
+        { "id": "kimi-k3", "label": "Kimi K3", "prices": { "in": 3, "out": 15 } }
+      ]
+    },
+    "opencode-free": {
+      "kind": "openai",
+      "label": "OpenCode Zen Free",
+      "baseUrl": "https://opencode.ai/zen/v1",
+      "apiKeyEnv": "OPENCODE_API_KEY",
+      "apiKeyOptional": true,
+      "prices": { "in": 0, "out": 0 },
+      "requiresStream": true,
+      "sharedQuota": true,
+      "$sharedQuota": "DeepSeek and GLM here draw on ONE free window per IP: a 429 from either means the other will refuse too, so after one the router skips the rest of this provider for that request and goes straight to the next provider in the chain (OmniRoute, for the rosalena class). A 5xx for one model still tries the other.",
+      "clientHeaders": "opencode",
+      "ensureTools": ["read"],
+      "userAgent": "opencode/latest/2.0.29/cli",
+      "models": [
+        {
+          "id": "deepseek-v4.1-flash-free",
+          "label": "DeepSeek V4.1 Flash Free",
+          "contextWindow": 200000,
+          "maxTokens": 65536,
+          "input": ["text", "image"],
+          "tags": ["cloud", "free"],
+          "requiresReasoningContent": true
+        },
+        {
+          "id": "glm-5.3-flash-free",
+          "label": "GLM-5.3 Flash Free",
+          "contextWindow": 200000,
+          "maxTokens": 65536,
+          "input": ["text", "image"],
+          "tags": ["cloud", "free"]
+        }
+      ],
+      "$modelsNote": "What this provider serves, for a reader rather than for the router: no code reads providers[].models for the menu, the curated top-level models[] is still the menu, and any target a chain names is accepted. Ported from DSH's own free route (`~/.dsh/profiles/desktop/cordis.patch.yml`, the `opencode-free` route): ids, the 200000-token context window, the 65536-token output cap and text+image input all come from there. DSH's shipped model catalog (`@earendil-works/pi-ai/dist/providers/data/opencode.json`) lists only the PAID ids `deepseek-v4.1-flash` and `glm-5.3-flash`; the `-free` ids exist on this route alone, which is why they are written down here instead of being looked up. ONE CAPABILITY IS READ FROM HERE and it is not documentation: `requiresReasoningContent`. DeepSeek's thinking mode rejects a history whose assistant turns do not carry `reasoning_content` back ('The reasoning_content in the thinking mode must be passed back to the API'), which is what breaks a conversation that switches onto this model mid-flight (the DSH REASONING-HISTORY error). When this flag is set, the request path fills an empty `reasoning_content` into assistant turns that have none (src/providers.mjs withReasoningContent) and the response path keeps the model's reasoning on the assistant message so a caller can send it back. It is per MODEL, not per provider, because glm-5.3-flash-free is served from this same endpoint and does not validate the field.",
+      "$note": "OpenCode Zen's free tier. THREE measured gates, all honoured here: (1) the upstream request MUST stream - a buffered request is a hard 403; (2) it MUST carry the OpenCode client fingerprint plus a valid ses_ session id, or the gateway answers 403 FreeTierError 'can only be used from within OpenCode' even with a valid key; (3) it MUST contain a tool named exactly `read` - `read_file`, `shell` and no-tools all 403, `read` alone is 200. So the router renames a caller's read tool to `read` for the request and maps the name back on the response, in both the buffered and streaming paths; a caller with no read tool at all gets a stub that is documented as such. The header names, the `ses_` + 12 hex + 14 base62 session shape and the fingerprint values are ported from `dsh-opencode-freeaccess` (`DEFAULT_HEADERS`, `SES_TOKEN_RE`, `DEFAULT_EXTRA_HEADERS`, `DEFAULT_USER_AGENT` in its lib/index.js); the session id is derived from the conversation id so a conversation keeps its prompt cache across router restarts. Costs nothing, so its budget is 0 = uncapped. THE KEY IS OPTIONAL, and that is measured rather than assumed: with no `authorization` header at all the gateway answers 200, a well-formed but invented key answers 401 `Invalid credential`, and a real key answers 200. So a machine with no key stored anywhere - a fresh install, which is how this was found on macOS - must still be served by this route, and it is the reason `apiKeyOptional` exists: without it the chain's only target was skipped as `no_key` and every request died with a 503 'every target in the chain failed'. When a key IS configured it is sent, because an account with one is the case the header was written for. Measured 2026-10-20 with `data/probe-key-class.mjs` (three 16-token requests). When the account's free window runs out the gateway answers 429 FreeUsageLimitError: the window is shared by every request from the same IP, and the observed shape is a 24-hour window (DSH's record `~/.dsh/rate-limits.json` holds firstHitAt/lastHitAt/resetEstimateAt), so the chain falls through to the next target, which is the router's job."
+    },
+    "omniroute": {
+      "kind": "openai",
+      "label": "OmniRoute (this PC)",
+      "baseUrl": "http://127.0.0.1:20128/v1",
+      "apiKeyEnv": "OMNIROUTE_API_KEY",
+      "apiKeyOptional": true,
+      "maxPromptChars": 5800,
+      "emulatedTools": ["read_file", "write_file", "edit_file", "list_dir", "search", "run_command"],
+      "shortSystem": "You are Rosalena, the coding assistant inside Rosalena Harness. You work in the user's open folder: use the tools to read, change and run things yourself, keep answers short and plain, and say what you changed.",
+      "$maxPromptChars": "The Cloudflare AI Playground behind keyless auto refuses a prompt over 6000 characters, counted over every turn ('Prompt too long (max 6000 characters)', measured 2026-11-06). The agent's own request is ~8000 characters of instructions plus 88 tools (~48000), so for this provider the router sends a fitted form (src/emulated-tools.mjs fitToBudget): only `emulatedTools`, one line each; `shortSystem` in place of a persona that would not fit (rosalena.md is 6504 characters); the task plus the newest turns, older ones dropped and long ones cut in the middle. Small tasks work; long ones lose context. Connecting a real provider in OmniRoute's dashboard (the OmniRoute tab in Rosalena) is the way past the cap.",
+      "$tools": "Measured 2026-10-29: every auto route (auto, auto/fast, auto/coding, auto/coding:fast, auto/qwen, auto/kimi, auto/llama, auto/deepseek) answered a request carrying `tools` in text only, with no tool_calls. The cause is in OmniRoute, not the models: with no provider accounts connected, auto lands on its keyless `cloudflare-playground` bridge (open-sse/executors/cloudflare-playground.ts: 'client system messages are dropped. Tool calls are not implemented (v1) - text-only chat'), so the agent's instructions and tool list never reach the model. `tools: false` on those models makes the router skip them for a request carrying tools when a later target exists; as the last target they are sent as chat, without the tools and with a system note. A model pinned to a real provider connected in OmniRoute's dashboard (gemini/..., groq/..., nvidia/...) passes tools through: add it below without `tools: false`. UPDATE 2026-11-06 (OmniRoute 3.8.52): the playground still drops system messages, tools and tool results, but its model (GLM 5.2) writes tool calls as text when the request describes them, so the auto routes are now `\"tools\": \"emulated\"`: the router folds the system messages and a tool contract into the first user turn, writes earlier calls and results back as text, and parses `<tool>{...}</tool>` replies into real tool_calls (src/emulated-tools.mjs). A plain chat is rewritten the same way minus the contract, so the Rosalena persona arrives too.",
+      "prices": { "in": 0, "out": 0 },
+      "models": [
+        { "id": "auto", "label": "OmniRoute auto", "tags": ["cloud", "free"], "tools": "emulated" },
+        { "id": "auto/fast", "label": "OmniRoute auto (fast)", "tags": ["cloud", "free"], "tools": "emulated" }
+      ],
+      "$note": "OmniRoute (github.com/diegosouzapw/OmniRoute, npm `omniroute`, MIT) is a local gateway on :20128 that spreads requests over the free tiers of many providers, so it is the fallback for when OpenCode's shared free window answers 429. Added 2026-10-27. `auto` lets OmniRoute pick and fail over inside its own pool; `auto/fast` prefers quick models. Its keyless providers work with nothing set up; providers that need an account (Groq, Mistral...) are connected in its dashboard (http://127.0.0.1:20128/dashboard), never here. The key is optional: set OMNIROUTE_API_KEY (Dashboard > Endpoints) once OmniRoute is told to require one. While OmniRoute is not running the target fails with a refused connection and the chain moves on, so it costs nothing to leave in."
+    }
+  },
+  "$classes": "A class is a job to be done, not a model. Callers ask for 'code'; the router decides which model does it and what happens when that model is unavailable. Order in the chain is preference order.",
+  "$models": "The selectable list the UI shows and the model monitor watches. `target` is exactly what the caller pins (provider/model); `label` is what a person reads. A target that is not in this list still works - this is a menu, not an allowlist - so an operator can pin any model the provider serves. `providers[].models` is separate: per-provider documentation of what that endpoint serves, not a second menu.",
+  "models": [
+    {
+      "target": "local/qwen3.8-27b",
+      "label": "Qwen3.8 27B (this PC)",
+      "tags": ["local", "free"],
+      "note": "The resident model on :8080. Free, private, one GPU slot."
+    },
+    {
+      "target": "opencode-free/deepseek-v4.1-flash-free",
+      "label": "DeepSeek V4.1 Flash Free",
+      "tags": ["cloud", "free"],
+      "note": "OpenCode's free tier: 200000-token window, 65536-token output cap, text+image input. No cost, but the free window is shared by every request from this IP and can answer 429 FreeUsageLimitError. Second in the `orchestrate` and `code` chains after the local model."
+    },
+    {
+      "target": "opencode-free/glm-5.3-flash-free",
+      "label": "GLM-5.3 Flash Free",
+      "tags": ["cloud", "free"],
+      "note": "Same free window and the same 200000/65536 limits as the DeepSeek row, and it shares that window with it. Second in the `fast` chain after the local model, last in `judge`."
+    },
+    {
+      "target": "omniroute/auto",
+      "label": "OmniRoute auto (free gateway)",
+      "tags": ["cloud", "free"],
+      "note": "OmniRoute on :20128 picks a free provider from its own pool and fails over inside it. Behind the OpenCode free tier in every free chain, so it answers when that shared window is spent. Needs OmniRoute running on this PC (Settings > Cloud models installs and starts it)."
+    },
+    {
+      "target": "anthropic/claude-opus-5-5",
+      "label": "Claude Opus 5.5",
+      "tags": ["cloud", "paid"],
+      "note": "Needs an Anthropic API key (Settings > Cloud models). Max, Ultra and Team plans include monthly API credits that pay for it."
+    },
+    {
+      "target": "anthropic/claude-sonnet-5-5",
+      "label": "Claude Sonnet 5.5",
+      "tags": ["cloud", "paid"],
+      "note": "Needs an Anthropic API key. The default judge, and the paid step in the free chains when a key is set."
+    },
+    {
+      "target": "anthropic/claude-haiku-5-5",
+      "label": "Claude Haiku 5.5",
+      "tags": ["cloud", "paid"],
+      "note": "Needs an Anthropic API key. The fastest and cheapest Claude."
+    },
+    {
+      "target": "anthropic/claude-fable-5-1",
+      "label": "Claude Fable 5.1",
+      "tags": ["cloud", "paid"],
+      "note": "Needs an Anthropic API key. Anthropic's most capable model, priced above Opus; long, hard tasks."
+    },
+    {
+      "target": "openai/gpt-5.1",
+      "label": "GPT-5.1",
+      "tags": ["cloud", "paid"],
+      "note": "Needs OPENAI_API_KEY."
+    },
+    {
+      "target": "google/gemini-2.5-flash",
+      "label": "Gemini 2.5 Flash",
+      "tags": ["cloud", "paid"],
+      "note": "Needs GOOGLE_API_KEY."
+    },
+    {
+      "target": "openrouter/openrouter/auto",
+      "label": "OpenRouter auto",
+      "tags": ["cloud", "paid"],
+      "note": "Needs an OpenRouter key (Settings > Cloud models). OpenRouter picks a model for each request and bills your account."
+    },
+    {
+      "target": "deepseek/deepseek-flash",
+      "label": "DeepSeek V4.1 Flash",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a DeepSeek API key (Settings > API keys). DeepSeek's own API, not the free shared window: 1M context, $0.30 in / $1.20 out per million tokens at peak, half that off-peak."
+    },
+    {
+      "target": "deepseek/deepseek-v4-pro",
+      "label": "DeepSeek V4 Pro",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a DeepSeek API key. The larger DeepSeek: 1M context, $1.32 in / $3.96 out per million at peak, half off-peak."
+    },
+    {
+      "target": "zai/glm-5.3",
+      "label": "GLM-5.3",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a Z.AI API key (Settings > API keys). Z.AI's flagship for coding and agents; always thinks (effort low, high or max)."
+    },
+    {
+      "target": "zai/glm-5.3-flash",
+      "label": "GLM-5.3 Flash",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a Z.AI API key. Cheap and fast: $0.15 in / $0.50 out per million tokens."
+    },
+    {
+      "target": "zai/glm-4.7-flash",
+      "label": "GLM-4.7 Flash (free)",
+      "tags": ["cloud", "free"],
+      "note": "Needs a Z.AI API key, but Z.AI does not charge for this model."
+    },
+    {
+      "target": "kimi/kimi-k3.1-pro",
+      "label": "Kimi K3.1 Pro",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a Kimi (Moonshot) API key and a topped-up account (minimum $1). Kimi's flagship, 1M context, always thinks."
+    },
+    {
+      "target": "kimi/kimi-k3.1-pro-highspeed",
+      "label": "Kimi K3.1 Pro Highspeed",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a Kimi API key. The same model 2-3x faster, at twice the price."
+    },
+    {
+      "target": "kimi/kimi-k3",
+      "label": "Kimi K3",
+      "tags": ["cloud", "paid"],
+      "note": "Needs a Kimi API key. The previous Kimi flagship."
+    }
+  ],
+  "classes": {
+    "orchestrate": {
+      "chain": [
+        "local/qwen3.8-27b",
+        "opencode-free/deepseek-v4.1-flash-free",
+        "anthropic/claude-sonnet-5-5",
+        "omniroute/auto",
+        "openrouter/anthropic/claude-sonnet-4.5"
+      ],
+      "note": "Planning and long-horizon judgment. Local first so unattended goal mode costs nothing, then the free tier so it keeps working when the GPU is busy with a render."
+    },
+    "code": {
+      "chain": [
+        "local/qwen3.8-27b",
+        "opencode-free/deepseek-v4.1-flash-free",
+        "anthropic/claude-sonnet-5-5",
+        "openai/gpt-5.1",
+        "omniroute/auto",
+        "openrouter/deepseek/deepseek-chat"
+      ],
+      "note": "The class the T0.1 acceptance test hammers 500x."
+    },
+    "fast": {
+      "chain": [
+        "local/qwen3.8-27b",
+        "opencode-free/glm-5.3-flash-free",
+        "omniroute/auto/fast",
+        "google/gemini-2.5-flash",
+        "openai/gpt-5-mini"
+      ],
+      "note": "Cheap, high-volume, latency-sensitive: classification, extraction, summaries."
+    },
+    "judge": {
+      "chain": [
+        "anthropic/claude-sonnet-5-5",
+        "local/qwen3.8-27b",
+        "opencode-free/glm-5.3-flash-free"
+      ],
+      "note": "Acceptance and quality verdicts. Cloud-first on purpose: a judge sharing the author's blind spots is worse than no judge."
+    },
+    "deepseek": {
+      "chain": [
+        "opencode-free/deepseek-v4.1-flash-free",
+        "opencode-free/glm-5.3-flash-free"
+      ],
+      "note": "DeepSeek first, because this is the class the public page and the X post name. A second free id behind it is a deliberate change of mind (2026-10-20): a class with one target is one skip away from a dead request, and that is exactly how 0.1.0 failed on a fresh install. What the fallback can and cannot do is worth being precise about - both ids come from the same provider and share one free window, so a 429 window takes both out and this chain still refuses; what it covers is the single-model failure (a model retired, or a 5xx for that id alone). The caller can always see which one answered: the response body's `model` field and the `x-router-target` header both name it, and a chain that fails reports every attempt and its reason under `router.attempts`."
+    },
+    "rosalena": {
+      "chain": [
+        "opencode-free/deepseek-v4.1-flash-free",
+        "opencode-free/glm-5.3-flash-free",
+        "omniroute/auto"
+      ],
+      "systemPromptFile": "../data/prompts/rosalena.md",
+      "note": "Rosalena itself: the assistant persona, on the free tier. This class used to be pinned to exactly one target on the argument that a fallback would let a different model answer under the same system prompt and call itself Rosalena. That argument is kept, not discarded: the persona prompt is the identity, and it is applied to whichever target answers, so the fallback changes the model and never the voice - and the response body's `model` field plus the `x-router-target` header say which model it was, so nothing about the answer is hidden. What changed (2026-10-20, the day the macOS build was opened on a Mac) is the cost of the pin: the class has no local member, so a skip meant every chat failed with a 503 instead of being answered by the second free id. Both ids share one free window, so a 429 takes them both out; since 2026-10-27 `omniroute/auto` sits behind them, a free gateway with its own providers, so a 429 falls through to it instead of refusing (while OmniRoute is not running, the 429 still refuses). `systemPromptFile` is read once at startup by src/persona.mjs (a missing or empty file stops the router rather than letting the class speak without its identity) and prepended as the FIRST system message to every request for this class, whatever the client sent; a client's own system message stays as a second one after it. The text never leaves the router: it is not in /v1/models, not in /admin/status, not in any response body and not in a log line - only in the upstream request. Resolved relative to this config file, so the router can be started from any directory."
+    }
+  }
+}

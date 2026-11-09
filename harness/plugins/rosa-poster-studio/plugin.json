@@ -1,0 +1,13 @@
+{
+  "id": "rosa-poster-studio",
+  "version": "1.0.0",
+  "bundled": true,
+  "description": "Design posters over a live fluid background and export them as full-size PNG or JPG.",
+  "ui": {
+    "title": "Poster Studio",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "files.save"],
+    "libs": []
+  }
+}

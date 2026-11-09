@@ -1,0 +1,158 @@
+// The exhibit text: fact sheets, what to notice, visit notes and lighting presets.
+// Figures are the well-established ones; anything uncertain is left out rather than guessed.
+
+export const LANDMARKS = [
+  {
+    id: "eiffel",
+    key: "1",
+    name: "Eiffel Tower",
+    alias: "La tour Eiffel",
+    place: "Paris, France",
+    dimension: "330 m tall",
+    stat: "330 m",
+    statLabel: "to the antenna tip",
+    modelHeight: 330,
+    lede: "A wrought-iron lattice tower built as the entrance arch to the 1889 World's Fair. It was the tallest structure in the world for 41 years, until 1930.",
+    facts: [
+      ["Built", "1887-1889, opened 31 March 1889"],
+      ["Height", "330 m to the antenna tip (300 m as built)"],
+      ["Base", "125 m square"],
+      ["Floors", "57 m, 115 m and 276 m"],
+      ["Material", "Puddled wrought iron, about 7,300 t in the metal frame"],
+      ["Parts", "18,038 iron pieces, about 2.5 million rivets"],
+      ["Design", "Gustave Eiffel's company: engineers Maurice Koechlin and Emile Nouguier, architect Stephen Sauvestre"],
+    ],
+    notice: [
+      { anno: "legs", text: "The curve of the four lattice legs comes from Eiffel's wind-load calculations; the open lattice gives the wind very little to push against." },
+      { anno: "arches", text: "The great arches under the first floor carry almost nothing. They were added so the tower would read as a monumental gateway to the fair." },
+      { anno: "second", text: "Above the second platform the four legs close into a single tapering shaft that carries the top floor at 276 m." },
+    ],
+    visit: [
+      "Book a timed ticket ahead. The stairs go as far as the second floor; the top is reached by lift only.",
+      "After dark the tower sparkles for five minutes at the start of each hour.",
+      "The Trocadero gardens across the Seine give the classic full-height view.",
+    ],
+    question: "How did Eiffel's engineers work out the curve of the legs for wind, and how was the riveted iron lattice put up in about two years?",
+  },
+  {
+    id: "wall",
+    key: "2",
+    name: "Great Wall",
+    alias: "Ming wall, mountain section",
+    place: "Northern China",
+    dimension: "8,851.8 km (Ming)",
+    stat: "8,851.8 km",
+    statLabel: "Ming-era wall, 2009 survey",
+    modelHeight: 7.5,
+    lede: "Not one wall but many, built and rebuilt over two thousand years. The brick and stone wall most visitors walk is Ming (1368-1644), laid along mountain ridges north of Beijing.",
+    facts: [
+      ["Built", "Ming wall mostly 1368-1644; the earliest walls date from the 7th century BC"],
+      ["Ming length", "8,851.8 km (2009 survey), counting trenches and natural barriers"],
+      ["All dynasties", "21,196 km (2012 survey)"],
+      ["Material", "Fired brick and dressed stone over an earth and rubble core (Ming)"],
+      ["Model", "A 1.4 km ridge section: about 7.5 m high with a 5 m walkway, typical of the Ming walls near Beijing"],
+      ["Myth", "It cannot be seen with the naked eye from the Moon"],
+      ["World Heritage", "UNESCO, 1987"],
+    ],
+    notice: [
+      { anno: "crenels", text: "The crenellated parapet faces outward, to the north, with gaps to shoot through. The inner side has only a low wall." },
+      { anno: "tower", text: "Watchtowers stand at intervals, often on high points, where troops sheltered and kept arms, and where signal fires could be seen from the next tower." },
+      { anno: "walkway", text: "The walkway rides the ridge crest and climbs steep slopes: the mountain itself is part of the defence." },
+    ],
+    visit: [
+      "Badaling and Mutianyu are the easiest sections to reach from Beijing; Mutianyu has a cable car.",
+      "Jinshanling is quieter and steeper. Unrestored stretches are crumbling and some are closed.",
+      "Avoid China's national holidays, above all Golden Week (1-7 October).",
+    ],
+    question: "How did Ming builders lay brick walls along such steep ridges, and how did signals pass from one watchtower to the next?",
+  },
+  {
+    id: "hall",
+    key: "3",
+    name: "Hall of Supreme Harmony",
+    alias: "Taihedian",
+    place: "Forbidden City, Beijing",
+    dimension: "64 x 37 m",
+    stat: "64 x 37 m",
+    statLabel: "11 x 5 bays",
+    modelHeight: 35,
+    lede: "The largest hall of the Forbidden City, where Ming and Qing emperors were enthroned. Its double-eaved hip roof was the highest rank of roof in imperial China.",
+    facts: [
+      ["First built", "1406-1420, under the Yongle Emperor"],
+      ["Current hall", "Rebuilt 1695-1697"],
+      ["Size", "11 x 5 bays, about 64 x 37 m"],
+      ["Height", "About 27 m; about 35 m with its terrace"],
+      ["Roof", "Double-eaved hip roof in yellow glazed tiles"],
+      ["Material", "Timber frame on a three-tier white marble terrace"],
+      ["Use", "Enthronements, imperial weddings and great ceremonies"],
+      ["World Heritage", "UNESCO, 1987 (Forbidden City)"],
+    ],
+    notice: [
+      { anno: "roof", text: "Two tiers of eaves over a four-sided hip roof: the form reserved for the most important imperial buildings." },
+      { anno: "guardians", text: "Ten small figures stand on each corner ridge, more than on any other building in China." },
+      { anno: "terrace", text: "The three-tier marble terrace lifts the hall above the great courtyard; carved spouts around every tier drain the rain." },
+    ],
+    visit: [
+      "The Palace Museum is visited south to north, entering by the Meridian Gate. Tickets are booked in advance with ID.",
+      "It is closed on most Mondays.",
+      "The hall's interior is seen from the doorway: the throne stands on a raised dais in the centre.",
+    ],
+    question: "What do the double-eaved hip roof, the ten roof figures and the three-tier terrace say about this hall's rank, and how does its timber bracket (dougong) system work?",
+  },
+  {
+    id: "colosseum",
+    key: "4",
+    name: "Colosseum",
+    alias: "Flavian Amphitheatre",
+    place: "Rome, Italy",
+    dimension: "189 x 156 m",
+    stat: "189 x 156 m",
+    statLabel: "outer wall about 48 m high",
+    modelHeight: 48,
+    lede: "The largest ancient amphitheatre ever built. It staged gladiator fights and public spectacles for crowds estimated at 50,000 or more.",
+    facts: [
+      ["Built", "c. 70-80 AD: begun under Vespasian, opened by Titus in 80 AD"],
+      ["Footprint", "About 189 x 156 m"],
+      ["Height", "Outer wall about 48 m"],
+      ["Arena", "About 87 x 55 m"],
+      ["Capacity", "Estimated 50,000-80,000"],
+      ["Material", "Travertine, tuff and brick-faced concrete"],
+      ["World Heritage", "UNESCO, 1980 (Historic Centre of Rome)"],
+    ],
+    notice: [
+      { anno: "orders", text: "The facade stacks three orders of half-columns, Tuscan at the bottom, then Ionic, then Corinthian, under a solid attic." },
+      { anno: "inner", text: "The south side of the outer ring fell in the earthquake of 1349, exposing the inner ring. 19th-century buttresses hold up both ends of what survives." },
+      { anno: "hypogeum", text: "The arena floor was wood laid over the hypogeum, a maze of tunnels and cages below; part of the floor has been rebuilt." },
+    ],
+    visit: [
+      "Timed tickets usually cover the Colosseum, the Roman Forum and the Palatine Hill together.",
+      "The arena floor and the underground need their own tickets or a guided tour.",
+      "Walk round to the north side to see the surviving four-storey wall at full height.",
+    ],
+    question: "How did the Colosseum's arches, vaults and stacked orders carry its seating, and how did the lifts in the hypogeum work?",
+  },
+];
+
+// Sun azimuth is relative to the landmark's camera (0 = from behind the viewer, + = to the right).
+export const LIGHTING = {
+  day: {
+    label: "Day", elev: 50, az: 55, sunColor: "#fff2dc", sunInt: 3.1,
+    hemiSky: "#cfe2ff", hemiGround: "#7a6a52", hemiInt: 1.25,
+    skyTop: "#3d79c6", skyMid: "#8db6e2", fog: "#d3dfe8", exposure: 1.0, night: 0, stars: 0,
+    glow: { color: "#fff6dd", size: 0.07, opacity: 0.9 },
+  },
+  dusk: {
+    label: "Dusk", elev: 9, az: -95, sunColor: "#ff9a5a", sunInt: 2.8,
+    hemiSky: "#9a8cc0", hemiGround: "#5a4038", hemiInt: 1.1,
+    skyTop: "#27305d", skyMid: "#a5637c", fog: "#f2a77c", exposure: 1.05, night: 0.35, stars: 0.12,
+    glow: { color: "#ffb070", size: 0.2, opacity: 0.85 },
+  },
+  night: {
+    label: "Night", elev: 40, az: -40, sunColor: "#9fb4ff", sunInt: 0.45,
+    hemiSky: "#2b3c6a", hemiGround: "#0d0d14", hemiInt: 0.4,
+    skyTop: "#02050f", skyMid: "#0a1430", fog: "#17213b", exposure: 1.15, night: 1, stars: 1,
+    glow: null,
+  },
+};
+
+export const ORDER = LANDMARKS.map((l) => l.id);

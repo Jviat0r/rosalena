@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rosalena Harness - plugins</title>
+<style>
+  :root {
+    --bg: #070c13;
+    --panel: #0d1621;
+    --panel-2: #111c28;
+    --panel-3: #162434;
+    --line: #2b3b4b;
+    --line-soft: #1a2734;
+    --text: #e9f1f9;
+    --text-2: #c4d4e4;
+    --dim: #97abc0;
+    --accent: #5fe3f0;
+    --accent-2: #16b8cc;
+    --accent-soft: #0b2a33;
+    --ok: #56e39f;
+    --warn: #f3c969;
+    --bad: #ff8a8a;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+    --t: 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body {
+    background: radial-gradient(1100px 520px at 12% -12%, rgba(95, 227, 240, 0.08), transparent 60%), var(--bg);
+    color: var(--text);
+    font: 14px/1.55 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 28px clamp(16px, 4vw, 44px) 64px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .back { display: inline-block; margin-bottom: 14px; color: var(--dim); border: 1px solid var(--line); padding: 4px 12px; border-radius: 999px; font-size: 13px; }
+  .back:hover { color: var(--text); border-color: var(--accent); text-decoration: none; }
+  header.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; margin-bottom: 22px; }
+  h1 { margin: 0 0 6px; font-size: clamp(20px, 2.4vw, 27px); font-weight: 620; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--dim); max-width: 70ch; }
+  button, .button {
+    font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 8px 14px; cursor: pointer; transition: background var(--t), border-color var(--t);
+  }
+  button:hover, .button:hover { background: var(--panel-3); border-color: var(--accent-2); text-decoration: none; }
+  button:focus-visible, .button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[disabled] { opacity: 0.55; cursor: progress; }
+  button.primary, .button.primary { background: var(--accent-2); border-color: var(--accent-2); color: #021116; font-weight: 600; }
+  button.primary:hover, .button.primary:hover { background: var(--accent); border-color: var(--accent); }
+  button.ghost { background: transparent; }
+  button.small { padding: 3px 10px; font-size: 12px; border-radius: var(--radius-xs); }
+  button.danger { color: var(--bad); }
+
+  section { margin-bottom: 30px; }
+  section > h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 0 0 4px; display: flex; gap: 10px; align-items: center; }
+  section > .sub { color: var(--dim); font-size: 12.5px; margin: 0 0 12px; max-width: 80ch; }
+  .count { color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 999px; padding: 1px 9px; font-size: 11px; letter-spacing: 0; }
+
+  .add { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; }
+  .add-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .add-row input { flex: 1 1 320px; min-width: 0; font: 13px "Cascadia Mono", Consolas, monospace; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; }
+  .add .hint { color: var(--dim); font-size: 12.5px; margin: 0; }
+  pre.report { margin: 0; white-space: pre-wrap; font: 12px/1.5 "Cascadia Mono", Consolas, monospace; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 10px 12px; max-height: 260px; overflow: auto; }
+  pre.report.ok { border-color: rgba(86, 227, 159, 0.35); }
+  pre.report.bad { border-color: rgba(255, 138, 138, 0.4); }
+
+  .list { display: grid; gap: 8px; }
+  .row { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 12px 14px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+  .row.off { opacity: 0.72; }
+  .row .icon { width: 30px; height: 30px; border-radius: 8px; background: var(--panel-3); display: grid; place-items: center; color: var(--accent); font-weight: 600; overflow: hidden; }
+  .row .icon img { width: 18px; height: 18px; filter: invert(84%) sepia(28%) saturate(700%) hue-rotate(140deg); }
+  .row .name { font-weight: 600; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .row .desc { grid-column: 2 / 3; color: var(--text-2); font-size: 13px; }
+  .row .meta { grid-column: 2 / 3; color: var(--dim); font-size: 12px; }
+  .row .problem { grid-column: 2 / -1; color: var(--bad); font-size: 12.5px; }
+  .row .actions { grid-row: 1 / span 3; grid-column: 3; display: flex; gap: 10px; align-items: center; }
+  .chip { font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); font-weight: 400; }
+  .chip.mine { color: var(--accent); border-color: var(--accent-2); }
+  .chip.bad { color: var(--bad); border-color: rgba(255, 138, 138, 0.4); }
+  .chip.core { color: var(--ok, #6fd59a); border-color: color-mix(in srgb, var(--ok, #6fd59a) 45%, var(--line)); }
+
+  /* The on/off switch. */
+  .switch { position: relative; width: 40px; height: 22px; padding: 0; border-radius: 999px; background: var(--line); border: 0; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--text-2); transition: transform var(--t); }
+  .switch[aria-checked="true"] { background: var(--accent-2); }
+  .switch[aria-checked="true"]::after { transform: translateX(18px); background: #021116; }
+  .switch:hover { background: var(--line); border: 0; }
+  .switch[aria-checked="true"]:hover { background: var(--accent); }
+
+  dialog { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; max-width: min(520px, calc(100vw - 32px)); }
+  dialog::backdrop { background: rgba(2, 6, 10, 0.62); }
+  dialog h3 { margin: 0 0 10px; font-size: 17px; }
+  dialog p { color: var(--text-2); font-size: 13.5px; }
+  dialog label { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; margin-top: 10px; }
+  dialog .buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); background: var(--panel-3); border: 1px solid var(--accent-2); padding: 10px 18px; border-radius: 999px; opacity: 0; transition: opacity var(--t), transform var(--t); pointer-events: none; font-size: 13px; max-width: calc(100vw - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 30px minmax(0, 1fr); }
+    .row .actions { grid-row: auto; grid-column: 1 / -1; justify-content: flex-end; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <a class="back" href="/" title="Back to your chats (Esc)">&larr; Back to chats</a>
+    <h1>Plugins</h1>
+    <p>Everything Rosalena adds on top of chat: pages in the sidebar and tools the agent can use. Switch any of them off,
+      remove the ones you added, or bring in your own.</p>
+  </div>
+  <div>
+    <a class="button primary" href="/?creator=1" title="Start a chat with Creator mode on and describe the plugin you want">Create with Creator mode</a>
+    <a class="button" href="/?mcp=1" title="MCP servers the agent can call, with an on/off switch each (also the MCP button beside the message box)">MCP servers</a>
+  </div>
+</header>
+
+<section>
+  <h2>Add your own</h2>
+  <p class="sub">Paste the path of a folder that holds a <code>plugin.json</code>. A sidebar page is checked in the sandbox first and only
+    installed if it passes. A tool plugin is agent code: it runs with this app's own access to your PC, so you're asked to confirm you trust it.</p>
+  <div class="add">
+    <form class="add-row" id="add-form" autocomplete="off">
+      <label for="add-folder" hidden>Plugin folder</label>
+      <input id="add-folder" type="text" spellcheck="false" placeholder="C:\Users\you\my-plugin" />
+      <button type="submit" class="primary" id="add-go">Add plugin</button>
+    </form>
+    <p class="hint" id="add-hint"></p>
+    <pre class="report" id="add-report" hidden></pre>
+  </div>
+</section>
+
+<section>
+  <h2>Sidebar pages <span class="count" id="pages-count">0</span></h2>
+  <p class="sub">Pages that open beside the chat. Each runs in its own sandbox with only the permissions it lists.</p>
+  <div class="list" id="pages"></div>
+</section>
+
+<section>
+  <h2>Agent tools <span class="count" id="tools-count">0</span></h2>
+  <p class="sub">Tools, hooks and commands the agent can use in a chat. A switch takes effect from the next message.</p>
+  <div class="list" id="tools"></div>
+</section>
+
+<dialog id="trust" aria-labelledby="trust-title">
+  <form method="dialog">
+    <h3 id="trust-title">Add a tool plugin?</h3>
+    <p id="trust-body"></p>
+    <label><input type="checkbox" id="trust-check" /> I wrote this plugin or I trust whoever did.</label>
+    <div class="buttons">
+      <button value="cancel" type="submit" class="ghost">Cancel</button>
+      <button value="go" type="submit" class="primary" id="trust-go" disabled>Add it</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+const TOKEN = "__ROSALENA_TOKEN__";
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined && text !== null) node.textContent = String(text);
+  return node;
+};
+
+function toast(message) {
+  const node = $("toast");
+  node.textContent = message;
+  node.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => node.classList.remove("show"), 2600);
+}
+
+async function api(method, body) {
+  const res = await fetch("/api/plugins/manage", {
+    method,
+    headers: { "content-type": "application/json", "x-rosalena-token": TOKEN },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok && out.ok !== false) throw new Error(out.error ?? `HTTP ${res.status}`);
+  return out;
+}
+
+// What stops working when a built-in feature is switched off, said before it happens.
+const CORE_AFFECTS = {
+  "rosa-commit-cadence": "the Commits menu and automatic commits",
+  "rosa-todo-guard": "the task list, and goal mode working through it",
+  "rosa-mcp-manager": "MCP servers (the MCP button stops reaching them)",
+  "rosa-process-tracker": "the list of programs a chat left running",
+  "rosa-local-model-host": "loading and switching local models",
+  "rosa-local-model-switch": "picking which local model to load",
+  "rosa-local-model-monitor": "the live view of the local model server",
+  "rosa-local-llm": "finding local models on this PC",
+  solbrowser: "the agent using your own browser",
+  browser: "the agent's own browser for checking its work",
+  "rosa-style-lab": "the app's look settings (theme, palette, text size, what the window shows)",
+  "rosa-creator-mode": "Creator mode",
+  advisor: "the reviewer on every step",
+  "rosa-rate-limit-failover": "skipping models that ran out, so fallbacks get slower",
+  "rosa-model-pin": "keeping a chat on the model you picked",
+};
+function confirmCoreOff(id, title) {
+  const what = CORE_AFFECTS[id] ?? "the feature it provides";
+  return confirm(`${title} is built into Rosalena. Switching it off turns off ${what}.\n\nDo it if you have your own plugin that does this job. You can switch it back on here any time.`);
+}
+
+function toggle(on, label, onClick) {
+  const sw = el("button", "switch");
+  sw.type = "button";
+  sw.setAttribute("role", "switch");
+  sw.setAttribute("aria-checked", String(on));
+  sw.setAttribute("aria-label", label);
+  sw.title = on ? "On: click to switch off" : "Off: click to switch on";
+  sw.addEventListener("click", async () => {
+    sw.disabled = true;
+    try {
+      await onClick(!on);
+    } finally {
+      sw.disabled = false;
+    }
+  });
+  return sw;
+}
+
+async function act(body, done) {
+  try {
+    const out = await api("POST", body);
+    if (out.ok === false) throw new Error(out.error);
+    if (done) toast(done);
+  } catch (err) {
+    toast(err.message);
+  }
+  await load();
+}
+
+function pageRow(p) {
+  const row = el("div", `row${p.enabled ? "" : " off"}`);
+  const icon = el("div", "icon");
+  if (p.icon) {
+    const img = el("img");
+    img.src = p.icon;
+    img.alt = "";
+    icon.append(img);
+  } else icon.textContent = (p.title || p.id).slice(0, 1).toUpperCase();
+  const name = el("div", "name", p.title || p.id);
+  name.append(el("span", `chip${p.source === "user" ? " mine" : ""}`, p.source === "user" ? "yours" : "ships with Rosalena"), el("span", "chip", `v${p.version}`));
+  const actions = el("div", "actions");
+  if (p.source === "user") {
+    const remove = el("button", "small ghost danger", "Remove");
+    remove.type = "button";
+    remove.addEventListener("click", () => {
+      if (!confirm(`Remove ${p.title || p.id}? Its versions are kept, so it can be put back from the sidebar.`)) return;
+      void act({ action: "page-remove", id: p.id }, `${p.title || p.id} removed`);
+    });
+    actions.append(remove);
+  }
+  // A built-in page (Style Lab holds the app's look settings) can be switched off, after a
+  // question that says what goes with it.
+  if (p.core) name.append(el("span", "chip core", "built in"));
+  actions.append(
+    toggle(p.enabled, `${p.title} on or off`, (on) => {
+      if (!on && p.core && !confirmCoreOff(p.id, p.title || p.id)) return false;
+      return act({ action: on ? "page-on" : "page-off", id: p.id }, `${p.title} switched ${on ? "on" : "off"}`);
+    }),
+  );
+  row.append(icon, name, actions, el("div", "desc", p.description || ""));
+  const perms = p.permissionText?.length ? `Can: ${p.permissionText.join("; ")}` : "Asks for no permissions";
+  row.append(el("div", "meta", `${perms}${p.libs?.length ? ` · uses ${p.libs.join(", ")}` : ""}`));
+  for (const problem of p.problems ?? []) row.append(el("div", "problem", problem));
+  return row;
+}
+
+function toolRow(t) {
+  const row = el("div", `row${t.enabled ? "" : " off"}`);
+  const icon = el("div", "icon", "⚙");
+  const name = el("div", "name", t.id);
+  name.append(el("span", `chip${t.source === "user" ? " mine" : ""}`, t.source === "user" ? "yours" : "ships with Rosalena"));
+  if (t.version) name.append(el("span", "chip", `v${t.version}`));
+  if (t.enabled && !t.loaded) name.append(el("span", "chip bad", "failed to load"));
+  const actions = el("div", "actions");
+  if (t.source === "user") {
+    const remove = el("button", "small ghost danger", "Remove");
+    remove.type = "button";
+    remove.addEventListener("click", () => {
+      if (!confirm(`Remove ${t.id}? Its folder is moved aside, not deleted.`)) return;
+      void act({ action: "tool-remove", id: t.id }, `${t.id} removed`);
+    });
+    actions.append(remove);
+  }
+  // Built-in features written as plugins: they can be switched off (say, for a plugin of your
+  // own that does the same job better), after a question that says what goes with them.
+  if (t.core) name.append(el("span", "chip core", "built in"));
+  actions.append(
+    toggle(t.enabled, `${t.id} on or off`, (on) => {
+      if (!on && t.core && !confirmCoreOff(t.id, t.id)) return false;
+      return act({ action: on ? "tool-on" : "tool-off", id: t.id }, `${t.id} switched ${on ? "on" : "off"}; it applies from the next message`);
+    }),
+  );
+  row.append(icon, name, actions, el("div", "desc", t.description || ""));
+  const parts = [];
+  if (t.tools?.length) parts.push(`${t.tools.length} tool${t.tools.length === 1 ? "" : "s"}: ${t.tools.slice(0, 6).join(", ")}${t.tools.length > 6 ? ", …" : ""}`);
+  if (t.hooks?.length) parts.push(`hooks: ${t.hooks.join(", ")}`);
+  if (t.commands?.length) parts.push(`/${t.id} ${t.commands.join(" | ")}`);
+  if (!t.enabled) parts.push("switched off");
+  if (parts.length) row.append(el("div", "meta", parts.join(" · ")));
+  for (const problem of t.problems ?? []) row.append(el("div", "problem", problem));
+  return row;
+}
+
+let folders = null;
+async function load() {
+  try {
+    const data = await api("GET");
+    folders = data.folders;
+    $("pages").replaceChildren(...data.pages.map(pageRow));
+    $("tools").replaceChildren(...data.tools.map(toolRow));
+    $("pages-count").textContent = String(data.pages.length);
+    $("tools-count").textContent = String(data.tools.length);
+    $("add-hint").textContent = `Pages you add are installed in ${folders.pages}; tool plugins in ${folders.tools}.`;
+  } catch (err) {
+    $("pages").replaceChildren(el("div", "row", `Plugins could not be listed: ${err.message}`));
+  }
+}
+
+function showReport(text, ok) {
+  const node = $("add-report");
+  node.hidden = !text;
+  node.textContent = text ?? "";
+  node.className = `report ${ok ? "ok" : "bad"}`;
+}
+
+/** Ask once, with the box unticked: a tool plugin is code that runs as this app. */
+function askTrust(id, folder) {
+  const dialog = $("trust");
+  $("trust-title").textContent = `Add the tool plugin "${id}"?`;
+  $("trust-body").textContent =
+    `It's code from ${folder}. Once added, the agent can run it in every chat with the same access this app has: your files, your network and the programs on this PC. ` +
+    "Only add plugins you wrote or got from someone you trust. You can switch it off or remove it here at any time.";
+  const check = $("trust-check");
+  check.checked = false;
+  $("trust-go").disabled = true;
+  check.onchange = () => ($("trust-go").disabled = !check.checked);
+  dialog.returnValue = "";
+  dialog.showModal();
+  dialog.addEventListener("close", () => {
+    if (dialog.returnValue === "go" && check.checked) void add(folder, true);
+  }, { once: true });
+}
+
+async function add(folder, trust = false) {
+  const go = $("add-go");
+  go.disabled = true;
+  go.textContent = trust ? "Adding…" : "Checking…";
+  showReport("", true);
+  try {
+    const out = await api("POST", { action: "import", folder, trust });
+    if (out.needsTrust) return askTrust(out.id, folder);
+    if (out.ok) {
+      toast(`${out.id} added`);
+      const lines = out.kind === "page" ? [out.report] : [`Loaded ${out.id}: ${out.tools?.length ?? 0} tool(s)${out.hooks?.length ? `, hooks ${out.hooks.join(", ")}` : ""}.`, ...(out.warnings ?? [])];
+      showReport(lines.filter(Boolean).join("\n"), true);
+      $("add-folder").value = "";
+    } else {
+      showReport([`Not added: ${out.error}`, out.report].filter(Boolean).join("\n\n"), false);
+    }
+  } catch (err) {
+    showReport(`Not added: ${err.message}`, false);
+  } finally {
+    go.disabled = false;
+    go.textContent = "Add plugin";
+    await load();
+  }
+}
+
+$("add-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const folder = $("add-folder").value.trim();
+  if (!folder) return toast("Paste the folder that holds the plugin's plugin.json");
+  void add(folder);
+});
+load();
+</script>
+<script>
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !document.querySelector("dialog[open]") && !event.target.closest?.("input, textarea, select")) location.href = "/";
+  });
+</script>
+</body>
+</html>

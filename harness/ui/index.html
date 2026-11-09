@@ -1,0 +1,1728 @@
+<!doctype html>
+<!-- `data-theme="auto"` follows the operating system's light/dark preference. The dark
+     palette is the base (`:root`); the ◐ button can pin either theme and remembers it. -->
+<html lang="en" data-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="rosalena-token" content="__ROSALENA_TOKEN__" />
+    <!-- The saved look (theme, UI style, layout, plugin themes), put back before any module
+         reads localStorage: the desktop app gets a new port, so a new empty storage, every
+         launch. The server fills the marker; persist.js applies it and saves later changes. -->
+    <!--ROSALENA_UI_STATE-->
+    <script src="/persist.js"></script>
+    <title>Rosalena Harness</title>
+    <link rel="icon" href="/rosalena-icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/plugins-ui.css" />
+    <!-- The session rail (ui/session-rail.mjs): tokens only, so the palettes below dress it. -->
+    <link rel="stylesheet" href="/session-rail.css" />
+    <!-- After styles.css, in this order: palettes, the refined default edges, the UI style looks. -->
+    <link rel="stylesheet" href="/themes.css" />
+    <link rel="stylesheet" href="/refine.css" />
+    <link rel="stylesheet" href="/ui-styles.css" />
+    <link rel="stylesheet" href="/phone.css" />
+  </head>
+  <body>
+    <!-- The window chrome, only in the desktop shell. app.js sets `is-desktop` on
+         <html> when window.rosalenaDesktop exists, so the browser build keeps exactly
+         the header it always had and never renders a Close button that could not work.
+         The strip is the drag region; each control opts out with -webkit-app-region:
+         no-drag, so a click closes the window and a drag on the empty part moves it. -->
+    <div class="chrome" id="chrome">
+      <span class="chrome-title">
+        <span class="chrome-name">Rosalena Harness</span>
+        <span class="chrome-tag" data-i18n="desktop">desktop</span>
+      </span>
+      <span class="chrome-spacer"></span>
+      <!-- Windows order, not Mac order: minimise, maximise/restore, close. The glyphs are
+           the ones a Windows title bar uses (a bar, a square that becomes two squares when
+           the window is maximised, an X), and app.js rewrites the middle one on every
+           maximise/restore so the picture always matches what the click will do. -->
+      <div class="win-controls" id="win-controls">
+        <button class="win-btn min" id="win-min" data-i18n-title="Minimise" data-i18n-aria-label="Minimise window" type="button" title="Minimise" aria-label="Minimise window"><span aria-hidden="true">−</span></button>
+        <button class="win-btn max" id="win-max" data-i18n-title="Maximise" data-i18n-aria-label="Maximise window" type="button" title="Maximise" aria-label="Maximise window"><span aria-hidden="true">□</span></button>
+        <button class="win-btn close" id="win-close" data-i18n-title="Close the window" data-i18n-aria-label="Close window" type="button" title="Close the window" aria-label="Close window"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+
+    <div class="app" id="app">
+      <div class="app-row" id="app-row">
+      <!-- The left dock is one panel now. It holds the search, the one primary row, the
+           chat lists and a bottom bar; every dashboard page that used to be a nav row
+           here (Monitor, VPN exits, Wi-Fi networks, Tokens, Layout, Commands, "What this
+           PC can do") lives in the More drawer above the account row. app.js still owns
+           the arrangement, the dock width (--dock-w) and every session row in #chat-list. -->
+      <aside class="dock dock-left" id="sidebar" data-dock="left">
+        <section class="panel side-panel" data-panel="sessions">
+          <div class="panel-head">
+            <span class="panel-title" data-i18n="Chats">Chats</span>
+            <!-- No collapse or close control here: the whole chats panel is opened and
+                 folded by the hamburger in the top bar, one control for one thing. The
+                 small rail button and the close button it used to carry both did the same
+                 job from a second place, and a panel you can delete by accident is worse
+                 than one you cannot. -->
+          </div>
+
+          <div class="side-top">
+            <div class="sidebar-search">
+              <input id="filter" data-i18n-placeholder="Search chats  ( / )" type="search" placeholder="Search chats  ( / )"
+                     autocomplete="off" spellcheck="false" />
+            </div>
+            <!-- The one primary row. app.js binds #new-chat by id, so the hook stays exactly
+                 where it was; only the shape changed. -->
+            <button class="new-chat" id="new-chat" data-i18n-title="New chat (Ctrl+K)" type="button" title="New chat (Ctrl+K)">
+              <span class="new-chat-glyph" aria-hidden="true">＋</span>
+              <span class="new-chat-label" data-i18n="New chat">New chat</span>
+              <span class="new-chat-hint" aria-hidden="true">Ctrl+K</span>
+            </button>
+          </div>
+
+          <div class="sidebar-scroll">
+            <!-- Sidebar plugins: pages that ship with the app plus the ones Creator mode
+                 built (plugins-ui.js fills #apps-list from GET /api/plugins/ui). Create
+                 starts a new chat with Creator mode on. -->
+            <section class="side-group" data-group="apps" aria-labelledby="apps-label">
+              <details class="side-disclosure" open>
+                <summary class="group-label" id="apps-label"><span data-i18n="Plugins">Plugins</span><span class="count" id="apps-count"></span></summary>
+                <div id="apps-list" class="list side-list" data-list="apps">
+                  <p class="empty side-empty" data-i18n="Loading…">Loading…</p>
+                </div>
+              </details>
+              <button class="mini-btn group-action" id="apps-create" data-i18n-title="Build a new plugin with Creator mode" data-i18n="＋ Create" type="button" title="Build a new plugin with Creator mode">＋ Create</button>
+            </section>
+
+            <section class="side-group" data-group="pinned">
+              <details class="side-disclosure" open>
+                <summary class="group-label" id="pinned-label"><span data-i18n="Pinned">Pinned</span></summary>
+                <!-- app.js does not know about pinning yet, so this is a real empty state
+                     rather than sample rows: the pinning pass fills #pinned-list. -->
+                <div id="pinned-list" class="list side-list" data-list="pinned">
+                  <p class="empty side-empty" data-i18n="No pinned chats yet.">No pinned chats yet.</p>
+                </div>
+              </details>
+            </section>
+
+            <section class="side-group" data-group="recent" aria-labelledby="recent-label">
+              <details class="side-disclosure" open>
+                <!-- Folds like the other sections; its open state is saved through /api/prefs. -->
+                <summary class="group-label" id="recent-label"><span data-i18n="Recent">Recent</span><span class="count" id="chat-count"></span></summary>
+                <!-- app.js renders every chat here as a .chat-item, grouped by folder. -->
+                <div id="chat-list" class="list side-list" data-list="recent">
+                  <p class="empty" data-i18n="No chats yet.">No chats yet.</p>
+                </div>
+              </details>
+              <!-- Outside the summary: a button inside one would also fold the section. -->
+              <button class="mini-btn group-action new-folder-btn" id="new-folder" data-i18n-title="Create a folder to organise chats" data-i18n="＋ Folder" type="button" title="Create a folder to organise chats">＋ Folder</button>
+              <button class="mini-btn group-action group-by-btn" id="group-by" data-i18n-title="Group Recent by your folders, by the workspace each chat works in, or not at all" data-i18n="Group: Folders" type="button" title="Group Recent by your folders, by the workspace each chat works in, or not at all">Group: Folders</button>
+            </section>
+
+            <section class="side-group" data-group="external" aria-labelledby="external-label">
+              <details class="side-disclosure" open>
+                <!-- One parent fold for every other harness, with a fold per tool inside it
+                     (app.js renders those). Its open state is saved through /api/prefs. -->
+                <summary class="group-label" id="external-label"><span data-i18n="Other harnesses">Other harnesses</span><span class="count" id="external-count"></span></summary>
+                <div id="external-list" class="list side-list" data-list="external">
+                  <p class="empty" data-i18n="Scanning…">Scanning…</p>
+                </div>
+              </details>
+              <!-- Outside the summary on purpose: a button nested in one cannot be clicked
+                   without also folding the section. -->
+              <button class="mini-btn group-action" id="refresh-sessions" data-i18n-title="Rescan session folders" type="button" title="Rescan session folders">↻</button>
+            </section>
+          </div>
+
+          <div class="sidebar-foot">
+            <div class="side-foot-bar">
+              <!-- A button and a sibling drawer, not a <details>. Chrome wraps a details'
+                   children in its own zero-height content box, so an absolutely positioned
+                   drawer inside one measures against zero and lands inside the footer
+                   instead of above it. A button with aria-expanded keeps the same keyboard
+                   behaviour and puts the drawer back under .sidebar-foot, which is the box
+                   it has to clear. -->
+              <button class="more-toggle" id="more-open" type="button" aria-expanded="false"
+                      aria-controls="more-drawer" title="Dashboard pages, tools and this machine" data-i18n-title="Dashboard pages, tools and this machine">
+                <span class="more-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span class="more-label" data-i18n="More">More</span>
+                <span class="more-caret" aria-hidden="true"></span>
+              </button>
+              <!-- Every page that used to be a nav row in this dock. The links work
+                   today; data-more-target is the hook the navigation pass reads. -->
+              <div class="more-drawer" id="more-drawer" hidden>
+                <p class="more-heading" id="more-pages" data-i18n="Dashboard">Dashboard</p>
+                <nav class="more-nav" aria-labelledby="more-pages">
+                  <!-- Usage and the model server in one place: opens with Tokens and Monitor as tabs. -->
+                  <a class="more-item" href="/usage" data-more-target="tokens" data-i18n-title="What the tokens cost, and the local model server (Tokens and Monitor tabs)" title="What the tokens cost, and the local model server (Tokens and Monitor tabs)">
+                    <span class="more-icon" aria-hidden="true">◎</span><span class="more-text" data-i18n="Usage &amp; monitor">Usage &amp; monitor</span>
+                  </a>
+                  <!-- Network: Wi-Fi, VPN exits and the VPN switches, folded into one menu. -->
+                  <button class="more-item more-group-toggle" id="network-toggle" type="button" aria-expanded="false" aria-controls="network-group"
+                          title="Wi-Fi networks, VPN exits and the VPNs on this PC" data-i18n-title="Wi-Fi networks, VPN exits and the VPNs on this PC">
+                    <span class="more-icon" aria-hidden="true">⌁</span><span class="more-text" data-i18n="Network">Network</span><span class="more-chev" aria-hidden="true">▸</span>
+                  </button>
+                  <div class="more-group" id="network-group" hidden>
+                    <a class="more-item more-sub" href="/network" data-more-target="wifi" data-i18n-title="See and join Wi-Fi networks" title="See and join Wi-Fi networks">
+                      <span class="more-icon" aria-hidden="true">≋</span><span class="more-text" data-i18n="Wi-Fi networks">Wi-Fi networks</span>
+                    </a>
+                    <a class="more-item more-sub" href="/exits" data-more-target="vpn" data-i18n-title="Both VPN clients, one at a time" title="Both VPN clients, one at a time">
+                      <span class="more-icon" aria-hidden="true">⛨</span><span class="more-text" data-i18n="VPN exits">VPN exits</span>
+                    </a>
+                    <p class="more-heading more-sub-heading" id="exit-heading" data-i18n="VPN on this PC" hidden>VPN on this PC</p>
+                    <!-- The VPN switches. Hidden entirely when /api/exits reports the plugin
+                         cannot see the process table; each row says `not installed` / `unknown`
+                         rather than lying with an "off" switch. -->
+                    <div class="exit-box" id="exit-box" hidden>
+                      <div class="exit-rows" data-exit-rows></div>
+                      <div class="exit-note" data-exit-note hidden></div>
+                    </div>
+                  </div>
+                  <button class="more-item" id="view-open" type="button" data-more-target="layout" data-i18n-title="Presets and panels" title="Presets and panels">
+                    <span class="more-icon" aria-hidden="true">▤</span><span class="more-text" data-i18n="Layout">Layout</span>
+                  </button>
+                  <button class="more-item" id="palette-open" type="button" data-more-target="commands" data-i18n-title="Every command (Ctrl+Shift+P)" title="Every command (Ctrl+Shift+P)">
+                    <span class="more-icon" aria-hidden="true">⌘</span><span class="more-text" data-i18n="Commands">Commands</span>
+                  </button>
+                  <a class="more-item" href="/models" data-more-target="pc" data-i18n-title="Which chat, image, video and voice models this PC runs, and download them" title="Which chat, image, video and voice models this PC runs, and download them">
+                    <span class="more-icon" aria-hidden="true">▣</span><span class="more-text" data-i18n="Models">Models</span>
+                  </a>
+                  <a class="more-item" href="/plugins" data-more-target="plugins" data-i18n-title="Switch plugins on or off, remove them, or add your own" title="Switch plugins on or off, remove them, or add your own">
+                    <span class="more-icon" aria-hidden="true">⚙</span><span class="more-text" data-i18n="Plugins">Plugins</span>
+                  </a>
+                  <!-- The same list as the MCP button beside the message box. -->
+                  <button class="more-item" id="more-mcp" type="button" data-more-target="mcp" data-i18n-title="MCP servers the agent can call, with an on/off switch each" title="MCP servers the agent can call, with an on/off switch each">
+                    <span class="more-icon" aria-hidden="true">⇄</span><span class="more-text" data-i18n="MCP servers">MCP servers</span>
+                  </button>
+                </nav>
+                <p class="more-heading" data-i18n="App">App</p>
+                <!-- In the desktop app this asks the shell, which checks the published feed
+                     and, when there is a newer version, offers "Update and restart"
+                     (download, SHA-256 check, install, reopen). In a browser tab it reads
+                     /api/update?fresh=1 and can only name the release page. app.js disables
+                     this row and labels it "Checking..." while it runs. -->
+                <button class="more-item" id="check-updates" type="button" data-more-target="updates"
+                        title="Ask the release page whether a newer version exists" data-i18n-title="Ask the release page whether a newer version exists">
+                  <span class="more-icon" aria-hidden="true">⟳</span>
+                  <span class="more-text" id="check-updates-text" data-i18n="Check for updates">Check for updates</span>
+                </button>
+                <p class="more-note"><span id="foot-spend" class="foot-text dim"></span></p>
+              </div>
+              <!-- Phone access: the panel with the switch, the QR code, the link and the paired
+                   devices (phone.js). The dot is green while the tunnel is live. -->
+              <button class="icon-btn foot-icon phone-open" id="phone-open" data-i18n-title="Phone access: use this app from your phone" type="button" title="Phone access: use this app from your phone"
+                      aria-label="Phone access" data-i18n-aria-label="Phone access" aria-haspopup="dialog" aria-controls="phone-panel" aria-expanded="false">
+                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><rect x="4.4" y="1.6" width="7.2" height="12.8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3" /><path d="M7 12.1h2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" /></svg>
+                <span class="phone-dot" id="phone-dot" hidden></span>
+              </button>
+              <button class="icon-btn foot-icon" id="theme" data-i18n-title="Switch light and dark" type="button" title="Switch light and dark">◐</button>
+            </div>
+
+            <!-- The account row opens the account panel: the name and avatar this window
+                 shows, the appearance, and which parts of the window are shown. Everything
+                 in it is saved on this computer through /api/prefs; there is no login and
+                 nothing is sent anywhere. app.js still writes #health-dot and #foot-router. -->
+            <button class="account" id="account" type="button" data-account aria-haspopup="dialog"
+                    aria-expanded="false" aria-controls="account-panel" title="Your name, appearance and what the window shows" data-i18n-title="Your name, appearance and what the window shows">
+              <span class="account-avatar" id="account-avatar" aria-hidden="true"><span id="account-initial">R</span><span class="dot" id="health-dot" data-i18n-title="router state" title="router state"></span></span>
+              <span class="account-text">
+                <span class="account-name" id="account-name" data-i18n="Add your name">Add your name</span>
+                <span class="account-sub" id="foot-router">router…</span>
+              </span>
+              <span class="account-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="account-panel" id="account-panel" data-i18n-aria-label="Account and appearance" role="dialog" aria-label="Account and appearance" hidden>
+              <div class="acct-head">
+                <span class="account-avatar acct-avatar-lg" id="acct-avatar-lg" aria-hidden="true">R</span>
+                <label class="acct-name-field">
+                  <span class="acct-label" data-i18n="Your name">Your name</span>
+                  <input id="acct-name" data-i18n-placeholder="What should this window call you?" type="text" maxlength="40" placeholder="What should this window call you?"
+                         autocomplete="nickname" spellcheck="false" />
+                </label>
+              </div>
+              <div class="acct-section">
+                <p class="acct-label" data-i18n="Avatar colour">Avatar colour</p>
+                <div class="acct-swatches" id="acct-colors" data-i18n-aria-label="Avatar colour" role="group" aria-label="Avatar colour"></div>
+              </div>
+              <!-- The look (light/dark, palette, accent, text size, density), which parts of the
+                   window show, and the skins all live in Style Lab now, with a live preview. -->
+              <div class="acct-section">
+                <p class="acct-label" data-i18n="Appearance">Appearance</p>
+                <button class="acct-style-btn" id="acct-style" type="button">
+                  <span>Style Lab</span>
+                  <small data-i18n="Theme, palette, accent, text size, density, skins and what the window shows, all with a live preview.">Theme, palette, accent, text size, density, skins and what the window shows, all with a live preview.</small>
+                </button>
+              </div>
+              <div class="acct-section">
+                <p class="acct-label" data-i18n="Help improve Rosalena">Help improve Rosalena</p>
+                <div class="acct-row" id="acct-sharing-row" hidden><span data-i18n="Sharing">Sharing</span><div class="seg acct-seg" id="acct-sharing" data-i18n-aria-label="What this app shares" role="group" aria-label="What this app shares"></div></div>
+                <p class="acct-help" id="acct-sharing-help"></p>
+              </div>
+              <div class="acct-foot">
+                <button class="acct-link" id="acct-settings" data-i18n="More settings…" type="button">More settings…</button>
+                <span class="acct-note" data-i18n="Settings are saved on this computer.">Settings are saved on this computer.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main" data-panel="document">
+        <header class="topbar">
+          <button class="icon-btn menu" id="menu" data-i18n-title="Toggle the sidebar" title="Toggle the sidebar">☰</button>
+          <div class="title-wrap">
+            <h1 id="chat-title" data-i18n="New chat">New chat</h1>
+            <p id="chat-meta" data-i18n="Pick a model and send a prompt." class="meta">Pick a model and send a prompt.</p>
+          </div>
+          <div class="top-actions">
+            <!-- What is running right now. The counts come from GET /api/activity (live
+                 runs in the run store split into chats and their subagents, plus the
+                 processes the process-tracker ledger still records as alive); the list
+                 behind the pill is the same payload, not a second guess. The strip starts
+                 hidden and app.js only shows it while something is actually running, so
+                 an idle page carries no "0 running" pill. -->
+            <div class="run-strip" id="run-strip" hidden>
+              <button class="run-pill" id="run-pill" type="button" aria-haspopup="true" aria-expanded="false"
+                      aria-controls="run-panel" title="Reading /api/activity…" data-i18n-title="Reading /api/activity…">
+                <span class="run-dot" id="run-dot" aria-hidden="true"></span>
+                <span class="run-label" id="run-label"></span>
+              </button>
+              <div class="run-panel" id="run-panel" data-i18n-aria-label="Running work" role="dialog" aria-label="Running work" hidden>
+                <div class="run-panel-head">
+                  <span id="run-panel-title" data-i18n="Running work">Running work</span>
+                  <button class="mini-btn" id="run-refresh" data-i18n-title="Read /api/activity again" type="button" title="Read /api/activity again">↻</button>
+                </div>
+                <div class="run-panel-body" id="run-panel-body"></div>
+              </div>
+            </div>
+            <button class="icon-btn" id="copy-answer" data-i18n-title="Copy the last answer" title="Copy the last answer">⧉</button>
+            <!-- Show in File Explorer. The target is the file the current trajectory last
+                 touched, or the chat's own workspace folder when nothing was written; with
+                 no chat open there is nothing to show, so it is disabled and says why. The
+                 server refuses any path outside the workspace - see src/reveal.mjs. -->
+            <button class="icon-btn reveal-btn" id="reveal-button" type="button" disabled
+                    title="Show in File Explorer - open a chat first" data-i18n-title="Show in File Explorer - open a chat first" data-i18n-aria-label="Show in File Explorer" aria-label="Show in File Explorer">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M1.6 3.6h4.1l1.4 1.8h7.3v7.2H1.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" />
+                <path d="M1.6 5.4h12.8" fill="none" stroke="currentColor" stroke-width="1.1" />
+              </svg>
+            </button>
+            <!-- usage-panel slot: a token / spend / rate panel belongs here, to the
+                 left of the settings button. It must stay in the top bar's flow (not
+                 position: fixed) so it shrinks with the window; give it class
+                 "usage-panel" and it inherits the same 8px gap as the other actions. -->
+            <!-- Settings opens as a dialog over the window (#settings-panel, near the end of
+                 the body): a fixed panel inside this flexible top bar would be clipped by it. -->
+            <!-- Session rail toggle (ui/session-rail.mjs): shows or hides the per-chat panel. -->
+            <button class="icon-btn rail-btn" id="rail-toggle" type="button" aria-pressed="false" aria-expanded="false"
+                    aria-controls="session-rail" title="Session rail (Ctrl+.)" data-i18n-title="Session rail (Ctrl+.)" data-i18n-aria-label="Session rail" aria-label="Session rail">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+                <path d="M14.5 4.5v15M17 8.5h1M17 11.5h1M17 14.5h1" />
+              </svg>
+            </button>
+            <div class="settings-wrap">
+              <button class="icon-btn" id="settings" data-i18n-title="Settings" type="button" title="Settings"
+                      aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">⚙</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="stats" id="stats" hidden>
+          <span class="stat" id="stat-steps"></span>
+          <span class="stat" id="stat-tools"></span>
+          <span class="stat" id="stat-time"></span>
+          <span class="stat" id="stat-tokens"></span>
+          <span class="stat target" id="stat-target"></span>
+        </div>
+
+        <!-- Two views of the same run: the conversation, and a compact record of what
+             actually changed. The trajectory is built from the same events the transcript
+             uses - the live SSE stream while a run is going, the stored `chat.events` when
+             an old chat is opened - so it cannot show a step the run did not take. -->
+        <div class="view-tabs" data-i18n-aria-label="Chat and trajectory" role="tablist" aria-label="Chat and trajectory">
+          <button class="view-tab" type="button" role="tab" data-view="chat" aria-selected="true" aria-controls="log" data-i18n="Chat">Chat</button>
+          <!-- The count lives inside the tab label: it is the answer to "how much has
+               happened", and a badge floating next to the tab read as a third control. -->
+          <button class="view-tab" type="button" role="tab" data-view="trajectory" aria-selected="false" aria-controls="trail" data-i18n="Trajectory">Trajectory <span class="view-count" id="trail-count" hidden></span></button>
+          <button class="view-tab" type="button" role="tab" data-view="terminal" aria-selected="false" aria-controls="terminal" data-i18n="Terminal">Terminal</button>
+          <span class="view-spacer"></span>
+          <span class="view-note" id="trail-note" data-i18n="what changed: commands, reads and writes, oldest first">what changed: commands, reads and writes, oldest first</span>
+        </div>
+
+        <section class="log" id="log" aria-live="polite">
+          <div class="welcome" id="welcome">
+            <img class="welcome-mark" src="/rosalena-icon.svg" alt="" width="64" height="64" />
+            <h2>Rosalena Harness</h2>
+            <p data-i18n="Local and cloud models behind one router. Ask for something, attach a file, or open a past session on the left.">Local and cloud models behind one router. Ask for something, attach a file,
+               or open a past session on the left.</p>
+            <div class="starters">
+              <button class="starter" data-i18n="What can this harness do?" data-prompt="Read HARNESS.md and tell me what this harness can do, briefly.">What can this harness do?</button>
+              <button class="starter" data-i18n="Run the test suite" data-prompt="Run node --test in the harness folder and summarise any failures.">Run the test suite</button>
+              <button class="starter" data-i18n="List the plugins" data-prompt="List the plugins in this install, with the tools each one adds.">List the plugins</button>
+            </div>
+            <!-- Asked once: what this install may send (telemetry.mjs). Until it is answered
+                 only usage numbers go out, never a message. Account > Sharing changes it. -->
+            <div class="local-offer share-ask" id="share-ask" hidden>
+              <div class="local-offer-head">
+                <span class="local-offer-badge" data-i18n="On by default · one click to turn off">On by default · one click to turn off</span>
+                <strong data-i18n="Rosalena shares what goes wrong, so it can get fixed">Rosalena shares what goes wrong, so it can get fixed</strong>
+              </div>
+              <p class="local-offer-why" data-i18n="For chats on cloud models, Rosalena sends the task, the answer, the model, token counts, errors and a short trace of each step. Keys, tokens and passwords are scrubbed out first. Chats on local models never leave this PC: only numbers and errors are sent for them. Turn it off here, or any time in Settings &gt; Advanced or Account.">For chats on cloud models, Rosalena sends the task, the answer, the
+                model, token counts, errors and a short trace of each step. Keys, tokens and passwords are
+                scrubbed out first. Chats on local models never leave this PC: only numbers and errors are
+                sent for them. Turn it off here, or any time in Settings &gt; Advanced or Account.</p>
+              <div class="local-offer-actions">
+                <button class="local-offer-go" type="button" data-share="full" data-i18n="Keep sharing">Keep sharing</button>
+                <button class="mini-btn" type="button" data-share="usage" data-i18n="Numbers only">Numbers only</button>
+                <button class="mini-btn" type="button" data-share="off" data-i18n="Turn it off">Turn it off</button>
+              </div>
+              <p class="local-offer-size" data-i18n="Keep sharing: everything above. Numbers only: counts, timings, models and errors, no words. Turn it off: only the token count of chats on Rosalena's free cloud models is sent, so the free tier can't be abused. No words, no model, nothing about your own keys or local models.">Keep sharing: everything above. Numbers only: counts, timings,
+                models and errors, no words. Turn it off: only the token count of chats on Rosalena's free cloud models is sent, so the free tier
+                can't be abused. No words, no model, nothing about your own keys or local models.</p>
+            </div>
+            <!-- The starter model: one free local model picked for this PC (/api/starter).
+                 Hidden until the server has measured the machine; gone once a starter is
+                 installed or the person says Not now. -->
+            <div class="local-offer" id="local-offer" hidden>
+              <div class="local-offer-head">
+                <span class="local-offer-badge" data-i18n="Free · runs on this PC">Free · runs on this PC</span>
+                <strong id="local-offer-title"></strong>
+              </div>
+              <p class="local-offer-why" id="local-offer-why"></p>
+              <p class="local-offer-size" id="local-offer-size"></p>
+              <div class="local-offer-progress" id="local-offer-progress" hidden>
+                <div class="local-offer-bar"><span id="local-offer-fill"></span></div>
+                <span id="local-offer-step"></span>
+              </div>
+              <div class="local-offer-actions">
+                <button class="local-offer-go" id="local-offer-go" data-i18n="Download and set up" type="button">Download and set up</button>
+                <button class="mini-btn" id="local-offer-skip" data-i18n="Not now" type="button">Not now</button>
+              </div>
+            </div>
+            <p class="welcome-foot" data-i18n-html="Enter sends · Shift+Enter new line · Esc stops a run"><span class="kbd">Enter</span> sends ·
+              <span class="kbd">Shift</span>+<span class="kbd">Enter</span> new line ·
+              <span class="kbd">Esc</span> stops a run</p>
+          </div>
+        </section>
+
+        <!-- Your own console: a shell on this machine, started in the workspace. Not a model tool. -->
+        <section class="terminal" id="terminal" aria-label="Terminal" hidden>
+          <div class="term-bar">
+            <div class="term-tabs" id="term-tabs"></div>
+            <label class="term-shell-label" for="term-shell">Shell</label>
+            <select id="term-shell" class="term-shell"></select>
+            <button type="button" class="term-btn" id="term-new" data-i18n="New terminal">New terminal</button>
+            <button type="button" class="term-btn" id="term-clear" data-i18n="Clear">Clear</button>
+            <button type="button" class="term-btn term-stop" id="term-stop" data-i18n-title="Kill this shell and everything it started" data-i18n="Stop" title="Kill this shell and everything it started">Stop</button>
+          </div>
+          <pre class="term-out" id="term-out" tabindex="0" aria-live="off"></pre>
+          <div class="term-line">
+            <span class="term-prompt" aria-hidden="true">&gt;</span>
+            <input class="term-input" id="term-input" type="text" spellcheck="false" autocomplete="off"
+                   aria-label="Command" data-i18n-aria-label="Command" data-i18n-placeholder="Type a command and press Enter (Up/Down for history, Ctrl+C on an empty line restarts the shell)" placeholder="Type a command and press Enter (Up/Down for history, Ctrl+C on an empty line restarts the shell)" />
+          </div>
+        </section>
+
+        <section class="trail" id="trail" data-i18n-aria-label="Trajectory" aria-label="Trajectory" hidden>
+          <p class="trail-empty" id="trail-empty" data-i18n="nothing changed yet">nothing changed yet</p>
+          <ol class="trail-list" id="trail-list"></ol>
+        </section>
+
+        <!-- A sidebar plugin's page. plugins-ui.js mounts it through plugin-host.js: a
+             sandboxed frame with no access to this page, served under its own CSP. The bar
+             holds what keeps a plugin system safe to use: versions to roll back to, the
+             verifier, and an off switch; the banner appears when the page reports errors. -->
+        <section class="plugin-view" id="plugin-view" aria-label="Plugin" hidden>
+          <div class="plugin-bar">
+            <button class="mini-btn" id="plugin-back" data-i18n-title="Back to the chat" type="button" title="Back to the chat">← Chat</button>
+            <div class="plugin-heading">
+              <strong id="plugin-title"></strong>
+              <span class="plugin-meta" id="plugin-meta"></span>
+            </div>
+            <span class="plugin-bar-spacer"></span>
+            <button class="mini-btn" id="plugin-reload" data-i18n-title="Load the page again" data-i18n="↻ Reload" type="button" title="Load the page again">↻ Reload</button>
+            <button class="mini-btn" id="plugin-open-external" data-i18n-title="Open this page in your web browser" data-i18n="Open in browser ↗" type="button" title="Open this page in your web browser" hidden>Open in browser ↗</button>
+            <button class="mini-btn" id="plugin-verify" data-i18n-title="Run the verifier on the installed files: static rules, the page in a sandboxed window, its self-tests" data-i18n="Verify" type="button" title="Run the verifier on the installed files: static rules, the page in a sandboxed window, its self-tests">Verify</button>
+            <span class="plugin-versions-wrap" id="plugin-versions-wrap">
+              <button class="mini-btn" id="plugin-versions" data-i18n-title="Earlier versions kept by Creator mode" data-i18n="Versions ▾" type="button" aria-haspopup="true" title="Earlier versions kept by Creator mode">Versions ▾</button>
+              <div class="plugin-menu" id="plugin-versions-menu" role="menu" hidden></div>
+            </span>
+            <button class="mini-btn" id="plugin-toggle" data-i18n="Switch off" type="button">Switch off</button>
+            <button class="mini-btn" id="plugin-theme-reset" data-i18n-title="Undo any colours a plugin applied to the app" data-i18n="Default look" type="button" title="Undo any colours a plugin applied to the app">Default look</button>
+          </div>
+          <div class="plugin-banner" id="plugin-banner" role="alert" hidden>
+            <span id="plugin-banner-text"></span>
+            <button class="mini-btn" id="plugin-banner-rollback" data-i18n="Roll back" type="button">Roll back</button>
+            <button class="mini-btn" id="plugin-banner-off" data-i18n="Switch off" type="button">Switch off</button>
+            <button class="mini-btn" id="plugin-banner-dismiss" data-i18n-aria-label="Dismiss" type="button" aria-label="Dismiss">×</button>
+          </div>
+          <div class="plugin-stage" id="plugin-stage"></div>
+        </section>
+
+        <button class="jump" id="jump" data-i18n="↓ Jump to latest" hidden>↓ Jump to latest</button>
+
+        <footer class="composer">
+          <!-- The model's todo list (todo_write), as a checklist you can watch fill in. -->
+          <div class="todo-panel" id="todo-panel" hidden>
+            <button class="todo-head" id="todo-head" type="button" aria-expanded="true">
+              <span class="todo-title" data-i18n="Progress">Progress</span>
+              <span class="todo-count" id="todo-count"></span>
+              <span class="todo-bar"><span class="todo-fill" id="todo-fill"></span></span>
+              <span class="todo-caret" aria-hidden="true">▾</span>
+            </button>
+            <ol class="todo-list" id="todo-list"></ol>
+          </div>
+          <!-- The queue: what was typed while a run was going (app.js). One at a time: each is
+               its own turn after the previous one finishes. Together: one turn when it ends. -->
+          <div class="queue-strip" id="queue-strip" hidden>
+            <div class="queue-head">
+              <span class="queue-title" id="queue-title" data-i18n="Queued">Queued</span>
+              <div class="queue-mode" data-i18n-aria-label="How queued messages are sent" role="group" aria-label="How queued messages are sent">
+                <button type="button" class="queue-mode-btn" data-mode="one" data-i18n-title="Each queued message is its own turn, sent when the previous one has finished" data-i18n="One at a time" title="Each queued message is its own turn, sent when the previous one has finished">One at a time</button>
+                <button type="button" class="queue-mode-btn" data-mode="together" data-i18n-title="Everything queued is sent as one message when the run ends" data-i18n="Together" title="Everything queued is sent as one message when the run ends">Together</button>
+              </div>
+              <button type="button" class="queue-act" id="queue-next" data-i18n="Send next" hidden>Send next</button>
+              <button type="button" class="queue-act" id="queue-clear" data-i18n="Clear">Clear</button>
+            </div>
+            <ol class="queue-list" id="queue-list"></ol>
+          </div>
+          <div id="attachments" class="attachments"></div>
+          <!-- The composer is one card: the prompt on its own line, and one row of tools under
+               it. Modes (Plan, Goal, Creator) live in the Mode menu and the per-folder settings
+               (Access, Commits, MCP) in the options menu, so the row stays short at any width.
+               Each chip says what is on, so nothing has to be opened to see the state. -->
+          <div class="composer-row">
+            <textarea id="prompt" data-i18n-placeholder="Send a message…  (Enter to send, Shift+Enter for a new line, / for commands)" rows="2" placeholder="Send a message…  (Enter to send, Shift+Enter for a new line, / for commands)"></textarea>
+            <!-- The slash command menu: built-in commands plus the person's own command files. -->
+            <div class="slash-menu" id="slash-menu" data-i18n-aria-label="Commands" role="listbox" aria-label="Commands" hidden></div>
+            <div class="composer-tools">
+              <!-- Drawn icons, not emoji: an emoji is a picture in the OS's own font and colours,
+                   so it looked blurry and off-theme; these take the button's colour. -->
+              <button class="icon-btn attach" id="attach" data-i18n-title="Attach files or images" data-i18n-aria-label="Attach files or images" type="button" title="Attach files or images" aria-label="Attach files or images">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M21.4 11.1 12.2 20.3a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5" />
+                </svg>
+              </button>
+              <input type="file" id="file-input" multiple hidden />
+              <!-- The quick picker: the same list as the header, one click away from the
+                   place the prompt is typed, which is where a model actually gets chosen. -->
+              <label class="quick-pick" data-i18n-title="Model for the next message" title="Model for the next message">
+                <span class="quick-label" data-i18n="Model">Model</span>
+                <select id="quick-model"></select>
+              </label>
+              <!-- Effort beside the model: the same setting as the model menu's Effort row
+                   (per chat), one click away. Hidden when the model offers no levels. -->
+              <div class="cmp-pop" id="effort-pop" hidden>
+                <button class="tool-chip effort-chip" id="effort-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="effort-menu"
+                        title="Reasoning effort for this chat" data-i18n-title="Reasoning effort for this chat">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+                  </svg>
+                  <span class="tool-chip-text" id="effort-label" data-i18n="Default">Default</span>
+                  <span class="tool-chip-caret" aria-hidden="true">▾</span>
+                </button>
+                <div class="cmp-menu effort-menu" id="effort-menu" data-i18n-aria-label="Reasoning effort" role="group" aria-label="Reasoning effort" hidden></div>
+              </div>
+              <!-- Mode: plan mode (this message only: read-only until you approve its plan),
+                   goal mode (keeps going until the goal is done) and Creator mode. The chip
+                   names whatever is on. -->
+              <div class="cmp-pop" id="mode-pop">
+                <button class="tool-chip" id="mode-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mode-menu"
+                        title="Plan, Goal and Creator modes" data-i18n-title="Plan, Goal and Creator modes">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 6h10M4 12h16M4 18h7" /><circle cx="17" cy="6" r="2" /><circle cx="14" cy="18" r="2" />
+                  </svg>
+                  <span class="tool-chip-text" id="mode-label" data-i18n="Mode">Mode</span>
+                  <span class="tool-chip-caret" aria-hidden="true">▾</span>
+                </button>
+                <div class="cmp-menu" id="mode-menu" data-i18n-aria-label="Modes" role="group" aria-label="Modes" hidden>
+                  <p class="cmp-menu-head" data-i18n="Modes · click to switch on or off">Modes · click to switch on or off</p>
+                  <button class="plan-toggle cmp-mode" id="plan-toggle" type="button" aria-pressed="false"
+                          title="Plan mode: the agent investigates read-only and proposes a plan; nothing changes until you approve it" data-i18n-title="Plan mode: the agent investigates read-only and proposes a plan; nothing changes until you approve it">
+                    <span class="cmp-mode-name">Plan</span>
+                    <span class="cmp-mode-hint" data-i18n="Looks around read-only, then asks you to approve a plan before changing anything. This message only.">Looks around read-only, then asks you to approve a plan before changing anything. This message only.</span>
+                  </button>
+                  <!-- Goal mode: the chat keeps working, round after round, until the goal is recorded
+                       done (or it is blocked on you). Stays on for this chat's follow-ups. -->
+                  <button class="plan-toggle goal-toggle cmp-mode" id="goal-toggle" type="button" aria-pressed="false"
+                          title="Goal mode: it keeps going on its own, task after task, until the whole goal is done and verified, or it needs something only you can give it" data-i18n-title="Goal mode: it keeps going on its own, task after task, until the whole goal is done and verified, or it needs something only you can give it">
+                    <span class="cmp-mode-name" data-i18n="Goal">Goal</span>
+                    <span class="cmp-mode-hint" data-i18n="Keeps going, task after task, until the whole goal is done or it needs you. Stays on for this chat.">Keeps going, task after task, until the whole goal is done or it needs you. Stays on for this chat.</span>
+                  </button>
+                  <button class="plan-toggle creator-toggle cmp-mode" id="creator-toggle" type="button" aria-pressed="false"
+                          title="Creator mode: the agent builds a sidebar plugin, verifies it in a sandbox, and installs it only if it passes (every install can be rolled back)" data-i18n-title="Creator mode: the agent builds a sidebar plugin, verifies it in a sandbox, and installs it only if it passes (every install can be rolled back)">
+                    <span class="cmp-mode-name" data-i18n="Creator">Creator</span>
+                    <span class="cmp-mode-hint" data-i18n="Builds a sidebar plugin, checks it in a sandbox and installs it only if it passes.">Builds a sidebar plugin, checks it in a sandbox and installs it only if it passes.</span>
+                  </button>
+                </div>
+              </div>
+              <!-- This folder's settings: what the agent may do without asking (saved), how
+                   finished work is committed (commit-cadence, hidden when that plugin is off),
+                   and the MCP servers it can call. -->
+              <div class="cmp-pop" id="opts-pop">
+                <button class="tool-chip" id="opts-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="opts-menu"
+                        title="Access, commits and MCP servers" data-i18n-title="Access, commits and MCP servers">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />
+                  </svg>
+                  <span class="tool-chip-text" id="opts-label" data-i18n="Access">Access</span>
+                  <span class="tool-chip-caret" aria-hidden="true">▾</span>
+                </button>
+                <div class="cmp-menu" id="opts-menu" data-i18n-aria-label="Access, commits and MCP" role="group" aria-label="Access, commits and MCP" hidden>
+                  <label class="quick-pick access-pick" title="What the agent may do without asking you" data-i18n-title="What the agent may do without asking you">
+                    <span class="quick-label" data-i18n="Access">Access</span>
+                    <select id="access-mode">
+                      <option value="full" data-i18n="Full access">Full access</option>
+                      <option value="workspace" data-i18n="Workspace write" selected>Workspace write</option>
+                      <option value="auto" data-i18n="Auto (a model reviews)">Auto (a model reviews)</option>
+                      <option value="read" data-i18n="Read only">Read only</option>
+                    </select>
+                  </label>
+                  <label class="quick-pick commit-pick" id="commit-pick" hidden
+                         title="How the agent commits finished work in this folder" data-i18n-title="How the agent commits finished work in this folder">
+                    <span class="quick-label">Commits</span>
+                    <select id="commit-mode">
+                      <option value="ask" data-i18n="Ask once at the end">Ask once at the end</option>
+                      <option value="loose" data-i18n="Small: commit · Big: ask">Small: commit · Big: ask</option>
+                      <option value="autonomous" data-i18n="Commit everything">Commit everything</option>
+                      <option value="off" data-i18n="Don't commit">Don't commit</option>
+                    </select>
+                  </label>
+                  <!-- The MCP servers the agent can call, each with an on/off switch (app.js, mcp-panel.mjs). -->
+                  <button class="plan-toggle mcp-toggle cmp-mode" id="mcp-toggle" type="button" aria-expanded="false" aria-controls="mcp-panel"
+                          title="MCP servers: see which ones the agent can use and turn them on or off" data-i18n-title="MCP servers: see which ones the agent can use and turn them on or off">
+                    <span class="cmp-mode-name" data-i18n="MCP servers">MCP servers <span class="mcp-count" id="mcp-count"></span></span>
+                    <span class="cmp-mode-hint" data-i18n="Turn the tool servers the agent can call on or off.">Turn the tool servers the agent can call on or off.</span>
+                  </button>
+                </div>
+              </div>
+              <span class="cmp-spacer" aria-hidden="true"></span>
+              <!-- Voice typing with Whisper, on this PC. Always shown: the first click offers to
+                   download the default speech model (about 180 MB) once. The text lands in the
+                   prompt to read and fix, never sent by itself. -->
+              <button class="icon-btn mic" id="mic" type="button" aria-pressed="false"
+                      title="Voice typing (Whisper, on this PC): click to start, click again to stop" data-i18n-title="Voice typing (Whisper, on this PC): click to start, click again to stop" data-i18n-aria-label="Voice typing" aria-label="Voice typing">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="9" y="2.5" width="6" height="12" rx="3" />
+                  <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+                  <path d="M12 17.5V21.5M8.5 21.5h7" />
+                </svg>
+              </button>
+              <button id="stop" data-i18n-title="Stop this chat at its next step" data-i18n="Stop" class="stop" title="Stop this chat at its next step" hidden>Stop</button>
+              <button id="send" data-i18n="Send" class="send">Send</button>
+            </div>
+            <div class="mcp-panel" id="mcp-panel" data-i18n-aria-label="MCP servers" role="dialog" aria-label="MCP servers" hidden>
+              <div class="mcp-head">
+                <span class="mcp-title" data-i18n="MCP servers">MCP servers</span>
+                <button type="button" class="mcp-close" id="mcp-close" data-i18n-aria-label="Close" aria-label="Close">✕</button>
+              </div>
+              <p class="mcp-note" id="mcp-note" data-i18n="Switches apply right away, chats that are running included.">Switches apply right away, chats that are running included.</p>
+              <ul class="mcp-list" id="mcp-list"></ul>
+              <div class="mcp-import" id="mcp-import" hidden>
+                <div class="mcp-sub" data-i18n="From Claude Code">From Claude Code</div>
+                <ul class="mcp-list" id="mcp-import-list"></ul>
+              </div>
+              <form class="mcp-add" id="mcp-add" autocomplete="off">
+                <div class="mcp-sub" data-i18n="Add a server">Add a server</div>
+                <input id="mcp-add-name" data-i18n-placeholder="name, e.g. github" data-i18n-aria-label="Server name" placeholder="name, e.g. github" aria-label="Server name" required />
+                <input id="mcp-add-command" data-i18n-placeholder="command, e.g. npx -y @modelcontextprotocol/server-github" data-i18n-aria-label="Command" placeholder="command, e.g. npx -y @modelcontextprotocol/server-github" aria-label="Command" required />
+                <button type="submit" class="queue-act" data-i18n="Add">Add</button>
+              </form>
+            </div>
+          </div>
+          <div class="composer-foot">
+            <span id="status" data-i18n="ready">ready</span>
+            <!-- One card, one model. The note says which model holds it; the button is the
+                 manual override: load a GGUF that is only on disk, swap the resident one for
+                 it, or unload it to free the card. A generating model cannot be unloaded, so
+                 the button is disabled and says why instead of failing. -->
+            <span class="local-state" id="local-state" hidden>
+              <span id="local-note"></span>
+              <button class="mini-btn" id="local-toggle" data-i18n="Load" type="button" disabled>Load</button>
+            </span>
+            <!-- The folder the agent works in. In the desktop app it is a button that opens a
+                 folder picker; the default workspace is flagged, because a run started there
+                 has to go looking for the project it was asked about. -->
+            <button id="workspace" data-i18n-title="The folder the agent works in" class="ws ws-btn" type="button" title="The folder the agent works in"></button>
+            <!-- The context meter: a ring, the two figures the request costs, and a
+                 breakdown that opens above it. It sits in the composer's foot, beside the
+                 prompt it describes, rather than in the title bar. Hidden until a chat has
+                 a reading, so an empty chat does not show a gauge that means nothing. -->
+            <div class="context-meter" id="context-meter" hidden>
+              <button class="ctx-button" id="ctx-button" type="button"
+                      title="What this conversation costs" data-i18n-title="What this conversation costs" aria-haspopup="true" aria-expanded="false">
+                <svg class="ctx-ring" viewBox="0 0 14 14" width="24" height="24" aria-hidden="true">
+                  <circle class="ctx-track" cx="7" cy="7" r="5.5" />
+                  <circle class="ctx-arc" id="ctx-arc" cx="7" cy="7" r="5.5" />
+                </svg>
+                <span class="ctx-figures">
+                  <span class="ctx-percent" id="ctx-percent">0%</span>
+                  <span class="ctx-used" id="ctx-used">~0 / 0</span>
+                </span>
+              </button>
+              <div class="ctx-panel" id="ctx-panel" hidden>
+                <p class="ctx-headline" id="ctx-headline" data-i18n="0% of context used">0% of context used</p>
+                <dl class="ctx-rows">
+                  <div class="ctx-row"><dt data-i18n="System prompt">System prompt</dt><dd id="ctx-system">~0</dd></div>
+                  <div class="ctx-row"><dt data-i18n="Tool definitions">Tool definitions</dt><dd id="ctx-tools">~0</dd></div>
+                  <div class="ctx-row"><dt data-i18n="Messages">Messages</dt><dd id="ctx-messages">~0</dd></div>
+                </dl>
+                <p class="ctx-foot" id="ctx-foot"></p>
+                <div class="ctx-window-row">
+                  <label for="ctx-window-slider" data-i18n="Context window">Context window</label>
+                  <output class="ctx-window-out" id="ctx-window-out" for="ctx-window-slider">64K</output>
+                  <input class="ctx-window-slider" id="ctx-window-slider" type="range" min="0" max="7" step="1" value="2"
+                         list="ctx-window-ticks" aria-label="Context window" data-i18n-aria-label="Context window" />
+                  <datalist id="ctx-window-ticks"></datalist>
+                  <div class="ctx-window-scale" id="ctx-window-scale" aria-hidden="true"></div>
+                  <!-- An exact size, for a local server started with a -c that is not a stop. -->
+                  <div class="ctxwin-custom ctx-exact">
+                    <input class="ctxwin-input" id="ctxwin-input" type="number" min="4096" max="2000000" step="1024"
+                           placeholder="Exact size, in tokens" data-i18n-placeholder="Exact size, in tokens" data-i18n-aria-label="Exact context window in tokens" aria-label="Exact context window in tokens" />
+                    <button type="button" class="ctxwin-apply" id="ctxwin-apply" data-i18n="Set">Set</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        <div class="drop-hint" id="drop-hint" data-i18n="Drop files to attach">Drop files to attach</div>
+      </main>
+
+      <!-- ============================================================ session rail
+           The chat's own info panel (ui/session-rail.mjs fills #rail-body). Docked, it is
+           this column beside the chat; Overlay, the module moves it inside <main> so it
+           slides over the transcript from the right. Hidden until the module places it. -->
+      <aside class="session-rail" id="session-rail" data-i18n-aria-label="Session" aria-label="Session" data-mode="docked" hidden>
+        <div class="rail-head">
+          <span class="panel-title" data-i18n="Session">Session</span>
+          <span class="panel-actions">
+            <button class="panel-btn" id="rail-mode" data-i18n-title="Switch between Docked and Overlay (Ctrl+Shift+.)" type="button" title="Switch between Docked and Overlay (Ctrl+Shift+.)">⧉</button>
+            <button class="panel-btn" id="rail-close" data-i18n-title="Hide the session rail (Ctrl+.)" data-i18n-aria-label="Hide the session rail" type="button" title="Hide the session rail (Ctrl+.)" aria-label="Hide the session rail">×</button>
+          </span>
+        </div>
+        <div class="rail-body" id="rail-body"></div>
+      </aside>
+      <!-- ========================================================== /session rail -->
+
+      <!-- The inspector: a tab per mounted panel. panels.js supplies the contents; if it
+           is missing or throws, app.js draws the empty state below instead. It is pinned to
+           this dock and has no close control, because the chat's inspector is the one panel
+           that must always have a way back: collapsed or expanded are its only states. -->
+      <aside class="dock dock-right" id="dock-right" data-dock="right">
+        <section class="panel" data-panel="inspector">
+          <div class="panel-head">
+            <!-- Only shown when the panel is collapsed to a rail: tabs would do nothing
+                 with the body folded away, so the rail names the panel instead. -->
+            <span class="panel-title insp-rail-title">Inspector</span>
+            <div class="insp-tabs" role="tablist" aria-label="Inspector">
+              <!-- The whole tab is the drag handle: no grip glyph to aim at. A press that
+                   moves fewer than four pixels is still a click, so selecting a tab and
+                   reordering the tabs are the same gesture on the same target. -->
+              <button class="insp-tab" data-insp="files" data-i18n-title="Files · drag the tab or press Alt+Left/Right to reorder" data-i18n="Files" type="button" role="tab" aria-selected="true" title="Files · drag the tab or press Alt+Left/Right to reorder">Files</button>
+            </div>
+            <span class="panel-actions">
+              <!-- Full screen: the sidebar fills the window (a file, a plugin, the terminal); Esc returns. -->
+              <button class="panel-btn" id="side-full" data-i18n-title="Fill the window with the sidebar (Esc to go back)" type="button" aria-pressed="false" title="Fill the window with the sidebar (Esc to go back)">⛶</button>
+              <button class="panel-btn" data-collapse="inspector" data-i18n-title="Collapse the inspector to a rail" type="button" title="Collapse the inspector to a rail">▭</button>
+            </span>
+          </div>
+          <div class="panel-body insp-body" id="inspector-body">
+            <div class="insp-empty" id="insp-empty"><p data-i18n="Loading the inspector…">Loading the inspector…</p></div>
+            <div class="insp-slot" data-insp-slot="files" hidden></div>
+          </div>
+        </section>
+      </aside>
+      </div><!-- /app-row -->
+
+      <!-- No bottom dock. It held one panel, Recent runs, which repeated what the run
+           strip in the top bar already says and what the chats list already lists, and it
+           cost the document a strip of height on every window. The panel itself is gone
+           from the layout model in app.js, not merely hidden here. -->
+    </div>
+
+    <!-- The status strip. Every figure here is fetched; none is computed from a guess.
+         `tok/s` is a two-sample average and says so in its title. -->
+    <footer class="statusbar" id="statusbar">
+      <span class="sb-item" id="sb-graph" data-i18n="graph …">graph …</span>
+      <span class="sb-sep" aria-hidden="true">·</span>
+      <span class="sb-item" id="sb-usage" data-i18n="usage …">usage …</span>
+      <span class="sb-sep" aria-hidden="true">·</span>
+      <span class="sb-item" id="sb-rate" data-i18n="rate …">rate …</span>
+      <span class="sb-sep" id="sb-exits-sep" aria-hidden="true" hidden>·</span>
+      <span class="sb-item" id="sb-exits" hidden>VPN …</span>
+      <!-- Hardware appears only when /api/recommend proves a total VRAM figure; an item
+           that has to say "unknown" is worse than no item at all. -->
+      <span class="sb-sep" id="sb-hardware-sep" aria-hidden="true" hidden>·</span>
+      <span class="sb-item" id="sb-hardware" hidden></span>
+      <span class="sb-spacer"></span>
+      <span class="sb-item dim" id="sb-layout">cockpit</span>
+      <button class="sb-hide" id="sb-hide" data-i18n-title="Hide the status bar (turn it back on from your account menu, bottom left)" data-i18n-aria-label="Hide the status bar" type="button" title="Hide the status bar (turn it back on from your account menu, bottom left)" aria-label="Hide the status bar">×</button>
+    </footer>
+
+    <!-- The View menu: presets, and every panel's show / collapse state. -->
+    <div class="view-menu" id="view-menu" data-i18n-aria-label="View" role="menu" aria-label="View" hidden></div>
+
+    <!-- First-run setup: everything optional Rosalena can download, in one place, with sizes.
+         It opens once on the first start (prefs.setup unset) and from Settings after that.
+         Each item runs through the same install its own page uses (app.js, setup section). -->
+    <div class="setup-overlay" id="setup-overlay" hidden>
+      <section class="setup-dialog" id="setup-dialog" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+        <header class="setup-head">
+          <h2 id="setup-title" data-i18n="Finish setting up Rosalena">Finish setting up Rosalena</h2>
+          <button class="icon-btn" id="setup-close" data-i18n-aria-label="Close" type="button" aria-label="Close">×</button>
+        </header>
+        <p class="setup-lede" data-i18n-html="Rosalena is built to run with these. Its free cloud models share one daily limit, and when that runs out, the free backup models are what keep it answering and using its tools. The rest let it work offline on this PC, take your voice, and use your own browser."><strong>Rosalena is built to run with these.</strong> Its free cloud models share one daily limit, and when that runs out, the free backup models are what keep it answering and using its tools. The rest let it work offline on this PC, take your voice, and use your own browser.</p>
+        <p class="setup-lede setup-lede-small" data-i18n="Everything is free, downloads once, and runs on this PC. Untick anything you don't want.">Everything is free, downloads once, and runs on this PC. Untick anything you don't want.</p>
+        <div class="setup-list" id="setup-list"></div>
+        <footer class="setup-foot">
+          <button class="setup-go" id="setup-go" data-i18n="Set up Rosalena" type="button">Set up Rosalena</button>
+          <span class="setup-total" id="setup-total"></span>
+          <button class="setup-later" id="setup-later" data-i18n="Not now" type="button">Not now</button>
+        </footer>
+      </section>
+    </div>
+
+    <!-- The command palette (Ctrl+Shift+P). It lists the same commands the View menu does,
+         plus the pages, so a panel that was closed is always one keystroke away. -->
+    <div class="palette" id="palette" data-i18n-aria-label="Command palette" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
+      <div class="palette-box">
+        <input id="palette-input" data-i18n-placeholder="Type a command…  (Esc to close)" type="text" placeholder="Type a command…  (Esc to close)"
+               autocomplete="off" spellcheck="false" aria-controls="palette-list" />
+        <ul class="palette-list" id="palette-list" role="listbox"></ul>
+      </div>
+    </div>
+
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="/app.js"></script>
+    <script type="module" src="/phone.js"></script>
+    <!-- The More drawer: a button and a panel, toggled here. It is ~25 lines of behaviour
+         (open, close, Escape, click beside, focus back to the button) that app.js does not
+         need to know about, and it keeps the drawer's own markup next to it. What each row
+         does is the navigation pass's job; data-more-target is its hook. -->
+    <script type="module">
+      const moreOpen = document.getElementById("more-open");
+      const more = document.getElementById("more-drawer");
+      if (moreOpen && more) {
+        const set = (open) => {
+          more.hidden = !open;
+          moreOpen.setAttribute("aria-expanded", open ? "true" : "false");
+        };
+        const close = (refocus) => {
+          if (more.hidden) return;
+          set(false);
+          if (refocus) moreOpen.focus();
+        };
+        moreOpen.addEventListener("click", () => set(more.hidden));
+        // A row that acts inside this page leaves nothing to look at, so the drawer closes
+        // and the button takes focus back. A link navigates; the drawer is gone anyway.
+        more.addEventListener("click", (event) => {
+          const item = event.target.closest(".more-item");
+          if (item) close(item.tagName === "BUTTON");
+        });
+        document.addEventListener("pointerdown", (event) => {
+          if (!more.hidden && !more.contains(event.target) && !moreOpen.contains(event.target)) close(false);
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") close(true);
+        });
+      }
+    </script>
+    <!-- The VPN exit switches. Kept out of app.js on purpose: they are a sidebar extra
+         with their own polling, and a separate small script keeps the chat client from
+         growing another concern. The token comes from the meta tag the server fills in,
+         exactly as app.js reads it, so the POST is authenticated the same way. -->
+    <script type="module">
+      import { t } from "/i18n.mjs";
+      const box = document.getElementById("exit-box");
+      const token = document.querySelector('meta[name="rosalena-token"]')?.content ?? "";
+      let busy = false;
+      let last = 0;
+      let sticky = 0;
+      const note = box.querySelector("[data-exit-note]");
+      const say = (text, bad) => {
+        note.textContent = text ?? "";
+        note.className = `exit-note${bad ? " bad" : ""}`;
+        note.hidden = !text;
+      };
+
+      // The switches draw what the server read. A click never flips them: the client
+      // starts or stops a real process, and the only truth about a process is the
+      // process table, so every click ends in a fresh GET.
+      // Rows are built from what /api/exits found installed on THIS PC, so a machine
+      // with neither client shows no VPN section at all, and the names come from the
+      // server rather than from this markup.
+      const rowsBox = box.querySelector("[data-exit-rows]");
+      const heading = document.getElementById("exit-heading");
+      function rowFor(client) {
+        let row = rowsBox.querySelector(`[data-exit="${CSS.escape(client.id)}"]`);
+        if (row) return row;
+        row = document.createElement("div");
+        row.className = "exit-row";
+        row.dataset.exit = client.id;
+        row.innerHTML =
+          '<span class="exit-dot" data-exit-dot aria-hidden="true"></span>' +
+          '<span class="exit-name"></span>' +
+          '<span class="exit-state" data-exit-state>' + t("checking") + '</span>' +
+          '<button class="exit-switch" type="button" role="switch" aria-checked="false" data-exit-switch><span class="exit-knob"></span></button>';
+        row.querySelector(".exit-name").textContent = client.label;
+        row.querySelector("[data-exit-switch]").setAttribute("aria-label", client.label);
+        rowsBox.append(row);
+        return row;
+      }
+      function draw(state) {
+        const installed = (state?.providers ?? []).filter((c) => c.installed !== false);
+        const show = state?.supported !== false && installed.length > 0;
+        box.hidden = !show;
+        if (heading) heading.hidden = !show;
+        for (const row of [...rowsBox.querySelectorAll(".exit-row")]) {
+          if (!installed.some((c) => c.id === row.dataset.exit)) row.remove();
+        }
+        for (const client of installed) {
+          const row = rowFor(client);
+          const dot = row.querySelector("[data-exit-dot]");
+          const label = row.querySelector("[data-exit-state]");
+          const button = row.querySelector("[data-exit-switch]");
+          const running = client.running === true;
+          dot.className = `exit-dot${running ? " on" : client.running === null ? " unknown" : ""}`;
+          if (client.running === null) {
+            label.textContent = t("unknown");
+            button.disabled = true;
+          } else {
+            label.textContent = running ? (client.pids?.length > 1 ? t("on {n}p", { n: client.pids.length }) : t("on")) : t("off");
+            button.disabled = busy;
+          }
+          button.setAttribute("aria-checked", running ? "true" : "false");
+          button.dataset.on = running ? "false" : "true";
+          button.title = running ? t("Turn {name} off", { name: client.label }) : t("Turn {name} on", { name: client.label });
+        }
+        const labelOf = (id) => (state?.providers ?? []).find((c) => c.id === id)?.label ?? id;
+        const running = installed.filter((c) => c.running === true).map((c) => c.label);
+        if (state?.conflict) {
+          if (Date.now() > sticky) say(t("{names} are all running: Windows will only route through one.", { names: running.join(` ${t("and")} `) }), true);
+        } else if (state?.active) {
+          if (Date.now() > sticky) say(t("{name} is carrying traffic.", { name: labelOf(state.active) }), false);
+        } else if (Date.now() > sticky) {
+          say("", false);
+        }
+      }
+
+      async function read() {
+        try {
+          const response = await fetch("/api/exits");
+          last = Date.now();
+          draw(await response.json());
+        } catch {
+          say(t("exits: could not read the process table"), true);
+        }
+      }
+
+      box.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-exit-switch]");
+        if (!button || button.disabled || busy) return;
+        const provider = button.closest(".exit-row").dataset.exit;
+        const on = button.dataset.on === "true";
+        busy = true;
+        box.querySelectorAll("[data-exit-switch]").forEach((b) => (b.disabled = true));
+        say(on ? t("starting {name}…", { name: provider }) : t("stopping {name}…", { name: provider }), false);
+        try {
+          const response = await fetch("/api/exits/toggle", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-rosalena-token": token },
+            body: JSON.stringify({ provider, on }),
+          });
+          const outcome = await response.json();
+          // The outcome stays on screen through the re-read that follows: it is the
+          // reason the switch moved back, not a transient toast.
+          sticky = Date.now() + 8000;
+          say(outcome.message ?? t("the harness answered {status}", { status: response.status }), !outcome.ok);
+        } catch (err) {
+          say(t("exits: {error}", { error: err?.message ?? err }), true);
+        } finally {
+          busy = false;
+          await read();
+        }
+      });
+
+      // 14 s between reads while visible, never while a toggle is in flight; the 3 s
+      // tick is only the check that decides whether a read is due.
+      setInterval(() => {
+        if (document.visibilityState === "visible" && !busy && Date.now() - last > 14000) read();
+      }, 3000);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && !busy) read();
+      });
+      read();
+    </script>
+    <!-- Settings: a dialog with a grouped sidebar (Basics, Agent, Extend, Advanced) and one
+         page at a time. The tab buttons carry data-settings-page and app.js swaps the section
+         with the matching data-settings-page-body, so a page is markup plus a row here. The
+         search box filters the pages and their rows by their visible text and jumps to a
+         match. Everything on these pages is saved on this computer (ui-prefs.json and the
+         files each page names); nothing is sent anywhere. -->
+    <!-- Phone access (phone.js): one panel for both ends. On this computer it is the switch,
+         the QR code, the link and the paired devices. Opened on a paired phone it only says
+         so and offers "Unpair this device": the server refuses everything else from there. -->
+    <div class="phone-scrim" id="phone-scrim" hidden></div>
+    <div class="phone-panel" id="phone-panel" role="dialog" aria-modal="true" aria-labelledby="phone-title" hidden>
+      <header class="phone-head">
+        <h2 id="phone-title" data-i18n="Phone access">Phone access</h2>
+        <span class="phone-pill" id="phone-pill" data-i18n="Off" data-state="idle">Off</span>
+        <button class="icon-btn phone-close" id="phone-close" data-i18n-title="Close (Esc)" data-i18n-aria-label="Close phone access" type="button" title="Close (Esc)" aria-label="Close phone access">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+        </button>
+      </header>
+      <div class="phone-body" id="phone-local">
+        <div class="phone-switch">
+          <input class="switch" id="phone-switch" data-i18n-aria-label="Use Rosalena from your phone" type="checkbox" aria-label="Use Rosalena from your phone" />
+          <label class="phone-switch-label" for="phone-switch">
+            <strong data-i18n="Use Rosalena from your phone">Use Rosalena from your phone</strong>
+            <span id="phone-switch-note" data-i18n="Off. Turn it on to get a QR code.">Off. Turn it on to get a QR code.</span>
+          </label>
+        </div>
+        <p class="phone-reason" id="phone-reason" role="status" aria-live="polite"></p>
+
+        <div class="phone-live" id="phone-live" hidden>
+          <div class="phone-qr-box">
+            <img class="phone-qr" id="phone-qr" data-i18n-alt="QR code: scan it with your phone's camera to open Rosalena" alt="QR code: scan it with your phone's camera to open Rosalena" width="264" height="264" />
+          </div>
+          <p class="phone-scan" data-i18n="Point your phone's camera at the code, then tap the link it shows.">Point your phone's camera at the code, then tap the link it shows.</p>
+          <div class="phone-link-row">
+            <input class="phone-link" id="phone-link" data-i18n-aria-label="Phone link" type="text" readonly aria-label="Phone link" />
+            <button class="phone-btn" id="phone-copy" data-i18n="Copy" type="button">Copy</button>
+          </div>
+          <p class="phone-relay" id="phone-relay"></p>
+          <div class="phone-actions">
+            <button class="phone-btn" id="phone-new-qr" data-i18n-title="A new code: links shared before stop pairing new devices. Paired devices stay paired." data-i18n="New QR code" type="button" title="A new code: links shared before stop pairing new devices. Paired devices stay paired.">New QR code</button>
+            <button class="phone-btn" id="phone-check" data-i18n-title="Open the link from the internet side to prove it works" data-i18n="Test the link" type="button" title="Open the link from the internet side to prove it works">Test the link</button>
+          </div>
+        </div>
+
+        <section class="phone-devices" aria-labelledby="phone-devices-title">
+          <h3 id="phone-devices-title" data-i18n="Paired devices">Paired devices <span class="phone-count" id="phone-count"></span></h3>
+          <ul class="phone-device-list" id="phone-device-list"></ul>
+          <button class="phone-btn danger" id="phone-unpair-all" data-i18n="Unpair all" type="button" hidden>Unpair all</button>
+        </section>
+
+        <footer class="phone-foot">
+          <button class="phone-btn ghost" id="phone-settings" data-i18n="Settings" type="button">Settings</button>
+          <span class="phone-foot-note" data-i18n="Anyone with the QR code or link can pair. Unpair all closes every door.">Anyone with the QR code or link can pair. Unpair all closes every door.</span>
+        </footer>
+      </div>
+      <div class="phone-body" id="phone-remote" hidden>
+        <p class="phone-paired" data-i18n="This device is paired with Rosalena on your computer.">This device is paired with Rosalena on your computer.</p>
+        <p class="phone-reason" id="phone-remote-note"></p>
+        <button class="phone-btn danger" id="phone-forget" data-i18n="Unpair this device" type="button">Unpair this device</button>
+      </div>
+    </div>
+
+    <div class="settings-scrim" id="settings-scrim" hidden></div>
+    <div class="settings-panel" id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-page-title" hidden>
+      <div class="settings-body">
+        <aside class="settings-side">
+          <label class="settings-search">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.4" fill="none" stroke="currentColor" stroke-width="1.3" /><path d="M10.3 10.3l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" /></svg>
+            <input id="settings-search" type="search" placeholder="Search settings" data-i18n-placeholder="Search settings" aria-label="Search settings" data-i18n-aria-label="Search settings" autocomplete="off" spellcheck="false" />
+          </label>
+          <nav class="settings-nav" role="tablist" aria-label="Settings pages" data-i18n-aria-label="Settings pages" aria-orientation="vertical">
+            <p class="settings-group" data-settings-group="basics" data-i18n="Basics">Basics</p>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="appearance" aria-selected="true" aria-controls="settings-appearance">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" /><path d="M8 2.4a5.6 5.6 0 0 1 0 11.2" /><circle cx="5.6" cy="6.4" r="0.9" /><circle cx="5.9" cy="9.8" r="0.9" /></svg>
+              <span data-i18n="Appearance">Appearance</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="models" aria-selected="false" aria-controls="settings-models">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5.4 3v6.4L8 14.2l-5.4-3V4.8z" /><path d="M2.6 4.8L8 7.8l5.4-3M8 7.8v6.4" /></svg>
+              <span data-i18n="Models">Models</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="providers" aria-selected="false" aria-controls="settings-providers">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.4" y="2.6" width="11.2" height="4.4" rx="1.2" /><rect x="2.4" y="9" width="11.2" height="4.4" rx="1.2" /><path d="M5 4.8h.01M5 11.2h.01" stroke-width="1.8" stroke-linecap="round" /></svg>
+              <span data-i18n="Providers">Providers</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="notifications" aria-selected="false" aria-controls="settings-notifications">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11V7.3a4 4 0 0 1 8 0V11l1.2 1.4H2.8z" /><path d="M6.6 13.6a1.5 1.5 0 0 0 2.8 0" /></svg>
+              <span data-i18n="Notifications">Notifications</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="phone" aria-selected="false" aria-controls="settings-phone">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.4" y="1.6" width="7.2" height="12.8" rx="1.6" /><path d="M7 12.1h2" stroke-linecap="round" /></svg>
+              <span data-i18n="Phone access">Phone access</span>
+            </button>
+            <p class="settings-group" data-settings-group="agent" data-i18n="Agent">Agent</p>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="agent" aria-selected="false" aria-controls="settings-agent">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.8" y="5" width="10.4" height="8" rx="2" /><path d="M8 5V2.6M6 9h.01M10 9h.01" stroke-linecap="round" /></svg>
+              <span data-i18n="Agent">Agent</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="permissions" aria-selected="false" aria-controls="settings-permissions">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5 1.9v4c0 3.2-2.1 5.4-5 6.5-2.9-1.1-5-3.3-5-6.5v-4z" /><path d="M5.8 8l1.6 1.6L10.4 6.6" /></svg>
+              <span data-i18n="Permissions">Permissions</span>
+            </button>
+            <p class="settings-group" data-settings-group="extend" data-i18n="Extend">Extend</p>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="skills" aria-selected="false" aria-controls="settings-skills">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.4 3.2h3.8A1.8 1.8 0 0 1 8 5v8.6a1.6 1.6 0 0 0-1.6-1.4h-4z" /><path d="M13.6 3.2H9.8A1.8 1.8 0 0 0 8 5v8.6a1.6 1.6 0 0 1 1.6-1.4h4z" /></svg>
+              <span>Skills</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="mcp" aria-selected="false" aria-controls="settings-mcp">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 5.4h9.6l-2.3-2.3M13.2 10.6H3.6l2.3 2.3" stroke-linecap="round" /></svg>
+              <span>MCP</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="plugins" aria-selected="false" aria-controls="settings-plugins">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.4" y="2.4" width="4.6" height="4.6" rx="1" /><rect x="9" y="2.4" width="4.6" height="4.6" rx="1" /><rect x="2.4" y="9" width="4.6" height="4.6" rx="1" /><path d="M11.3 9.2v4.2M9.2 11.3h4.2" stroke-linecap="round" /></svg>
+              <span>Plugins</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="templates" aria-selected="false" aria-controls="settings-templates">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.8 1.8h5.6l2.8 3v9.4H3.8z" /><path d="M9.2 1.8v3.1h3M6 8.2h4M6 10.8h4" /></svg>
+              <span data-i18n="Templates">Templates</span>
+            </button>
+            <p class="settings-group" data-settings-group="advanced" data-i18n="Advanced">Advanced</p>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="generation" aria-selected="false" aria-controls="settings-generation">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.4 4.4h11.2M2.4 8h11.2M2.4 11.6h11.2" /><circle cx="5.4" cy="4.4" r="1.4" /><circle cx="10.4" cy="8" r="1.4" /><circle cx="7" cy="11.6" r="1.4" /></svg>
+              <span data-i18n="Generation">Generation</span>
+            </button>
+            <button class="settings-tab" type="button" role="tab" data-settings-page="advanced" aria-selected="false" aria-controls="settings-advanced">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.6 4.4L2.4 8l3.2 3.6M10.4 4.4L13.6 8l-3.2 3.6M9 3.2L7 12.8" stroke-linecap="round" /></svg>
+              <span data-i18n="Advanced">Advanced</span>
+            </button>
+          </nav>
+          <p class="settings-hint" data-i18n="Saved on this computer">Saved on this computer</p>
+        </aside>
+
+        <div class="settings-main">
+          <header class="settings-head">
+            <h2 id="settings-page-title" data-i18n="Appearance">Appearance</h2>
+            <button class="icon-btn settings-close" id="settings-close" type="button" title="Close settings (Esc)" data-i18n-title="Close settings (Esc)" aria-label="Close settings" data-i18n-aria-label="Close settings">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+            </button>
+          </header>
+
+          <!-- Search results: every row whose text matches, grouped by page. -->
+          <div class="settings-results" id="settings-results" role="listbox" aria-label="Matching settings" data-i18n-aria-label="Matching settings" hidden></div>
+
+          <div class="settings-pages" id="settings-pages">
+            <!-- ======================================================= APPEARANCE -->
+            <section class="settings-page" id="settings-appearance" role="tabpanel" data-settings-page-body="appearance" data-title="Appearance" data-i18n-data-title="Appearance">
+              <!-- The window's language (i18n.mjs). The second name is the other language's word,
+                   so search finds "Language" and "Idioma" whichever one is on. -->
+              <div class="settings-row" id="language-row">
+                <div class="row-label"><span data-i18n="Language">Language</span><span class="row-value" data-i18n="Language (alternate name)">Idioma</span></div>
+                <select class="settings-select" id="language-select" aria-label="Language of the window" data-i18n-aria-label="Language of the window">
+                  <option value="en" lang="en">English</option>
+                  <option value="es" lang="es">Español</option>
+                  <option value="system" data-i18n="Match my system">Match my system</option>
+                </select>
+                <p class="row-help" data-i18n="The window's words. Changing it redraws the window; chats and runs keep going. What the agent writes follows the language you write in.">The window's words. Changing it redraws the window; chats and runs keep going. What the agent writes follows the language you write in.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Theme">Theme</span><span class="row-value" data-i18n="light, dark, or follow the system">light, dark, or follow the system</span></div>
+                <div class="seg acct-seg settings-seg" id="acct-theme" role="group" aria-label="Theme" data-i18n-aria-label="Theme"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Palette">Palette</span><span class="row-value" data-i18n="the colour family under the theme">the colour family under the theme</span></div>
+                <div class="acct-palettes" id="acct-palettes" role="group" aria-label="Palette" data-i18n-aria-label="Palette"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Accent colour">Accent colour</span></div>
+                <div class="acct-swatches" id="acct-accents" role="group" aria-label="Accent colour" data-i18n-aria-label="Accent colour"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Text size">Text size</span></div>
+                <div class="seg acct-seg settings-seg" id="acct-text" role="group" aria-label="Text size" data-i18n-aria-label="Text size"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Density">Density</span></div>
+                <div class="seg acct-seg settings-seg" id="acct-density" role="group" aria-label="Density" data-i18n-aria-label="Density"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="What the window shows">What the window shows</span></div>
+                <div class="acct-switches" id="acct-switches"></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span>Style Lab</span><span class="row-value" data-i18n="skins and a live preview">skins and a live preview</span></div>
+                <div class="switch-row"><button class="btn" id="settings-style-lab" type="button" data-i18n="Open Style Lab">Open Style Lab</button></div>
+                <p class="row-help" data-i18n="Everything on this page with a live preview, plus saved skins. It opens in the sidebar.">Everything on this page with a live preview, plus saved skins. It opens in the sidebar.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Resizable window">Resizable window</span>
+                  <span class="row-value" id="resize-value" data-i18n="on">on</span>
+                </div>
+                <div class="switch-row">
+                  <input class="switch" id="resizable" type="checkbox" checked />
+                  <label class="switch-label" for="resizable" id="resizable-label" data-i18n="Drag the window edges">Drag the window edges</label>
+                </div>
+                <p class="row-help" id="resize-help" data-i18n="Off locks the window size and disables Maximise.">Off locks the window size and disables Maximise.</p>
+              </div>
+              <!-- Session rail placement (ui/session-rail.mjs paints the buttons and the switch). -->
+              <div class="settings-row" id="rail-settings-row">
+                <div class="row-label"><span data-i18n="Session rail">Session rail</span><span class="row-value" id="rail-settings-value" data-i18n="docked">docked</span></div>
+                <div class="seg acct-seg settings-seg" id="rail-placement" role="group" aria-label="Session rail placement" data-i18n-aria-label="Session rail placement"></div>
+                <div class="switch-row">
+                  <input class="switch" id="rail-shown" type="checkbox" />
+                  <label class="switch-label" for="rail-shown" data-i18n="Show the rail">Show the rail</label>
+                </div>
+                <p class="row-help" data-i18n-html="The chat's folder, context, MCP servers, outputs, changes and background tasks. Docked sits beside the chat; Overlay slides over it and closes on Esc or a click outside. Ctrl+. shows or hides it, Ctrl+Shift+. switches.">The chat's folder, context, MCP servers, outputs, changes and background tasks.
+                  <b>Docked</b> sits beside the chat; <b>Overlay</b> slides over it and closes on Esc or a click outside.
+                  Ctrl+. shows or hides it, Ctrl+Shift+. switches.</p>
+              </div>
+            </section>
+
+            <!-- =========================================================== MODELS -->
+            <section class="settings-page" id="settings-models" role="tabpanel" data-settings-page-body="models" data-title="Models" data-i18n-data-title="Models" hidden>
+              <div class="settings-block">
+                <h3 class="settings-subhead" data-i18n="Models you can pick">Models you can pick</h3>
+                <p class="row-help" data-i18n-html="Every model the model list offers right now: Rosalena's free ones, the ones your keys and sign-ins open, and the models on this PC. Which one a new chat starts on is under Generation.">Every model the model list offers right now: Rosalena's free ones, the ones your keys and
+                  sign-ins open, and the models on this PC. Which one a new chat starts on is under <strong>Generation</strong>.</p>
+                <div class="settings-filter">
+                  <input class="settings-filter-input" id="models-filter" type="search" placeholder="Find a model" data-i18n-placeholder="Find a model" aria-label="Find a model" data-i18n-aria-label="Find a model" autocomplete="off" />
+                  <button class="btn" id="models-open-pc" type="button" title="Which chat, image, video and voice models this PC runs, and download them" data-i18n-title="Which chat, image, video and voice models this PC runs, and download them" data-i18n="Models on this PC…">Models on this PC…</button>
+                </div>
+                <div class="model-table" id="models-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+                <p class="settings-note" id="models-note"></p>
+              </div>
+              <!-- Every figure here is read from /api/orchestration, which is built from
+                   data/roles.json + router/router.config.json (through the menu the picker
+                   already uses) and the plugin host. Nothing is typed in by hand. -->
+              <div class="settings-block" id="settings-orchestration">
+                <h3 class="settings-subhead" data-i18n="Model fallback: which models answer, in what order">Model fallback: which models answer, in what order</h3>
+                <p class="row-help" data-i18n="Each kind of work below has a list of models. Rosalena tries the first one; if it cannot answer (no key, its limit is used up, not installed, or down for a moment) it moves to the next by itself, so a chat keeps going. There is nothing to set up: add a key or a local model and more of each list lights up. Picking one model in the model list skips this.">Each kind of work below has a list of models. Rosalena tries the first one;
+                  if it cannot answer (no key, its limit is used up, not installed, or down for a moment) it moves
+                  to the next by itself, so a chat keeps going. There is nothing to set up: add a key or a local
+                  model and more of each list lights up. Picking one model in the model list skips this.</p>
+                <div class="fallback-list" id="orchestration-roles" aria-label="Fallback lists" data-i18n-aria-label="Fallback lists">
+                  <p class="empty" data-i18n="Reading…">Reading…</p>
+                </div>
+                <p class="settings-note" id="orchestration-source"></p>
+                <details class="fallback-advanced">
+                  <summary data-i18n="Advanced: subagents, judge pass and where this comes from">Advanced: subagents, judge pass and where this comes from</summary>
+                  <div id="orchestration-subagents">
+                    <p class="empty" data-i18n="Reading the subagent settings…">Reading the subagent settings…</p>
+                  </div>
+                  <div class="orchestration-howto" id="orchestration-howto"></div>
+                </details>
+              </div>
+            </section>
+
+            <!-- ======================================================== PROVIDERS -->
+            <section class="settings-page" id="settings-providers" role="tabpanel" data-settings-page-body="providers" data-title="Providers" data-i18n-data-title="Providers" hidden>
+              <div class="settings-filter">
+                <input class="settings-filter-input" id="providers-filter" type="search" placeholder="Find a provider" data-i18n-placeholder="Find a provider" aria-label="Find a provider" data-i18n-aria-label="Find a provider" autocomplete="off" />
+                <button class="btn" id="providers-refresh" type="button" title="Probe the addresses and read the router again" data-i18n-title="Probe the addresses and read the router again" data-i18n="Check again">Check again</button>
+              </div>
+
+              <div class="settings-block" data-provider-group="local">
+                <h3 class="settings-subhead">Local <span class="subhead-note" data-i18n="servers on this PC or your network">servers on this PC or your network</span></h3>
+                <p class="row-help" data-i18n="Each address is checked for a server listening there. &quot;In the model list&quot; means Rosalena's router sends chats to it; the others are common servers it found or looked for.">Each address is checked for a server listening there. "In the model list" means
+                  Rosalena's router sends chats to it; the others are common servers it found or looked for.</p>
+                <div class="provider-list" id="providers-local"><p class="empty" data-i18n="Checking…">Checking…</p></div>
+                <p class="settings-note" id="providers-router"></p>
+              </div>
+
+              <!-- Cloud models the person brings (/api/cloud, cloud-setup.mjs): their own
+                   provider keys. Keys are written to the router's key file and never shown
+                   back, only their last 4 characters. -->
+              <div class="settings-block" id="settings-cloud" data-provider-group="cloud">
+                <h3 class="settings-subhead" data-i18n="Cloud API">Cloud API <span class="subhead-note" data-i18n="your own API keys">your own API keys</span></h3>
+                <div class="key-summary" id="cloud-key-summary" aria-label="Which keys are saved" data-i18n-aria-label="Which keys are saved"></div>
+                <p class="row-help" data-i18n="For the paid models in the list. Each key is saved on this PC in the router's key file and works on your next message. How much each may spend a month is just below.">For the paid models in the list. Each key is saved on this PC in the router's key
+                  file and works on your next message. How much each may spend a month is just below.</p>
+                <div class="cloud-keys" id="cloud-keys"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+
+                <!-- Where a student or anyone gets a free key (data/student-programs.json). -->
+                <h3 class="settings-subhead" data-i18n="Get a free API key">Get a free API key</h3>
+                <p class="row-help" data-i18n="Programs that give students (or anyone) free model access. Cards marked &quot;Works in Rosalena&quot; take the key right here; the others give credits for their own tools.">Programs that give students (or anyone) free model access. Cards marked
+                  "Works in Rosalena" take the key right here; the others give credits for their own tools.</p>
+                <div class="key-programs" id="key-programs"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+                <p class="row-help key-programs-note" id="key-programs-note"></p>
+              </div>
+
+              <!-- Monthly spend caps per paid provider (/api/budgets -> router /admin/budgets). -->
+              <div class="settings-block" id="settings-spend" data-provider-group="spend">
+                <h3 class="settings-subhead" data-i18n="Monthly spend limits">Monthly spend limits</h3>
+                <p class="row-help" data-i18n="The most each paid provider may spend in a calendar month with your API key. When a limit is reached, requests to it stop and the chat falls back to a free model. A change applies to your next message, chats that are running included. 0 means no limit.">The most each paid provider may spend in a calendar month with your API
+                  key. When a limit is reached, requests to it stop and the chat falls back to a free model.
+                  A change applies to your next message, chats that are running included. 0 means no limit.</p>
+                <div class="spend-list" id="spend-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+                <p class="row-help" id="spend-note"></p>
+              </div>
+
+              <div class="settings-block" data-provider-group="subscriptions">
+                <h3 class="settings-subhead" data-i18n="Subscriptions">Subscriptions <span class="subhead-note" data-i18n="sign-ins to a plan you pay for">sign-ins to a plan you pay for</span></h3>
+                <div class="provider-list" id="providers-subs"><p class="empty" data-i18n="Checking…">Checking…</p></div>
+              </div>
+            </section>
+
+            <!-- ==================================================== NOTIFICATIONS -->
+            <section class="settings-page" id="settings-notifications" role="tabpanel" data-settings-page-body="notifications" data-title="Notifications" data-i18n-data-title="Notifications" hidden>
+              <p class="row-help" data-i18n="A system notification when something happens in the chat you have open while this window is in the background. Nothing shows while you are looking at the window.">A system notification when something happens in the chat you have open while this
+                window is in the background. Nothing shows while you are looking at the window.</p>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="A run finishes">A run finishes</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="notify-done" type="checkbox" checked />
+                  <label class="switch-label" for="notify-done" data-i18n="Tell me when an answer is ready">Tell me when an answer is ready</label>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="A run fails">A run fails</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="notify-failed" type="checkbox" checked />
+                  <label class="switch-label" for="notify-failed" data-i18n="Tell me when a run stops with an error">Tell me when a run stops with an error</label>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="A run needs approval">A run needs approval</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="notify-approval" type="checkbox" checked />
+                  <label class="switch-label" for="notify-approval" data-i18n="Tell me when the agent waits for my yes or no">Tell me when the agent waits for my yes or no</label>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Try it">Try it</span><span class="row-value" id="notify-state"></span></div>
+                <div class="switch-row"><button class="btn" id="notify-test" type="button" data-i18n="Send a test notification">Send a test notification</button></div>
+                <p class="row-help" id="notify-help" data-i18n="In the desktop app these are Windows notifications. In a browser tab the browser asks once whether this page may show them.">In the desktop app these are Windows notifications. In a browser tab the
+                  browser asks once whether this page may show them.</p>
+              </div>
+            </section>
+
+            <!-- ===================================================== PHONE ACCESS -->
+            <!-- phone.js fills and saves this page through /api/remote/* (remote.mjs). -->
+            <section class="settings-page" id="settings-phone" role="tabpanel" data-settings-page-body="phone" data-title="Phone access" data-i18n-data-title="Phone access" hidden>
+              <p class="row-help" data-i18n="Use this app from your phone or another computer, from anywhere, through a private Cloudflare tunnel. Scan the QR code once and that device stays paired. Nothing to install: Rosalena downloads Cloudflare's cloudflared the first time.">Use this app from your phone or another computer, from anywhere, through a private
+                Cloudflare tunnel. Scan the QR code once and that device stays paired. Nothing to install: Rosalena
+                downloads Cloudflare's cloudflared the first time.</p>
+              <div class="settings-row" id="phone-set-status">
+                <div class="row-label"><span data-i18n="Phone access now">Phone access now</span><span class="row-value" id="phone-set-state" data-i18n="off">off</span></div>
+                <div class="switch-row">
+                  <button class="btn primary" id="phone-set-show" type="button" data-i18n="Show QR code">Show QR code</button>
+                  <button class="btn" id="phone-set-toggle" type="button" data-i18n="Turn on">Turn on</button>
+                </div>
+                <p class="row-help" id="phone-set-reason"></p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Keep phone access on">Keep phone access on</span><span class="row-value" id="phone-set-keep-value" data-i18n="off">off</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="phone-set-keep" type="checkbox" />
+                  <label class="switch-label" for="phone-set-keep" data-i18n="Start it every time Rosalena starts">Start it every time Rosalena starts</label>
+                </div>
+                <p class="row-help" data-i18n="With the stable link on, your phone's bookmark works again a few seconds after the app opens.">With the stable link on, your phone's bookmark works again a few seconds after the app opens.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Stable link">Stable link</span><span class="row-value" id="phone-set-relay-value" data-i18n="on">on</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="phone-set-relay" type="checkbox" checked />
+                  <label class="switch-label" for="phone-set-relay" data-i18n="One address that never changes (rosalena.dev relay)">One address that never changes (rosalena.dev relay)</label>
+                </div>
+                <p class="row-help" id="phone-set-relay-help" data-i18n="The relay forwards your own address to this PC's tunnel, so a restart doesn't break the link. Off: the address changes every time the tunnel starts, and phones have to scan again.">The relay forwards your own address to this PC's tunnel, so a
+                  restart doesn't break the link. Off: the address changes every time the tunnel starts, and phones
+                  have to scan again.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Stay paired for">Stay paired for</span><span class="row-value" data-i18n="without being used">without being used</span></div>
+                <select class="settings-select phone-days" id="phone-set-days" aria-label="How long a paired device stays paired without being used" data-i18n-aria-label="How long a paired device stays paired without being used">
+                  <option value="1" data-i18n="1 day">1 day</option>
+                  <option value="7" data-i18n="7 days">7 days</option>
+                  <option value="30" data-i18n="30 days">30 days</option>
+                  <option value="90" data-i18n="90 days">90 days</option>
+                  <option value="365" data-i18n="1 year">1 year</option>
+                </select>
+                <p class="row-help" data-i18n="A device that isn't used for this long has to scan the QR code again.">A device that isn't used for this long has to scan the QR code again.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Paired devices">Paired devices</span><span class="row-value" id="phone-set-devices" data-i18n="none">none</span></div>
+                <div class="switch-row">
+                  <button class="btn" id="phone-set-manage" type="button" data-i18n="See devices">See devices</button>
+                  <button class="btn danger" id="phone-set-unpair-all" type="button" data-i18n="Unpair all">Unpair all</button>
+                </div>
+                <p class="row-help" data-i18n="Unpair all signs out every device and makes a new QR code and a new link.">Unpair all signs out every device and makes a new QR code and a new link.</p>
+              </div>
+              <h3 class="settings-subhead" data-i18n="Your own Cloudflare tunnel">Your own Cloudflare tunnel</h3>
+              <div class="settings-row" id="phone-set-named">
+                <div class="row-label"><span data-i18n="Named tunnel">Named tunnel</span><span class="row-value" id="phone-set-named-value" data-i18n="not set">not set</span></div>
+                <div class="phone-named-grid">
+                  <label for="phone-set-host" data-i18n="Hostname">Hostname</label>
+                  <input class="settings-select" id="phone-set-host" type="text" placeholder="rosalena.example.com" autocomplete="off" spellcheck="false" />
+                  <label for="phone-set-token" data-i18n="Tunnel token">Tunnel token</label>
+                  <input class="settings-select" id="phone-set-token" type="password" placeholder="paste the token from the tunnel's install command" data-i18n-placeholder="paste the token from the tunnel's install command" autocomplete="off" spellcheck="false" />
+                  <label for="phone-set-port" data-i18n="Local port">Local port</label>
+                  <input class="settings-select" id="phone-set-port" type="number" min="1024" max="65535" step="1" />
+                </div>
+                <div class="switch-row">
+                  <button class="btn" id="phone-set-named-save" type="button" data-i18n="Save tunnel">Save tunnel</button>
+                  <button class="btn" id="phone-set-named-clear" type="button" data-i18n="Remove">Remove</button>
+                </div>
+                <p class="row-help" data-i18n-html="Bring your own domain instead of the relay. In Cloudflare: Zero Trust, Networks, Tunnels, create a tunnel, add a public hostname pointing to http://127.0.0.1: plus the local port above, then paste the tunnel's token here. The token stays on this computer.">Bring your own domain instead of the relay. In Cloudflare: Zero Trust, Networks, Tunnels,
+                  create a tunnel, add a public hostname pointing to <code>http://127.0.0.1:</code> plus the local port above,
+                  then paste the tunnel's token here. The token stays on this computer.</p>
+              </div>
+            </section>
+
+            <!-- ============================================================ AGENT -->
+            <!-- How each message runs: limits, tools and checks. -->
+            <section class="settings-page" id="settings-agent" role="tabpanel" data-settings-page-body="agent" data-title="Agent" data-i18n-data-title="Agent" hidden>
+              <!-- Steps one message may take before it stops with "max_steps". Saved in
+                   ui-prefs.json through /api/prefs; app.js builds the buttons. -->
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Steps per message">Steps per message</span>
+                  <span class="row-value" id="steps-value">100</span>
+                </div>
+                <div class="seg ctxwin-seg" role="group" aria-label="Steps per message" data-i18n-aria-label="Steps per message" id="steps-seg"></div>
+                <div class="ctxwin-custom">
+                  <input class="ctxwin-input" id="steps-input" type="number" min="1" max="1000" step="1"
+                         placeholder="Custom, 1 to 1000" data-i18n-placeholder="Custom, 1 to 1000" aria-label="Custom steps per message" data-i18n-aria-label="Custom steps per message" />
+                  <button type="button" class="ctxwin-apply" id="steps-apply" data-i18n="Set">Set</button>
+                </div>
+                <p class="row-help" data-i18n="How many model calls one message can make before it stops and reports where it got to. Long tasks need more; a loop guard still stops a run that repeats itself.">How many model calls one message can make before it stops and
+                  reports where it got to. Long tasks need more; a loop guard still stops a run that
+                  repeats itself.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Time per message">Time per message</span>
+                  <span class="row-value" id="minutes-value">60 min</span>
+                </div>
+                <div class="seg ctxwin-seg" role="group" aria-label="Time per message" data-i18n-aria-label="Time per message" id="minutes-seg"></div>
+                <p class="row-help" data-i18n="How long one message may keep working before it stops and hands back what it has. &quot;No limit&quot; leaves only the step limit and the stall watchdog.">How long one message may keep working before it stops and hands back what it
+                  has. "No limit" leaves only the step limit and the stall watchdog.</p>
+              </div>
+              <!-- The advisor plugin: a reviewer model checks each step as it happens. -->
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Reviewer on every step">Reviewer on every step</span>
+                  <span class="row-value" id="advisor-value" data-i18n="off">off</span>
+                </div>
+                <div class="switch-row">
+                  <input class="switch" id="advisor" type="checkbox" />
+                  <label class="switch-label" for="advisor" data-i18n="Check each step that changes something">Check each step that changes something</label>
+                </div>
+                <p class="row-help" data-i18n="A second model looks at each step that changes files or runs a changing command, and speaks up only about concrete problems: a bug it can point at, a claim no test backs, work drifting from the request. One short extra model call per step.">A second model looks at each step that changes files or runs a changing
+                  command, and speaks up only about concrete problems: a bug it can point at, a claim no test
+                  backs, work drifting from the request. One short extra model call per step.</p>
+              </div>
+              <!-- On: each message starts with one small load_tools tool and the model adds
+                   the tools it needs (tool-loading.mjs). Off: every tool, every message. -->
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Load tools">Load tools</span>
+                  <span class="row-value" id="tool-loading-value" data-i18n="when needed">when needed</span>
+                </div>
+                <div class="switch-row">
+                  <input class="switch" id="tool-loading" type="checkbox" checked />
+                  <label class="switch-label" for="tool-loading" data-i18n="Only when a chat needs them">Only when a chat needs them</label>
+                </div>
+                <p class="row-help" data-i18n="On, a quick question like a math problem is sent without the tool definitions, which saves several thousand tokens a message and keeps small local models from calling tools they don't need. The model loads the tools it needs itself, and they stay loaded for the rest of the chat. Off sends every tool with every message.">On, a quick question like a math problem is sent without the tool
+                  definitions, which saves several thousand tokens a message and keeps small local models
+                  from calling tools they don't need. The model loads the tools it needs itself, and they
+                  stay loaded for the rest of the chat. Off sends every tool with every message.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Your browser">Your browser</span>
+                  <span class="row-value" id="solbrowser-value" data-i18n="not set up">not set up</span>
+                </div>
+                <div class="switch-row">
+                  <button class="btn" id="solbrowser-setup" type="button" data-i18n="Set up">Set up</button>
+                  <button class="btn" id="solbrowser-check" type="button" data-i18n="Check connection">Check connection</button>
+                </div>
+                <p class="row-help" id="solbrowser-help" data-i18n="Lets the agent read pages in your own browser with your logins, and click and type there, inside embedded frames too (SolBrowser). Set up copies the extension to a folder; load that folder once on your browser's extensions page with Developer mode on. Reading asks nothing; clicking and typing ask first.">Lets the agent read pages in your own browser with
+                  your logins, and click and type there, inside embedded frames too (SolBrowser). Set up copies
+                  the extension to a folder; load that folder once on your browser's extensions page with
+                  Developer mode on. Reading asks nothing; clicking and typing ask first.</p>
+              </div>
+              <p class="row-help settings-pointer" data-i18n-html="What the agent may do without asking (access, sandbox, desktop control, commits, approval rules) is under Permissions. The context window is next to the message box, on the gauge.">What the agent may do without asking (access, sandbox, desktop control,
+                commits, approval rules) is under <strong>Permissions</strong>. The context window is next to the message
+                box, on the gauge.</p>
+            </section>
+
+            <!-- ====================================================== PERMISSIONS -->
+            <section class="settings-page" id="settings-permissions" role="tabpanel" data-settings-page-body="permissions" data-title="Permissions" data-i18n-data-title="Permissions" hidden>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Access">Access</span><span class="row-value" data-i18n="the composer's Access menu">the composer's Access menu</span></div>
+                <div class="seg perm-seg" id="perm-access" role="group" aria-label="Access" data-i18n-aria-label="Access">
+                  <button type="button" class="seg-btn" data-access="read" aria-pressed="false"><span data-i18n="Read only">Read only</span></button>
+                  <button type="button" class="seg-btn" data-access="workspace" aria-pressed="true"><span data-i18n="Workspace write">Workspace write</span></button>
+                  <button type="button" class="seg-btn" data-access="auto" aria-pressed="false"><span>Auto</span></button>
+                  <button type="button" class="seg-btn" data-access="full" aria-pressed="false"><span data-i18n="Full access">Full access</span></button>
+                </div>
+                <p class="row-help" id="perm-access-help"></p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Auto approval">Auto approval</span><span class="row-value" id="perm-auto-value" data-i18n="off">off</span></div>
+                <p class="row-help" data-i18n-html="With Auto access, every action Workspace write would ask you about goes to a reviewer model instead, which allows or refuses it with a reason the agent reads. Built-in deny rules still deny, and after 3 refusals in a row (or 20 in one run) it goes back to asking you. A reviewer that cannot be reached means it asks you.">With <b>Auto</b> access, every action Workspace write would ask you about goes to a
+                  reviewer model instead, which allows or refuses it with a reason the agent reads. Built-in deny rules
+                  still deny, and after 3 refusals in a row (or 20 in one run) it goes back to asking you. A reviewer
+                  that cannot be reached means it asks you.</p>
+              </div>
+              <!-- Commands in the OS sandbox (sandbox.mjs): writes only inside the workspace. -->
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Sandbox commands">Sandbox commands</span>
+                  <span class="row-value" id="sandbox-value" data-i18n="off">off</span>
+                </div>
+                <div class="switch-row">
+                  <input class="switch" id="sandbox" type="checkbox" />
+                  <label class="switch-label" for="sandbox" data-i18n="Commands can only write inside the project folder">Commands can only write inside the project folder</label>
+                </div>
+                <p class="row-help" id="sandbox-help" data-i18n="On, every command the agent runs is started in the operating system's sandbox: it can read files but can only write inside the project folder and its own temp folder. A command that would write anywhere else is refused by the system, not by a rule the model could talk around. Background jobs are off while it is on.">On, every command the agent runs is started in the
+                  operating system's sandbox: it can read files but can only write inside the project folder
+                  and its own temp folder. A command that would write anywhere else is refused by the system,
+                  not by a rule the model could talk around. Background jobs are off while it is on.</p>
+              </div>
+              <!-- Desktop control (src/desktop.mjs): screen, mouse and keyboard tools. -->
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Desktop control">Desktop control</span>
+                  <span class="row-value" id="desktop-value" data-i18n="off">off</span>
+                </div>
+                <div class="switch-row">
+                  <input class="switch" id="desktop" type="checkbox" />
+                  <label class="switch-label" for="desktop" data-i18n="Let the agent see the screen and use the mouse and keyboard">Let the agent see the screen and use the mouse and keyboard</label>
+                </div>
+                <p class="row-help" id="desktop-help" data-i18n="On, the agent gets desktop tools: a screenshot of the screen or one window, the window list, and click, drag, scroll, type and key presses. Looking never asks; every click, drag, scroll, keystroke or shortcut asks you first in Workspace write mode, and none are allowed in Read only. Full access lets them run without asking. Needs a model that can see images. Windows only.">On, the agent gets desktop tools: a screenshot of the screen or
+                  one window, the window list, and click, drag, scroll, type and key presses. Looking never asks;
+                  every click, drag, scroll, keystroke or shortcut asks you first in Workspace write mode, and none
+                  are allowed in Read only. Full access lets them run without asking. Needs a model that can see
+                  images. Windows only.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Commits in this folder">Commits in this folder</span><span class="row-value" id="perm-commits-value"></span></div>
+                <div class="seg perm-seg" id="perm-commits" role="group" aria-label="Commits">
+                  <button type="button" class="seg-btn" data-commit="ask" aria-pressed="false"><span data-i18n="Ask at the end">Ask at the end</span></button>
+                  <button type="button" class="seg-btn" data-commit="loose" aria-pressed="false"><span data-i18n="Small only">Small only</span></button>
+                  <button type="button" class="seg-btn" data-commit="autonomous" aria-pressed="false"><span data-i18n="Everything">Everything</span></button>
+                  <button type="button" class="seg-btn" data-commit="off" aria-pressed="false"><span data-i18n="Never">Never</span></button>
+                </div>
+                <p class="row-help" id="perm-commits-help" data-i18n="The composer's Commits menu: how the agent commits finished work in the folder this chat works in. It never pushes.">The composer's Commits menu: how the agent commits finished work
+                  in the folder this chat works in. It never pushes.</p>
+              </div>
+              <div class="settings-block">
+                <h3 class="settings-subhead" data-i18n="Approval rules">Approval rules</h3>
+                <p class="row-help" data-i18n-html="Your own rules, checked before the access level on every tool call, first match wins. The pattern is matched against the command, the file path or the address, and * means anything. &quot;Always allow&quot; on an approval card only lasts for that chat; a rule here lasts.">Your own rules, checked before the access level on every tool call, first match wins.
+                  The pattern is matched against the command, the file path or the address, and <code>*</code> means
+                  anything. "Always allow" on an approval card only lasts for that chat; a rule here lasts.</p>
+                <div class="rule-list" id="perm-rules"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+                <div class="rule-add">
+                  <select id="perm-rule-action" aria-label="What the rule does" data-i18n-aria-label="What the rule does">
+                    <option value="ask" data-i18n="Ask first">Ask first</option>
+                    <option value="allow" data-i18n="Allow">Allow</option>
+                    <option value="deny" data-i18n="Refuse">Refuse</option>
+                  </select>
+                  <select id="perm-rule-tool" aria-label="Which tool" data-i18n-aria-label="Which tool">
+                    <option value="run_command" data-i18n="Commands">Commands</option>
+                    <option value="write_file" data-i18n="Writing files">Writing files</option>
+                    <option value="edit_file" data-i18n="Editing files">Editing files</option>
+                    <option value="web_fetch" data-i18n="Web pages">Web pages</option>
+                    <option value="*" data-i18n="Any tool">Any tool</option>
+                  </select>
+                  <input id="perm-rule-pattern" type="text" placeholder="*npm publish*" aria-label="Pattern" data-i18n-aria-label="Pattern" spellcheck="false" />
+                  <button class="btn" id="perm-rule-add" type="button" data-i18n="Add rule">Add rule</button>
+                </div>
+                <p class="settings-note" id="perm-rules-note"></p>
+                <details class="fallback-advanced">
+                  <summary data-i18n="The rules that ship with Rosalena">The rules that ship with Rosalena</summary>
+                  <div class="rule-list" id="perm-builtin"></div>
+                </details>
+              </div>
+            </section>
+
+            <!-- =========================================================== SKILLS -->
+            <section class="settings-page" id="settings-skills" role="tabpanel" data-settings-page-body="skills" data-title="Skills" hidden>
+              <p class="row-help" data-i18n="Skills are step-by-step instructions for a kind of task (a SKILL.md in a folder). The agent loads one with its skill tool, and Rosalena loads some by itself when the work calls for them. A skill that is off is not offered either way.">Skills are step-by-step instructions for a kind of task (a SKILL.md in a folder). The agent
+                loads one with its skill tool, and Rosalena loads some by itself when the work calls for them. A skill
+                that is off is not offered either way.</p>
+              <div class="skill-list" id="skills-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+              <p class="settings-note" id="skills-note"></p>
+            </section>
+
+            <!-- ============================================================== MCP -->
+            <section class="settings-page" id="settings-mcp" role="tabpanel" data-settings-page-body="mcp" data-title="MCP" hidden>
+              <p class="row-help" data-i18n="MCP servers are programs that give the agent more tools. The switches are the same ones as the MCP button beside the message box and apply right away, chats that are running included.">MCP servers are programs that give the agent more tools. The switches are the same ones as the
+                MCP button beside the message box and apply right away, chats that are running included.</p>
+              <div class="provider-list" id="settings-mcp-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+              <div class="switch-row"><button class="btn" id="settings-mcp-open" type="button" data-i18n="Add or import servers…">Add or import servers…</button></div>
+              <p class="settings-note" id="settings-mcp-note"></p>
+            </section>
+
+            <!-- ========================================================== PLUGINS -->
+            <section class="settings-page" id="settings-plugins" role="tabpanel" data-settings-page-body="plugins" data-title="Plugins" hidden>
+              <p class="row-help" data-i18n="Tool plugins add tools and checks to the agent; page plugins add a page to the sidebar. Switching one changes the next message. Removing, adding your own and version history are on the Plugins page.">Tool plugins add tools and checks to the agent; page plugins add a page to the sidebar.
+                Switching one changes the next message. Removing, adding your own and version history are on the Plugins page.</p>
+              <div class="provider-list" id="settings-plugins-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+              <div class="switch-row"><button class="btn" id="settings-plugins-open" type="button" data-i18n="Open the Plugins page…">Open the Plugins page…</button></div>
+              <p class="settings-note" id="settings-plugins-note"></p>
+            </section>
+
+            <!-- ======================================================== TEMPLATES -->
+            <section class="settings-page" id="settings-templates" role="tabpanel" data-settings-page-body="templates" data-title="Templates" data-i18n-data-title="Templates" hidden>
+              <p class="row-help" data-i18n-html="Saved prompts. Each one is also a slash command: type /name in the message box, and anything after the name fills $ARGUMENTS. Yours are files you can edit here; the others ship with Rosalena or come from another tool's folder.">Saved prompts. Each one is also a slash command: type <code>/name</code> in the message box, and
+                anything after the name fills <code>$ARGUMENTS</code>. Yours are files you can edit here; the others ship with
+                Rosalena or come from another tool's folder.</p>
+              <div class="switch-row"><button class="btn" id="tpl-new" type="button" data-i18n="New template">New template</button></div>
+              <form class="tpl-editor" id="tpl-editor" hidden>
+                <div class="tpl-fields">
+                  <label><span data-i18n="Name">Name</span><input id="tpl-name" type="text" maxlength="48" placeholder="standup" spellcheck="false" autocomplete="off" /></label>
+                  <label><span data-i18n="Runs as">Runs as</span>
+                    <select id="tpl-mode">
+                      <option value="" data-i18n="A normal message">A normal message</option>
+                      <option value="plan" data-i18n="Plan first">Plan first</option>
+                      <option value="goal" data-i18n="A goal">A goal</option>
+                    </select>
+                  </label>
+                </div>
+                <label><span data-i18n="Description">Description</span><input id="tpl-desc" type="text" maxlength="200" placeholder="What it is for, in one line" data-i18n-placeholder="What it is for, in one line" /></label>
+                <label><span>Prompt</span><textarea id="tpl-body" rows="6" placeholder="Summarise what changed since yesterday: $ARGUMENTS" data-i18n-placeholder="Summarise what changed since yesterday: $ARGUMENTS"></textarea></label>
+                <div class="switch-row">
+                  <button class="btn primary" id="tpl-save" type="submit" data-i18n="Save template">Save template</button>
+                  <button class="btn" id="tpl-cancel" type="button" data-i18n="Cancel">Cancel</button>
+                </div>
+              </form>
+              <div class="tpl-list" id="templates-list"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+              <p class="settings-note" id="tpl-note"></p>
+            </section>
+
+            <!-- ======================================================= GENERATION -->
+            <section class="settings-page" id="settings-generation" role="tabpanel" data-settings-page-body="generation" data-title="Generation" data-i18n-data-title="Generation" hidden>
+              <p class="row-help" data-i18n="What a new chat starts with. A chat you already have keeps the model and effort it was left on; change those in the message box.">What a new chat starts with. A chat you already have keeps the model and effort it was
+                left on; change those in the message box.</p>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Model for new chats">Model for new chats</span><span class="row-value" id="gen-model-value"></span></div>
+                <select class="settings-select" id="gen-model" aria-label="Model for new chats" data-i18n-aria-label="Model for new chats"></select>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Effort for new chats">Effort for new chats</span></div>
+                <select class="settings-select" id="gen-effort" aria-label="Effort for new chats" data-i18n-aria-label="Effort for new chats">
+                  <option value="" data-i18n="Default (the model's own)">Default (the model's own)</option>
+                  <option value="low" data-i18n="Low">Low</option>
+                  <option value="medium" data-i18n="Medium">Medium</option>
+                  <option value="high" data-i18n="High">High</option>
+                  <option value="xhigh">Extra</option>
+                  <option value="max" data-i18n="Max">Max</option>
+                </select>
+                <p class="row-help" data-i18n="How hard the model thinks. A model that has no such setting ignores it.">How hard the model thinks. A model that has no such setting ignores it.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Max output tokens">Max output tokens</span><span class="row-value" id="gen-tokens-value" data-i18n="default (4,096)">default (4,096)</span></div>
+                <div class="seg ctxwin-seg" role="group" aria-label="Max output tokens" data-i18n-aria-label="Max output tokens" id="gen-tokens-seg"></div>
+                <div class="ctxwin-custom">
+                  <input class="ctxwin-input" id="gen-tokens-input" type="number" min="256" max="131072" step="256" placeholder="Custom, 256 to 131072" data-i18n-placeholder="Custom, 256 to 131072" aria-label="Custom max output tokens" data-i18n-aria-label="Custom max output tokens" />
+                  <button type="button" class="ctxwin-apply" id="gen-tokens-apply" data-i18n="Set">Set</button>
+                </div>
+                <p class="row-help" data-i18n="The longest reply each step may ask for. The run raises it by itself when a reply is cut off in the middle of a tool call, and some providers keep a higher floor of their own.">The longest reply each step may ask for. The run raises it by itself when a reply is cut
+                  off in the middle of a tool call, and some providers keep a higher floor of their own.</p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Temperature">Temperature</span><span class="row-value" id="gen-temp-value" data-i18n="the model's own">the model's own</span></div>
+                <div class="switch-row">
+                  <input class="switch" id="gen-temp-on" type="checkbox" />
+                  <label class="switch-label" for="gen-temp-on" data-i18n="Set my own">Set my own</label>
+                  <input class="settings-range" id="gen-temp" type="range" min="0" max="2" step="0.05" value="0.7" aria-label="Temperature" data-i18n-aria-label="Temperature" disabled />
+                </div>
+                <p class="row-help" data-i18n="Lower is steadier, higher is more varied. Sent only to models that accept it: the router leaves it out for the ones that refuse sampling settings (the newer Claude models).">Lower is steadier, higher is more varied. Sent only to models that accept it: the router
+                  leaves it out for the ones that refuse sampling settings (the newer Claude models).</p>
+              </div>
+            </section>
+
+            <!-- ========================================================= ADVANCED -->
+            <section class="settings-page" id="settings-advanced" role="tabpanel" data-settings-page-body="advanced" data-title="Advanced" data-i18n-data-title="Advanced" hidden>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Set up Rosalena">Set up Rosalena</span>
+                  <span class="row-value" data-i18n="free backup models, a local model, voice typing, your browser">free backup models, a local model, voice typing, your browser</span>
+                </div>
+                <div class="switch-row"><button class="mini-btn" id="setup-open" type="button" data-i18n="Open setup…">Open setup…</button></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span>Router</span><span class="row-value" id="adv-router-value" data-i18n="checking…">checking…</span></div>
+                <div class="adv-lines" id="adv-router"></div>
+                <div class="switch-row"><button class="btn" id="adv-router-check" type="button" data-i18n="Check again">Check again</button></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Data folders">Data folders</span></div>
+                <div class="adv-lines" id="adv-folders"><p class="empty" data-i18n="Reading…">Reading…</p></div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Sharing">Sharing</span><span class="row-value" data-i18n="what this install sends">what this install sends</span></div>
+                <div class="seg acct-seg settings-seg" id="adv-sharing" role="group" aria-label="What this app shares" data-i18n-aria-label="What this app shares"></div>
+                <p class="row-help" id="adv-sharing-help"></p>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span data-i18n="Render rate">Render rate</span>
+                  <span class="row-value" id="rate-value" data-i18n="30 updates/s">30 updates/s</span>
+                </div>
+                <div class="seg" role="group" aria-label="Render rate" data-i18n-aria-label="Render rate">
+                  <button type="button" class="seg-btn" data-rate="60" aria-pressed="false">
+                    <span data-i18n="Smooth">Smooth</span><span class="seg-rate">60/s</span>
+                  </button>
+                  <button type="button" class="seg-btn" data-rate="30" aria-pressed="true">
+                    <span data-i18n="Balanced">Balanced</span><span class="seg-rate">30/s</span>
+                  </button>
+                  <button type="button" class="seg-btn" data-rate="15" aria-pressed="false">
+                    <span data-i18n="Low">Low</span><span class="seg-rate">15/s</span>
+                  </button>
+                </div>
+                <p class="row-help" data-i18n="Streaming text is painted at most this often. Nothing is dropped: deltas that arrive between paints are added to the next one.">Streaming text is painted at most this often. Nothing is
+                  dropped: deltas that arrive between paints are added to the next one.</p>
+                <div class="rate-counter" id="rate-counter" title="DOM updates applied vs deltas received since this page loaded" data-i18n-title="DOM updates applied vs deltas received since this page loaded">0 / 0</div>
+              </div>
+
+              <!-- OmniRoute (/api/cloud, omniroute-manager.mjs): an optional download that runs
+                   as Rosalena's own background process, no window. -->
+              <div class="settings-block">
+                <h3 class="settings-subhead" data-i18n="OmniRoute (optional)">OmniRoute (optional)</h3>
+                <p class="row-help" data-i18n="A free gateway that runs on this PC and spreads your chats over many providers' free tiers, so cloud models keep answering when one is busy. About 2 GB, installed with Node.js from nodejs.org. Once it runs, pick &quot;OmniRoute auto&quot; in the model list.">A free gateway that runs on this PC and spreads your chats over many
+                  providers' free tiers, so cloud models keep answering when one is busy. About 2 GB, installed
+                  with Node.js from nodejs.org. Once it runs, pick "OmniRoute auto" in the model list.</p>
+                <div class="cloud-omni">
+                  <p class="cloud-status" id="omni-status" data-i18n="Checking…">Checking…</p>
+                  <p class="cloud-line" id="omni-line" hidden></p>
+                  <div class="local-offer-actions">
+                    <button class="local-offer-go" id="omni-install" type="button" hidden data-i18n="Install OmniRoute">Install OmniRoute</button>
+                    <a class="mini-btn" id="omni-get-node" href="https://nodejs.org/en/download" target="_blank" rel="noopener" hidden title="Only needed on a PC Rosalena cannot fetch Node.js for" data-i18n-title="Only needed on a PC Rosalena cannot fetch Node.js for" data-i18n="Get Node.js ↗">Get Node.js ↗</a>
+                    <button class="local-offer-go" id="omni-start" type="button" hidden data-i18n="Start OmniRoute">Start OmniRoute</button>
+                    <button class="local-offer-go" id="omni-adopt" type="button" hidden title="Stop the copy that runs in its own window and run it inside Rosalena instead" data-i18n-title="Stop the copy that runs in its own window and run it inside Rosalena instead" data-i18n="Run it inside Rosalena">Run it inside Rosalena</button>
+                    <button class="mini-btn" id="omni-restart" type="button" hidden data-i18n="Restart">Restart</button>
+                    <button class="mini-btn" id="omni-stop" type="button" hidden data-i18n="Stop">Stop</button>
+                    <button class="mini-btn" id="omni-log-toggle" type="button" hidden aria-expanded="false" aria-controls="omni-log" data-i18n="Show log">Show log</button>
+                    <button class="mini-btn" id="omni-dashboard" type="button" hidden title="OmniRoute's dashboard, in a tab of this window" data-i18n-title="OmniRoute's dashboard, in a tab of this window" data-i18n="Open its dashboard">Open its dashboard</button>
+                  </div>
+                  <div class="omni-prefs" id="omni-prefs" hidden>
+                    <label data-i18n="Start OmniRoute with Rosalena"><input type="checkbox" id="omni-autostart" /> Start OmniRoute with Rosalena</label>
+                    <label data-i18n="Keep it running after Rosalena closes (for the website's tunnel)"><input type="checkbox" id="omni-keep" /> Keep it running after Rosalena closes (for the website's tunnel)</label>
+                  </div>
+                  <pre class="omni-log" id="omni-log" hidden></pre>
+                </div>
+              </div>
+
+              <div class="settings-row">
+                <div class="row-label"><span data-i18n="Updates">Updates</span></div>
+                <div class="switch-row"><button class="btn" id="adv-updates" type="button" data-i18n="Check for updates">Check for updates</button></div>
+              </div>
+              <div class="settings-block">
+                <h3 class="settings-subhead" data-i18n="Reset">Reset</h3>
+                <div class="reset-list">
+                  <div class="reset-row"><span data-i18n="Layout: back to the Cockpit preset and its panel sizes.">Layout: back to the Cockpit preset and its panel sizes.</span><button class="btn" id="reset-layout" type="button" data-i18n="Reset layout">Reset layout</button></div>
+                  <div class="reset-row"><span data-i18n="Agent limits: steps, time and context window back to the defaults.">Agent limits: steps, time and context window back to the defaults.</span><button class="btn" id="reset-limits" type="button" data-i18n="Reset limits">Reset limits</button></div>
+                  <div class="reset-row"><span data-i18n="Generation: max output tokens and temperature back to the model's own.">Generation: max output tokens and temperature back to the model's own.</span><button class="btn" id="reset-generation" type="button" data-i18n="Reset generation">Reset generation</button></div>
+                  <div class="reset-row"><span data-i18n="Forget the model and effort each chat was left on (the chats stay).">Forget the model and effort each chat was left on (the chats stay).</span><button class="btn" id="reset-chat-picks" type="button" data-i18n="Forget picks">Forget picks</button></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- The More menu's pages (Tokens, Monitor, Models, Plugins, ...) open over the chat
+         instead of replacing it: the chat stays loaded underneath, so going back is instant
+         and lands in the same conversation (app.js, openPage). -->
+    <div class="page-overlay" id="page-overlay" role="dialog" aria-label="Page" data-i18n-aria-label="Page" hidden>
+      <!-- Only for pages that open as tabs of one view (Tokens | Monitor, Wi-Fi | VPN exits).
+           Every page has its own "Back to chats" link, and Esc closes the overlay too. -->
+      <div class="page-overlay-bar" id="page-overlay-bar" hidden>
+        <span class="page-overlay-title" id="page-overlay-title"></span>
+        <div class="page-overlay-tabs" id="page-overlay-tabs" role="tablist" aria-label="Pages" data-i18n-aria-label="Pages"></div>
+      </div>
+      <!-- name="rosalena-page" is how the desktop shell knows this frame may show app pages. -->
+      <iframe class="page-overlay-frame" id="page-overlay-frame" name="rosalena-page" title="Page" data-i18n-title="Page"></iframe>
+    </div>
+  </body>
+</html>

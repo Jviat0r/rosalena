@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SolBrowser extension for Rosalena</title>
+<meta name="description" content="SolBrowser is the small browser extension that lets Rosalena Harness read pages in your own browser with your logins and click and type there, inside embedded frames too. It isn't on the Chrome Web Store yet, so you load it once with Load unpacked.">
+<link rel="canonical" href="https://rosalena.dev/download/solbrowser/">
+<link rel="alternate" hreflang="en" href="https://rosalena.dev/download/solbrowser/">
+<link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/solbrowser/">
+<link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/solbrowser/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rosalena.dev/download/solbrowser/">
+<meta property="og:title" content="SolBrowser extension for Rosalena">
+<meta property="og:description" content="Let the agent use your own browser: one small extension, loaded once, for Chrome, Brave and Edge.">
+<meta name="theme-color" content="#051217">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<script src="/theme.js"></script>
+<script src="/lang.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SolBrowser",
+  "url": "https://rosalena.dev/download/solbrowser/",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome, Brave, Edge",
+  "softwareVersion": "0.2.0",
+  "downloadUrl": "https://rosalena.dev/download/solbrowser/solbrowser-extension-0.2.0.zip",
+  "description": "A browser extension that lets the Rosalena Harness agent read pages in your own browser with your logins and act on them, inside cross-origin iframes too."
+}
+</script>
+<style>
+  .steps { margin: 18px 0 0; padding-left: 22px; display: grid; gap: 10px; color: var(--silver); }
+  .steps code, .file-row code { font: 13px/1.5 var(--mono); color: var(--powder); }
+  .hash { font: 12px/1.5 var(--mono); overflow-wrap: anywhere; color: var(--silver); }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Rosalena home">
+      <img src="/favicon.svg" alt="" width="26" height="26">
+      Rosalena
+    </a>
+    <nav aria-label="Main">
+      <a class="hide-sm" href="/#models">Free models</a>
+      <a href="/download/">Download</a>
+      <a class="nav-cta" href="/harness/">Try Harness</a>
+      <a class="lang-switch" href="/es/download/solbrowser/" hreflang="es" lang="es" data-lang-switch="es" aria-label="Español: ver esta página en español" title="Ver esta página en español"><span class="lang-on">EN</span><span class="lang-sep" aria-hidden="true">/</span><span>ES</span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to the light theme" title="Light theme"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section aria-labelledby="sb-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Optional add-on</div>
+        <h1 id="sb-h">SolBrowser: let the agent use your own browser</h1>
+        <p>Rosalena can read pages in your own browser with your logins, and click and type there, even inside embedded frames like a Power Apps screen or a payment form. That goes through SolBrowser, a small extension I built. It isn't on the Chrome Web Store yet, so you load it yourself once. You only need it for sites you're signed in to: public pages are read without opening a browser at all.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">File</th><th scope="col">Size</th><th scope="col">SHA-256</th></tr></thead>
+          <tbody>
+            <tr class="file-row"><td><a href="/download/solbrowser/solbrowser-extension-0.2.0.zip"><code>solbrowser-extension-0.2.0.zip</code></a><small>SolBrowser 0.2.0, the same extension the app ships</small></td><td>66 KB</td><td class="hash">0d46274cfd55a562d0318e1b0f75dc42e182d12a30bba7c5301afa3af2aa954d</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="load-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Setup</div>
+        <h2 id="load-h">How to load it (about a minute)</h2>
+      </div>
+      <ol class="steps">
+        <li>Easiest: in Rosalena, open Settings, find <strong>Your browser</strong> and press <strong>Set up</strong>. It copies the extension to a folder and opens it. Or download the zip above and unzip it.</li>
+        <li>Open your browser's extensions page: <code>chrome://extensions</code>, <code>brave://extensions</code> or <code>edge://extensions</code>.</li>
+        <li>Turn on <strong>Developer mode</strong>, click <strong>Load unpacked</strong> and choose the <code>solbrowser-extension</code> folder.</li>
+        <li>That's it. It connects by itself the first time the agent needs your browser, and its popup has a switch to disconnect it whenever you want.</li>
+      </ol>
+      <p class="fine">Reading a page never asks you. Clicking, typing and filling forms ask first, and the agent can't run scripts in your pages. Keep the folder where it is: the browser loads the extension from it every time it starts.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Rosalena Harness, built in public. Updated November 2026.</span>
+    <span><a href="/download/">Download</a> · <a href="/harness/">Try Harness</a> · <a href="/check/">What can my PC run?</a></span>
+  </div>
+</footer>
+</body>
+</html>

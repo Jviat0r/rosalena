@@ -1,0 +1,9 @@
+{
+  "name": "ui-check-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Rendered-page audit for the ui-check skill. playwright-core only: it drives a browser already on the machine and downloads none.",
+  "dependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

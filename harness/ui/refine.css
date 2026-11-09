@@ -1,0 +1,83 @@
+/* The sleek default: edges that blend instead of boxing everything in.
+ *
+ * styles.css draws a full-strength 1px line around almost every region and control, and
+ * on a dark palette those lines read as a grid of boxes. This layer, loaded after it,
+ * keeps the structure and lowers the volume:
+ *
+ *   - every line is worked out from the palette (text mixed into the background) at low
+ *     strength, so it is a hairline on any palette, dark or light
+ *   - regions (sidebar, chat, files, top bar, composer, status bar) are told apart by
+ *     their surface colour first; the lines between them are near-invisible
+ *   - controls are flat fills with no border until hovered or focused
+ *
+ * The "Classic" UI style (ui-styles.js) sets data-ui-style="classic", which turns all of
+ * this off and gives back the original look exactly.
+ */
+
+html:not([data-ui-style="classic"]) {
+  --line: color-mix(in srgb, var(--text) 11%, var(--bg));
+  --line-soft: color-mix(in srgb, var(--text) 6%, var(--bg));
+  /* Separators between regions: present, never drawn on top of anything. */
+  --hair: color-mix(in srgb, var(--text) 7%, transparent);
+  /* Resting and hovered fill for flat controls. */
+  --fill: color-mix(in srgb, var(--text) 4.5%, transparent);
+  --fill-hover: color-mix(in srgb, var(--text) 8%, transparent);
+  --focus-ring: 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* ------------------------------------------------------------------ regions */
+html:not([data-ui-style="classic"]) .dock-left { border-right-color: var(--hair); }
+html:not([data-ui-style="classic"]) .dock-right { border-left-color: var(--hair); }
+html:not([data-ui-style="classic"]) .dock-bottom { border-top-color: var(--hair); }
+html:not([data-ui-style="classic"]) .topbar { border-bottom-color: transparent; background: transparent; backdrop-filter: none; }
+html:not([data-ui-style="classic"]) .view-tabs { border-bottom-color: var(--hair); background: transparent; }
+html:not([data-ui-style="classic"]) .composer { border-top-color: transparent; background: transparent; backdrop-filter: none; }
+html:not([data-ui-style="classic"]) .statusbar { border-top-color: var(--hair); background: var(--bg-2); }
+html:not([data-ui-style="classic"]) .side-top { border-bottom-color: transparent; }
+html:not([data-ui-style="classic"]) .sidebar-foot { border-top-color: var(--hair); }
+html:not([data-ui-style="classic"]) .panel-head { border-bottom-color: var(--hair); }
+
+/* ------------------------------------------------------------------ controls: flat until touched */
+html:not([data-ui-style="classic"]) :is(.icon-btn, .quick-pick, .plan-toggle, .new-chat, .chip, .starter) {
+  border-color: transparent;
+  background: var(--fill);
+  box-shadow: none;
+}
+html:not([data-ui-style="classic"]) :is(.icon-btn, .quick-pick, .plan-toggle, .new-chat, .starter):hover {
+  border-color: transparent;
+  background: var(--fill-hover);
+}
+html:not([data-ui-style="classic"]) .quick-pick:focus-within { border-color: transparent; box-shadow: var(--focus-ring); }
+html:not([data-ui-style="classic"]) .plan-toggle[aria-pressed="true"] { background: var(--accent); color: var(--btn-ink); }
+html:not([data-ui-style="classic"]) .creator-toggle[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #c18cff));
+}
+
+html:not([data-ui-style="classic"]) .sidebar-search input {
+  border-color: transparent;
+  background: var(--fill);
+}
+html:not([data-ui-style="classic"]) .sidebar-search input:hover { background: var(--fill-hover); }
+html:not([data-ui-style="classic"]) .sidebar-search input:focus { border-color: transparent; box-shadow: var(--focus-ring); background: var(--fill); }
+
+/* The prompt is the one control that keeps a visible edge, because it is where the eye
+   has to land; it is a soft one, and focus shows as a glow rather than a hard ring. */
+html:not([data-ui-style="classic"]) #prompt {
+  background: var(--fill);
+  border-color: var(--hair);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 3%, transparent) inset;
+}
+html:not([data-ui-style="classic"]) #prompt:hover { border-color: color-mix(in srgb, var(--text) 12%, transparent); }
+html:not([data-ui-style="classic"]) #prompt:focus { border-color: transparent; box-shadow: var(--focus-ring); }
+
+/* Messages: the bubble is a tint, not a box. */
+html:not([data-ui-style="classic"]) .msg .body { border-color: transparent; box-shadow: none; }
+html:not([data-ui-style="classic"]) .msg.user .body { border-color: transparent; }
+html:not([data-ui-style="classic"]) .msg.error .body { border-color: color-mix(in srgb, var(--bad) 28%, transparent); }
+
+/* Inspector tabs and the More drawer pick up the same flat treatment. */
+html:not([data-ui-style="classic"]) .insp-tab[aria-selected="true"] { border-color: transparent; }
+html:not([data-ui-style="classic"]) .kbd { border-color: var(--hair); background: var(--fill); }
+
+/* Splitters stay invisible until a pointer finds them (unchanged), but get a wider target. */
+html:not([data-ui-style="classic"]) .splitter.vertical { width: 7px; margin: 0 -3px; }

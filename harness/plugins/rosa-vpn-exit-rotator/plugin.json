@@ -1,0 +1,20 @@
+{
+  "id": "rosa-vpn-exit-rotator",
+  "version": "0.1.0",
+  "bundled": true,
+  "description": "Two VPN clients, one at a time: turns the Outline or ExpressVPN client on or off from here, starts it detached so the harness is not its parent, and stops only that exact image",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "timeoutMs": 8000,
+    "startAttempts": 4,
+    "startIntervalMs": 700,
+    "stopAttempts": 3,
+    "stopIntervalMs": 300,
+    "rotateDefault": "outline",
+    "allowToggle": true,
+    "reportAtRunStart": true,
+    "serviceCaveat": true,
+    "installs": {}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "rosa-comfyui",
+  "version": "0.1.0",
+  "bundled": true,
+  "description": "Drives a local ComfyUI server: health and queue, installed checkpoints, and generation from API-format workflow templates",
+  "config": {
+    "baseUrl": "http://127.0.0.1:8188",
+    "allowGenerate": true,
+    "outputDir": "comfyui",
+    "pollMs": 1000,
+    "timeoutMs": 600000,
+    "presets": {}
+  }
+}

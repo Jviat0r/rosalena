@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can your PC run it? Which local models your hardware holds</title>
+<meta name="description" content="Open this page and it reads the graphics card your browser will reveal, then sorts 10 local AI models into what runs well, what runs with CPU offload, and what will not fit. No speed guesses.">
+<link rel="canonical" href="https://rosalena.dev/check/">
+<link rel="alternate" hreflang="en" href="https://rosalena.dev/check/">
+<link rel="alternate" hreflang="es" href="https://rosalena.dev/es/check/">
+<link rel="alternate" hreflang="x-default" href="https://rosalena.dev/check/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rosalena.dev/check/">
+<meta property="og:title" content="Can your PC run it?">
+<meta property="og:description" content="The page reads what your browser exposes about your graphics card and tells you which local models fit, at which quantisation. The desktop app measures the card properly.">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#070c13">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- No web fonts on purpose: this page claims nothing leaves the tab, so it makes no
+     third-party request at all. The stack falls back to the system UI font. -->
+<link rel="stylesheet" href="check.css">
+<script src="/theme.js"></script>
+<script src="/lang.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Can your PC run it?",
+  "url": "https://rosalena.dev/check/",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any (runs in the browser)",
+  "description": "Checks which of 10 local AI models fit your graphics card's memory, entirely in the browser. Nothing about your machine is sent anywhere.",
+  "isAccessibleForFree": true
+}
+</script>
+</head>
+<body>
+<div class="page">
+
+  <header class="mast">
+    <div class="mast-top">
+      <a class="brand" href="/" aria-label="Rosalena home">
+        <img src="/favicon.svg" alt="" width="26" height="26">
+        Rosalena
+      </a>
+      <nav class="mast-links" aria-label="Main">
+        <a href="/download/">Download</a>
+        <a class="lang-switch" href="/es/check/" hreflang="es" lang="es" data-lang-switch="es" aria-label="Español: ver esta página en español" title="Ver esta página en español"><span class="lang-on">EN</span><span class="lang-sep" aria-hidden="true">/</span><span>ES</span></a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">Light theme</button>
+      </nav>
+    </div>
+    <h1>Can your PC run it?</h1>
+    <p class="lede">
+      This page reads the graphics card your browser is willing to describe, then sorts 10 local AI models into
+      what runs comfortably, what runs with CPU offload, and what will not fit. Everything happens in this tab:
+      nothing about your machine is sent anywhere.
+    </p>
+  </header>
+
+  <main>
+
+  <p class="honest">
+    <strong>This page guesses your card from what the browser exposes; the desktop app measures it with the
+    driver, and the app is the thing that also runs the model.</strong>
+    Treat every number below as a good second opinion, not a reading.
+  </p>
+
+  <section class="panel" aria-labelledby="hw-h">
+    <div class="panel-head">
+      <h2 id="hw-h">Your machine</h2>
+      <span class="chip" id="vram-chip" data-source="none">reading&hellip;</span>
+    </div>
+    <dl class="kv">
+      <div class="kv-row"><dt>Graphics card</dt><dd id="hw-gpu">&mdash;</dd></div>
+      <div class="kv-row"><dt>VRAM</dt><dd id="hw-vram">&mdash;</dd></div>
+      <div class="kv-row"><dt>RAM</dt><dd id="hw-ram">&mdash;</dd></div>
+      <div class="kv-row"><dt>CPU cores</dt><dd id="hw-cores">&mdash;</dd></div>
+      <div class="kv-row"><dt>WebGPU</dt><dd id="hw-webgpu">&mdash;</dd></div>
+      <div class="kv-row"><dt>Download room</dt><dd id="hw-storage">&mdash;</dd></div>
+    </dl>
+    <ul class="notes" id="hw-notes"></ul>
+  </section>
+
+  <section class="panel picker-panel" aria-labelledby="picker-h">
+    <div class="panel-head">
+      <h2 id="picker-h">Set your card</h2>
+    </div>
+    <p class="panel-sub" id="picker-sub">
+      Browsers do not expose VRAM, so the figure above comes from recognising the card's name. If that name is
+      wrong, or your browser would not give one, pick the card here. A result built from your pick is labelled
+      <span class="chip chip-inline" data-source="manual">manual</span> and is never shown as detected.
+    </p>
+    <form class="picker" id="picker" novalidate>
+      <div class="field">
+        <label for="gpu-select">Your graphics card</label>
+        <select id="gpu-select" aria-describedby="picker-sub">
+          <option value="">Not listed &mdash; I will type the VRAM</option>
+        </select>
+      </div>
+      <div class="field field-narrow">
+        <label for="vram-input">VRAM in GB</label>
+        <input id="vram-input" type="number" min="0" max="256" step="1" inputmode="numeric" placeholder="e.g. 12">
+      </div>
+      <button class="btn btn-primary" type="submit">Use this card</button>
+    </form>
+    <p class="panel-sub dim" id="picker-note" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="results" id="results" aria-live="polite" aria-labelledby="results-h">
+    <h2 class="section-h" id="results-h">What fits</h2>
+    <p class="summary" id="summary">Working out what your machine will hold&hellip;</p>
+    <p class="trust" id="trust"></p>
+    <noscript>
+      <div class="fallback">
+        <h3>This page needs JavaScript to read your hardware</h3>
+        <p>
+          With JavaScript off, the page cannot ask the browser for a graphics card, a RAM figure or a WebGPU
+          feature list, and it has nothing to compare the models against. The rest of this page still explains
+          what it does, and the models it sorts are the ten in the Rosalena Harness catalog.
+        </p>
+        <p>
+          A model fits when its download, its KV cache at the served context, plus about 0.5&nbsp;GiB of runtime
+          overhead all fit inside your card's VRAM. Below that, the same total has to fit your system RAM, which
+          is where the "runs, but tight" answer comes from. The desktop app measures both figures properly; this
+          page can only read what a browser will say.
+        </p>
+      </div>
+    </noscript>
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="models-h">
+    <div class="panel-head">
+      <h2 id="models-h">The 10 models this page checks</h2>
+    </div>
+    <p class="panel-sub">
+      Download sizes are the GGUF file sizes in gigabytes, from the desktop app's model catalog (version 1, updated 2026-10-20).
+      A model needs its file size plus room for its context (the KV cache) and about 0.5 GB of overhead, so a
+      card needs a little more memory than the file. The checker above does that sum for your card.
+    </p>
+    <div class="table-wrap">
+      <table class="static-models">
+        <thead><tr><th scope="col">Model</th><th scope="col">Good for</th><th scope="col">Download size by quant</th><th scope="col">License</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Qwen3.8-27B</strong></td><td>reasoning</td><td>UD-Q4_K_M 16.46 GB, UD-Q5_K_M 19.77 GB, UD-Q6_K 21.98 GB, Q8_0 29.05 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-32B</strong></td><td>reasoning</td><td>Q4_K_M 19.76 GB, Q5_K_M 23.21 GB, Q6_K 26.88 GB, Q8_0 34.82 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-Coder-30B-A3B-Instruct</strong></td><td>coding</td><td>Q4_K_M 18.56 GB, Q5_K_M 21.73 GB, Q6_K 25.09 GB, Q8_0 32.48 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-30B-A3B</strong></td><td>chat</td><td>Q4_K_M 18.56 GB, Q5_K_M 21.73 GB, Q8_0 32.48 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-14B</strong></td><td>chat</td><td>Q4_K_M 9 GB, Q6_K 12.12 GB, Q8_0 15.7 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-8B</strong></td><td>chat</td><td>Q4_K_M 5.03 GB, Q5_K_M 5.85 GB, Q8_0 8.71 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-4B</strong></td><td>chat</td><td>Q4_K_M 2.5 GB, Q5_K_M 2.89 GB, Q8_0 4.28 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-VL-8B-Instruct</strong></td><td>images + text</td><td>Q4_K_M 5.03 GB, Q8_0 8.71 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Qwen3-Embedding-0.6B</strong></td><td>search (embeddings)</td><td>Q8_0 0.64 GB, F16 1.2 GB</td><td>Apache-2.0</td></tr>
+          <tr><td><strong>Llama-3.3-70B-Instruct</strong></td><td>chat</td><td>Q4_K_M 42.52 GB, Q8_0 74.98 GB</td><td>Llama 3.3 Community License</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="sizes-h">
+    <div class="panel-head">
+      <h2 id="sizes-h">What fits on an 8, 12, 16, 24 or 32 GB card</h2>
+    </div>
+    <p class="panel-sub">
+      The same arithmetic the checker runs, worked out ahead of time for common amounts of graphics memory (as of
+      October 2026). Each model is shown at the biggest quant that fits fully on the card, with its weights, its KV cache
+      at the context it is served with and about 0.5 GB of runtime overhead.
+    </p>
+    <div class="table-wrap">
+      <table class="static-models">
+        <thead><tr><th scope="col">Card memory</th><th scope="col">Models that fit</th><th scope="col">Which ones, at what quant</th><th scope="col">The rest</th></tr></thead>
+        <tbody>
+          <tr><td><strong>8 GB</strong></td><td>2 of 10</td><td>Qwen3-4B (Q8_0, needs 6.7 GB); Qwen3-Embedding-0.6B (F16, needs 2.5 GB)</td><td>8 need more memory or CPU offload</td></tr>
+          <tr><td><strong>12 GB</strong></td><td>4 of 10</td><td>Qwen3-8B (Q5_K_M, needs 10.4 GB); Qwen3-VL-8B-Instruct (Q4_K_M, needs 10.4 GB); Qwen3-4B (Q8_0, needs 6.7 GB); Qwen3-Embedding-0.6B (F16, needs 2.5 GB)</td><td>6 need more memory or CPU offload</td></tr>
+          <tr><td><strong>16 GB</strong></td><td>5 of 10</td><td>Qwen3-14B (Q4_K_M, needs 13.9 GB); Qwen3-VL-8B-Instruct (Q8_0, needs 13.8 GB); Qwen3-8B (Q8_0, needs 13.1 GB); Qwen3-4B (Q8_0, needs 6.7 GB); Qwen3-Embedding-0.6B (F16, needs 2.5 GB)</td><td>5 need more memory or CPU offload</td></tr>
+          <tr><td><strong>24 GB</strong></td><td>9 of 10</td><td>Qwen3-Coder-30B-A3B-Instruct (Q5_K_M, needs 23.7 GB); Qwen3-30B-A3B (Q5_K_M, needs 23.7 GB); Qwen3.8-27B (UD-Q5_K_M, needs 22.9 GB); Qwen3-32B (Q4_K_M, needs 20.9 GB); Qwen3-14B (Q8_0, needs 20.1 GB); Qwen3-VL-8B-Instruct (Q8_0, needs 13.8 GB); Qwen3-8B (Q8_0, needs 13.1 GB); Qwen3-4B (Q8_0, needs 6.7 GB); Qwen3-Embedding-0.6B (F16, needs 2.5 GB)</td><td>1 needs more memory or CPU offload</td></tr>
+          <tr><td><strong>32 GB</strong></td><td>9 of 10</td><td>Qwen3.8-27B (Q8_0, needs 31.6 GB); Qwen3-32B (Q6_K, needs 27.5 GB); Qwen3-Coder-30B-A3B-Instruct (Q6_K, needs 26.9 GB); Qwen3-30B-A3B (Q5_K_M, needs 23.7 GB); Qwen3-14B (Q8_0, needs 20.1 GB); Qwen3-VL-8B-Instruct (Q8_0, needs 13.8 GB); Qwen3-8B (Q8_0, needs 13.1 GB); Qwen3-4B (Q8_0, needs 6.7 GB); Qwen3-Embedding-0.6B (F16, needs 2.5 GB)</td><td>1 needs more memory or CPU offload</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="speed-h">
+    <div class="panel-head">
+      <h2 id="speed-h">No tokens per second, on purpose</h2>
+    </div>
+    <p class="panel-sub">
+      Speed depends on the model, the quant, the driver, the context length and whatever else is using the GPU,
+      and a page that has not loaded the model cannot measure any of it. A made-up number would be worse than
+      none, so this page does not show one. The desktop app runs the model, and can tell you what it actually did.
+    </p>
+  </section>
+
+  <details class="method">
+    <summary>How these numbers are made</summary>
+    <ul>
+      <li>Download size is the GGUF file size from the app's own model catalog, in decimal gigabytes as Hugging Face reports it.</li>
+      <li>KV cache is 2 &times; layers &times; context &times; kvDim &times; 2 bytes, at the context the app would serve the model with, not the length the model was trained for.</li>
+      <li>0.5 GiB of runtime overhead covers the compute buffer and context initialisation.</li>
+      <li>A model fits when that total is at or under your card's VRAM. It runs tight when it is over VRAM but under your RAM, which means CPU offload.</li>
+      <li>The arithmetic is the desktop app's own, ported without changes, and a test pins the page to the app's byte results.</li>
+    </ul>
+  </details>
+
+  </main>
+
+  <footer class="foot">
+    <span>Rosalena Harness, built in public. Updated October 2026.</span>
+    <span><a href="/">Home</a> &middot; <a href="/download/">Get the app</a> &middot; <a href="/check/">This page</a></span>
+  </footer>
+
+</div>
+<script type="module" src="check.js"></script>
+</body>
+</html>

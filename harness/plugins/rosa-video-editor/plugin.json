@@ -1,0 +1,13 @@
+{
+  "id": "rosa-video-editor",
+  "version": "1.0.0",
+  "bundled": true,
+  "description": "Edit video in the app: import clips, images and music, cut them on a three-track timeline with titles, and export a WebM or a PNG frame.",
+  "ui": {
+    "title": "Video Editor",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "files.save"],
+    "libs": []
+  }
+}

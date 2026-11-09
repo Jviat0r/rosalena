@@ -1,0 +1,17 @@
+{
+  "id": "rosa-model-pin",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Pins a run to one router target and retries it rather than drifting to another model",
+  "config": {
+    "pin": null,
+    "depth": "root",
+    "maxAttempts": 3,
+    "backoff": {
+      "initialDelayMs": 1500,
+      "maxDelayMs": 12000,
+      "jitterRatio": 0.3
+    }
+  }
+}

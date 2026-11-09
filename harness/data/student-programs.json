@@ -1,0 +1,72 @@
+{
+  "$about": "Free and student API-key programs shown in Settings > Cloud models. DATA: ui.mjs sends this with /api/cloud and the page draws one card per program. A program whose `provider` is one of the router's key providers (cloud-setup.mjs KEY_PROVIDERS) gets a paste-your-key field that saves to that provider; `provider: null` means its credits work in another tool and the card says so. Facts were checked against the programs' own pages on `checked`; amounts that vary or are not published are described as such, never guessed. The first four are the programs UMD DIT pointed students to on 2026-11-03.",
+  "checked": "2026-11-03",
+  "programs": [
+    {
+      "id": "claude-builder-club",
+      "name": "Claude Builder Club",
+      "by": "Anthropic",
+      "group": "student",
+      "provider": "anthropic",
+      "what": "Student-run clubs at campuses Anthropic supports. Members have received Claude Pro and API credits (one club lists 6 months of Pro plus $50 of API credits); what you get depends on the campus.",
+      "how": "Join your school's club, or apply to start one. Credits arrive in your Anthropic Console account: make a key at console.anthropic.com and paste it here.",
+      "url": "https://claude.com/programs/campus",
+      "link": "Claude campus programs"
+    },
+    {
+      "id": "openai-student",
+      "name": "OpenAI Student Collective and Campus Network",
+      "by": "OpenAI",
+      "group": "student",
+      "provider": "openai",
+      "what": "OpenAI's programs for undergraduate campus leads and student clubs. No API credit amount is published.",
+      "how": "Apply as a campus lead or through a club. If credits come with it they are on your platform.openai.com account: make a key there and paste it here.",
+      "url": "https://openai.com/student-collective/",
+      "link": "OpenAI Student Collective"
+    },
+    {
+      "id": "github-copilot-student",
+      "name": "GitHub Copilot Student",
+      "by": "GitHub",
+      "group": "student",
+      "provider": null,
+      "what": "A free Copilot Student plan for verified students through GitHub Education.",
+      "how": "Verify as a student in GitHub Education. Copilot runs inside editors like VS Code; it does not give an API key Rosalena can use.",
+      "url": "https://education.github.com/pack",
+      "link": "GitHub Student Developer Pack"
+    },
+    {
+      "id": "kiro-students",
+      "name": "Kiro for Students",
+      "by": "AWS",
+      "group": "student",
+      "provider": null,
+      "what": "A free year of Kiro's paid tier, 1,000 credits a month, at participating universities, checked with your school email.",
+      "how": "Check whether your university takes part, then verify with your school email. Kiro's credits are used inside Kiro, not through an API key.",
+      "url": "https://kiro.dev/students",
+      "link": "Kiro for Students"
+    },
+    {
+      "id": "google-ai-studio",
+      "name": "Gemini API free tier",
+      "by": "Google",
+      "group": "anyone",
+      "provider": "google",
+      "what": "Gemini models with a free, rate-limited tier. No card and no student check.",
+      "how": "Sign in at Google AI Studio, create an API key and paste it here.",
+      "url": "https://aistudio.google.com/apikey",
+      "link": "Google AI Studio"
+    },
+    {
+      "id": "openrouter-free",
+      "name": "OpenRouter free models",
+      "by": "OpenRouter",
+      "group": "anyone",
+      "provider": "openrouter",
+      "what": "One key for many providers, including models marked free that cost nothing within a daily request limit.",
+      "how": "Make an account and a key at openrouter.ai/keys and paste it here.",
+      "url": "https://openrouter.ai/keys",
+      "link": "OpenRouter keys"
+    }
+  ]
+}

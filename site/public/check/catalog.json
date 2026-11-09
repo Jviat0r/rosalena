@@ -1,0 +1,381 @@
+{
+  "$about": "Generated from harness/data/model-catalog.json by site/tools/export-catalog.mjs. Do not edit: change the app's catalog and run the exporter.",
+  "$source": "../harness/data/model-catalog.json",
+  "$units": "`file` is the GGUF download size for that quant in decimal gigabytes (1e9 bytes); `params` is billions of parameters; `context` and `serveContext` are tokens.",
+  "$fit": "`serveContext` is the context the KV-cache arithmetic uses; `context` is what the model was trained for. `layers` and `kvDim` turn a context length into KV bytes.",
+  "catalogVersion": 1,
+  "catalogUpdated": "2026-10-20",
+  "models": [
+    {
+      "id": "qwen3.8-27b",
+      "name": "Qwen3.8-27B",
+      "params": 27.78,
+      "context": 262144,
+      "serveContext": 16384,
+      "layers": 64,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "reasoning",
+      "notes": "The model this harness's router already points at (local/qwen3.8-27b), and the GGUF on this box is exactly the UD-Q4_K_M below; it is text-only unless you add its 0.93 GB mmproj projector, which is not counted in the sizes here.",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF",
+      "quants": [
+        {
+          "quant": "UD-Q4_K_M",
+          "file": 16.46,
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q4_K_M.gguf"
+        },
+        {
+          "quant": "UD-Q5_K_M",
+          "file": 19.77,
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q5_K_M.gguf"
+        },
+        {
+          "quant": "UD-Q6_K",
+          "file": 21.98,
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q6_K.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 29.05,
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-32b",
+      "name": "Qwen3-32B",
+      "params": 32.76,
+      "context": 40960,
+      "serveContext": 8192,
+      "layers": 64,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "reasoning",
+      "notes": "Q4_K_M at 8k context is the only fully-on-card setting here; Q5_K_M already spills to the CPU, and Q8_0's 34.8 GB cannot load in 24 GB at any context.",
+      "url": "https://huggingface.co/Qwen/Qwen3-32B-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 19.76,
+          "url": "https://huggingface.co/Qwen/Qwen3-32B-GGUF/resolve/main/Qwen3-32B-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 23.21,
+          "url": "https://huggingface.co/Qwen/Qwen3-32B-GGUF/resolve/main/Qwen3-32B-Q5_K_M.gguf"
+        },
+        {
+          "quant": "Q6_K",
+          "file": 26.88,
+          "url": "https://huggingface.co/Qwen/Qwen3-32B-GGUF/resolve/main/Qwen3-32B-Q6_K.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 34.82,
+          "url": "https://huggingface.co/Qwen/Qwen3-32B-GGUF/resolve/main/Qwen3-32B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-coder-30b-a3b",
+      "name": "Qwen3-Coder-30B-A3B-Instruct",
+      "params": 30.53,
+      "context": 262144,
+      "serveContext": 32768,
+      "layers": 48,
+      "kvDim": 512,
+      "license": "Apache-2.0",
+      "use": "code",
+      "notes": "A 30B mixture with 3.3B active per token, so it decodes near 8B speed while carrying 30B-class code knowledge; Q8_0 at 32.5 GB does not fit 24 GB at any context worth using.",
+      "url": "https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 18.56,
+          "url": "https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 21.73,
+          "url": "https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q5_K_M.gguf"
+        },
+        {
+          "quant": "Q6_K",
+          "file": 25.09,
+          "url": "https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q6_K.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 32.48,
+          "url": "https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-30b-a3b",
+      "name": "Qwen3-30B-A3B",
+      "params": 30.53,
+      "context": 40960,
+      "serveContext": 32768,
+      "layers": 48,
+      "kvDim": 512,
+      "license": "Apache-2.0",
+      "use": "chat",
+      "notes": "The best all-round fit for 24 GB: Q4_K_M plus 32k of KV cache is about 20.8 GiB, and the 3.3B-active mixture keeps decoding fast on a 3090.",
+      "url": "https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 18.56,
+          "url": "https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 21.73,
+          "url": "https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q5_K_M.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 32.48,
+          "url": "https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF/resolve/main/Qwen3-30B-A3B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-14b",
+      "name": "Qwen3-14B",
+      "params": 14.77,
+      "context": 40960,
+      "serveContext": 32768,
+      "layers": 40,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "chat",
+      "notes": "Dense 14B at Q8_0 with 32k of context is about 20.1 GiB, which makes it the densest near-lossless model this GPU holds without offload.",
+      "url": "https://huggingface.co/Qwen/Qwen3-14B-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 9,
+          "url": "https://huggingface.co/Qwen/Qwen3-14B-GGUF/resolve/main/Qwen3-14B-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q6_K",
+          "file": 12.12,
+          "url": "https://huggingface.co/Qwen/Qwen3-14B-GGUF/resolve/main/Qwen3-14B-Q6_K.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 15.7,
+          "url": "https://huggingface.co/Qwen/Qwen3-14B-GGUF/resolve/main/Qwen3-14B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-8b",
+      "name": "Qwen3-8B",
+      "params": 8.19,
+      "context": 40960,
+      "serveContext": 32768,
+      "layers": 36,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "chat",
+      "notes": "The fast model: Q8_0 at 32k context is about 13.1 GiB, so it leaves room for a second process or a bigger KV budget, and it is the right draft/summary worker.",
+      "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 5.03,
+          "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 5.85,
+          "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q5_K_M.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 8.71,
+          "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-4b",
+      "name": "Qwen3-4B",
+      "params": 4.02,
+      "context": 40960,
+      "serveContext": 16384,
+      "layers": 36,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "chat",
+      "notes": "Small enough to run at Q8_0 next to a render job, and the honest pick for classification, routing and short extraction where a 27B is wasted.",
+      "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 2.5,
+          "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 2.89,
+          "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q5_K_M.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 4.28,
+          "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-vl-8b",
+      "name": "Qwen3-VL-8B-Instruct",
+      "params": 8.77,
+      "context": 262144,
+      "serveContext": 32768,
+      "layers": 36,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "vision",
+      "notes": "The vision-language pick; it needs its mmproj projector loaded alongside (0.75 GB for the Q8_0 one), and Q8_0 plus that plus 32k of KV is about 13.8 GiB, still inside the card.",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "extraGb": 0.75,
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 5.03,
+          "url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/main/Qwen3VL-8B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 8.71,
+          "url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/main/Qwen3VL-8B-Instruct-Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen3-embedding-0.6b",
+      "name": "Qwen3-Embedding-0.6B",
+      "params": 0.6,
+      "context": 32768,
+      "serveContext": 8192,
+      "layers": 28,
+      "kvDim": 1024,
+      "license": "Apache-2.0",
+      "use": "embedding",
+      "notes": "1024-dimension embeddings at 0.64 GB for the Q8_0 file, small enough to stay resident next to a 24 GB text model without costing it a layer.",
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF",
+      "quants": [
+        {
+          "quant": "Q8_0",
+          "file": 0.64,
+          "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-Q8_0.gguf"
+        },
+        {
+          "quant": "F16",
+          "file": 1.2,
+          "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-f16.gguf"
+        }
+      ]
+    },
+    {
+      "id": "llama-3.1-8b",
+      "name": "Llama-3.1-8B-Instruct",
+      "params": 8.03,
+      "context": 131072,
+      "serveContext": 16384,
+      "layers": 32,
+      "kvDim": 1024,
+      "license": "Llama 3.1 Community License",
+      "use": "chat",
+      "notes": "The starter model for a PC with a real GPU or 16 GB of RAM: good enough for basic coding and math, and Q4_K_M plus 16k of KV is about 7.1 GiB, so it runs on the CPU too, slowly.",
+      "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 4.92,
+          "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 5.73,
+          "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "llama-3.2-3b",
+      "name": "Llama-3.2-3B-Instruct",
+      "params": 3.21,
+      "context": 131072,
+      "serveContext": 16384,
+      "layers": 28,
+      "kvDim": 1024,
+      "license": "Llama 3.2 Community License",
+      "use": "chat",
+      "notes": "The starter model for a modest PC (8 GB of RAM, no real GPU): about twice as fast as the 8B on a CPU and still fine for short coding and math questions.",
+      "url": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 2.02,
+          "url": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q5_K_M",
+          "file": 2.32,
+          "url": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q5_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "llama-3.3-70b",
+      "name": "Llama-3.3-70B-Instruct",
+      "params": 70.55,
+      "context": 131072,
+      "serveContext": 8192,
+      "layers": 80,
+      "kvDim": 1024,
+      "license": "Llama 3.3 Community License",
+      "use": "chat",
+      "notes": "Deliberately too big and kept as the honest no: 42.5 GB at Q4_K_M exceeds 24 GB of VRAM and does not fit in 32-64 GB of RAM either, and Q8_0 is two files totalling 75 GB, so the url points at the first part.",
+      "url": "https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 42.52,
+          "url": "https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant": "Q8_0",
+          "file": 74.98,
+          "url": "https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q8_0/Llama-3.3-70B-Instruct-Q8_0-00001-of-00002.gguf"
+        }
+      ]
+    },
+    {
+      "id": "qwen2.5-72b",
+      "name": "Qwen2.5-72B-Instruct",
+      "params": 72.71,
+      "context": 32768,
+      "serveContext": 8192,
+      "layers": 80,
+      "kvDim": 1024,
+      "license": "Qwen License",
+      "use": "chat",
+      "notes": "A second honest no beside Llama 3.3 70B: 47.4 GB at Q4_K_M (one file, size read from Hugging Face on 2026-11-03) is twice a 24 GB card, and only runs split across the card and 64 GB or more of RAM, at a word or two a second.",
+      "url": "https://huggingface.co/bartowski/Qwen2.5-72B-Instruct-GGUF",
+      "quants": [
+        {
+          "quant": "Q4_K_M",
+          "file": 47.42,
+          "url": "https://huggingface.co/bartowski/Qwen2.5-72B-Instruct-GGUF/resolve/main/Qwen2.5-72B-Instruct-Q4_K_M.gguf"
+        }
+      ]
+    }
+  ]
+}

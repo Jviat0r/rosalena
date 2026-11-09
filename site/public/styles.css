@@ -1,0 +1,288 @@
+/* Rosalena site. Palette: cyan / turquoise primary, platinum blonde, powder-blue frills, silver. */
+:root {
+  --bg: #0a2029;
+  --bg-2: #102d38;
+  --surface: #163b47;
+  --surface-2: #1d4956;
+  --line: rgba(205, 214, 221, 0.20);
+  --line-strong: rgba(205, 214, 221, 0.38);
+  --cyan: #4beef5;
+  --turquoise: #23d3da;
+  --teal: #139aa3;
+  --powder: #c9ebf7;
+  --platinum: #f4ecd9;
+  --silver: #d0d6dd;
+  --text: #effafc;
+  --muted: #a9c2c9;
+  --danger: #ffb4a8;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --max: 1120px;
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--powder); }
+a:hover { color: var(--cyan); }
+img, svg { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+/* ---- header ---- */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(10, 32, 41, 0.82);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 650; letter-spacing: -0.01em; }
+.brand svg, .brand img { width: 26px; height: 26px; display: block; }
+.site-header nav { display: flex; align-items: center; gap: 6px; }
+.site-header nav a { color: var(--silver); text-decoration: none; font-size: 14px; padding: 8px 10px; border-radius: 8px; }
+.site-header nav a:hover { color: var(--text); background: var(--surface); }
+.site-header nav a.nav-cta { color: #031014; background: var(--cyan); font-weight: 600; }
+.site-header nav a.nav-cta:hover { background: var(--powder); }
+/* The second try button: present, clearly a button, and not competing with the free
+   cloud one for the eye. It exists for the visitor who came for local models. */
+.site-header nav a.nav-cta-ghost { color: var(--text); border: 1px solid var(--line-strong); font-weight: 600; }
+.site-header nav a.nav-cta-ghost:hover { border-color: var(--platinum); background: var(--surface); }
+@media (max-width: 560px) { .site-header nav a.hide-sm { display: none; } }
+/* On a phone the two try buttons would push the brand off the bar; the hero below the
+   header still carries both, so only the local one is dropped here. */
+@media (max-width: 560px) { .site-header nav a.nav-cta-ghost { display: none; } }
+
+/* ---- buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 18px; border-radius: 10px;
+  font: 600 15px/1 var(--font); text-decoration: none; cursor: pointer;
+  border: 1px solid transparent; transition: background .15s, border-color .15s, color .15s;
+}
+.btn-primary { background: var(--cyan); color: #031014; }
+.btn-primary:hover { background: var(--powder); color: #031014; }
+.btn-secondary { background: transparent; color: var(--platinum); border-color: var(--line-strong); }
+.btn-secondary:hover { border-color: var(--platinum); color: var(--text); }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+
+/* ---- hero ---- */
+.hero { position: relative; overflow: hidden; padding: 88px 0 40px; text-align: center; }
+.hero::before {
+  content: ""; position: absolute; inset: -40% -10% auto; height: 720px; pointer-events: none;
+  background:
+    radial-gradient(45% 50% at 50% 40%, rgba(46, 230, 238, 0.20), transparent 70%),
+    radial-gradient(30% 35% at 70% 30%, rgba(185, 228, 242, 0.12), transparent 70%),
+    radial-gradient(30% 35% at 30% 35%, rgba(239, 229, 204, 0.08), transparent 70%);
+}
+.hero .wrap { position: relative; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line-strong); color: var(--silver); font-size: 13px; background: rgba(12, 38, 47, 0.6);
+}
+.eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+h1 {
+  margin: 22px auto 0; max-width: 820px;
+  font-size: clamp(38px, 7vw, 68px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 700;
+  background: linear-gradient(180deg, var(--text) 30%, var(--platinum) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+h1 em { font-style: normal; background: linear-gradient(90deg, var(--cyan), var(--powder)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { margin: 20px auto 0; max-width: 660px; color: var(--muted); font-size: clamp(16px, 2.2vw, 19px); }
+.hero-ctas { margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-note { margin-top: 14px; color: var(--muted); font-size: 13px; }
+
+/* the powder-blue frill under the hero */
+.frill {
+  height: 18px; margin-top: 56px; opacity: .55;
+  background: radial-gradient(circle at 12px -4px, transparent 12px, var(--powder) 13px, var(--powder) 14px, transparent 15px) 0 0 / 24px 18px repeat-x;
+}
+
+/* ---- product window mock (mirrors the real harness UI) ---- */
+.window {
+  margin: 48px auto 0; max-width: 980px; text-align: left;
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 1px rgba(46, 230, 238, .06), 0 0 60px rgba(46, 230, 238, .08);
+  overflow: hidden;
+}
+.window-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.window-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); display: inline-block; }
+.window-bar span { margin-left: 8px; }
+.window-body { display: grid; grid-template-columns: 220px 1fr; min-height: 340px; }
+.win-side { border-right: 1px solid var(--line); padding: 14px; font-size: 13px; color: var(--muted); }
+.win-side h3 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--silver); font-weight: 600; }
+.win-side ul { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 4px; }
+.win-side li { padding: 6px 8px; border-radius: 7px; display: flex; justify-content: space-between; gap: 8px; }
+.win-side li.on { background: var(--surface-2); color: var(--text); }
+.tag { font-size: 11px; color: var(--powder); }
+.win-main { display: grid; grid-template-rows: 1fr auto; }
+.win-log { padding: 16px 18px; font: 13px/1.6 var(--mono); color: var(--silver); display: grid; gap: 10px; align-content: start; }
+.win-log .you { color: var(--platinum); }
+.win-log .tool { color: var(--muted); }
+.win-log .route { color: var(--cyan); }
+.win-composer { border-top: 1px solid var(--line); padding: 12px 14px; display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--muted); }
+.win-composer .fake-input { flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.win-composer .picker { border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px; color: var(--powder); white-space: nowrap; }
+@media (max-width: 760px) {
+  .window-body { grid-template-columns: 1fr; }
+  .win-side { display: none; }
+  .win-composer .picker { display: none; }
+}
+
+/* ---- sections ---- */
+section { padding: 72px 0; }
+section + section { border-top: 1px solid var(--line); }
+.section-head { max-width: 680px; margin-bottom: 32px; }
+h2 { font-size: clamp(28px, 4.4vw, 40px); line-height: 1.12; letter-spacing: -0.025em; margin: 0; }
+.section-head p { color: var(--muted); margin: 12px 0 0; }
+.kicker { color: var(--cyan); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.card { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: linear-gradient(180deg, rgba(16, 49, 60, .55), rgba(8, 28, 35, .4)); }
+.card h3 { margin: 0 0 6px; font-size: 17px; letter-spacing: -0.01em; color: var(--text); }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+.card .icon { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 14px; background: rgba(46, 230, 238, .1); color: var(--cyan); border: 1px solid rgba(46, 230, 238, .25); }
+
+/* free models table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px; }
+th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--silver); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; background: var(--bg-2); }
+tr:last-child td { border-bottom: 0; }
+td small { color: var(--muted); display: block; }
+.pill { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--powder); white-space: nowrap; }
+.pill.local { color: var(--platinum); }
+
+/* ---- try it ---- */
+.try { border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg-2); overflow: hidden; }
+.try-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px; border-bottom: 1px solid var(--line); }
+.try-bar label { font-size: 13px; color: var(--muted); }
+select, textarea {
+  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 9px; padding: 10px 12px;
+}
+select { min-height: 44px; max-width: 100%; }
+.progress { flex-basis: 100%; height: 6px; border-radius: 99px; background: var(--surface); overflow: hidden; display: none; }
+.progress > span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--teal), var(--cyan), var(--powder)); transition: width .2s; }
+.status { flex-basis: 100%; font-size: 13px; color: var(--muted); min-height: 1.4em; }
+.status.error { color: var(--danger); }
+.chat { padding: 16px; min-height: 260px; max-height: 460px; overflow-y: auto; display: grid; gap: 12px; align-content: start; }
+.msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; }
+.msg.user { justify-self: end; background: rgba(46, 230, 238, .14); border: 1px solid rgba(46, 230, 238, .3); }
+.msg.bot { justify-self: start; background: var(--surface); border: 1px solid var(--line); }
+.msg.note { justify-self: center; max-width: 100%; color: var(--muted); font-size: 13px; background: none; padding: 0; text-align: center; }
+.composer { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--line); align-items: flex-end; }
+.composer textarea { flex: 1; resize: vertical; min-height: 46px; max-height: 200px; }
+.fine { color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+/* ---- download page ---- */
+.platforms { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.status-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.status-list li { display: flex; gap: 10px; align-items: baseline; }
+.status-list .ok { color: var(--cyan); }
+.status-list .todo { color: var(--silver); }
+
+/* ---- footer ---- */
+footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+footer a { color: var(--silver); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+@media (max-width: 560px) { .hero { padding-top: 56px; } section { padding: 56px 0; } }
+
+/* ---- theme switch (header) ---- */
+.theme-toggle {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 9px; background: transparent;
+  color: var(--silver); cursor: pointer;
+}
+.theme-toggle:hover { color: var(--text); background: var(--surface); }
+.theme-toggle svg { width: 18px; height: 18px; display: block; }
+.theme-toggle .sun { display: none; }
+:root[data-theme="light"] .theme-toggle .sun { display: block; }
+:root[data-theme="light"] .theme-toggle .moon { display: none; }
+
+/* ---- light theme (2026-11-09): the same cyan, powder and platinum family on near-white, with a
+   brighter, softer glow. Dark stays the default; theme.js applies a saved choice. ---- */
+:root[data-theme="light"] {
+  /* Soft, not paper-white: a grey-teal page, off-white panels, a calmer cyan. */
+  --bg: #dce6e8;
+  --bg-2: #d3dfe2;
+  --surface: #e9eff0;
+  --surface-2: #e1e9eb;
+  --line: rgba(20, 60, 70, 0.16);
+  --line-strong: rgba(20, 60, 70, 0.28);
+  --cyan: #2fb1b8;
+  --turquoise: #1f939a;
+  --teal: #146f76;
+  --powder: #1b6878;
+  --platinum: #7d6330;
+  --silver: #445c64;
+  --text: #17323a;
+  --muted: #4d646b;
+  --danger: #b3261e;
+  color-scheme: light;
+}
+:root[data-theme="light"] a:hover { color: var(--teal); }
+:root[data-theme="light"] :focus-visible { outline-color: var(--teal); }
+:root[data-theme="light"] .site-header { background: rgba(220, 230, 232, 0.88); }
+:root[data-theme="light"] .site-header nav a.nav-cta:hover,
+:root[data-theme="light"] .btn-primary:hover { background: #4cc3c9; color: #031014; }
+:root[data-theme="light"] .hero::before {
+  background:
+    radial-gradient(45% 50% at 50% 40%, rgba(47, 177, 184, 0.16), transparent 70%),
+    radial-gradient(30% 35% at 70% 30%, rgba(120, 180, 200, 0.16), transparent 70%),
+    radial-gradient(30% 35% at 30% 35%, rgba(200, 180, 140, 0.14), transparent 70%);
+}
+:root[data-theme="light"] h1 { background-image: linear-gradient(180deg, var(--text) 40%, var(--teal) 100%); }
+:root[data-theme="light"] .eyebrow { background: rgba(233, 239, 240, 0.8); }
+:root[data-theme="light"] .eyebrow .dot { box-shadow: 0 0 8px rgba(47, 177, 184, 0.6); }
+:root[data-theme="light"] .window {
+  box-shadow: 0 30px 80px rgba(20, 50, 58, 0.16), 0 0 0 1px rgba(47, 177, 184, 0.12), 0 0 60px rgba(47, 177, 184, 0.12);
+}
+:root[data-theme="light"] .card {
+  background: linear-gradient(180deg, #e9eff0, #e2eaec);
+  box-shadow: 0 10px 30px rgba(20, 50, 58, 0.06);
+}
+:root[data-theme="light"] .card .icon { color: var(--teal); }
+:root[data-theme="light"] .msg.user { background: rgba(18, 195, 204, 0.12); border-color: rgba(18, 195, 204, 0.35); }
+/* The download page's own blocks. */
+:root[data-theme="light"] .artifact { background: var(--surface); }
+:root[data-theme="light"] .badge[data-status="available"] { color: var(--teal); border-color: rgba(11, 120, 128, 0.4); background: rgba(18, 195, 204, 0.1); }
+:root[data-theme="light"] .badge[data-status="partial"] { border-color: rgba(138, 106, 36, 0.4); }
+:root[data-theme="light"] .manifest-error { border-color: rgba(179, 38, 30, 0.35); background: rgba(179, 38, 30, 0.06); }
+
+/* ---- language switch (header, next to the theme switch) and the Spanish hint (lang.js) ---- */
+.site-header nav a.lang-switch {
+  display: inline-flex; align-items: center; gap: 3px; height: 36px; padding: 0 9px;
+  border: 1px solid var(--line-strong); border-radius: 9px; color: var(--muted);
+  font: 600 12px/1 var(--font); letter-spacing: .04em;
+}
+.site-header nav a.lang-switch:hover { color: var(--text); background: var(--surface); }
+.lang-switch .lang-on { color: var(--text); }
+.lang-switch .lang-sep { opacity: .55; }
+.lang-hint {
+  display: flex; align-items: center; justify-content: center; gap: 10px; padding: 7px 16px;
+  background: var(--surface); border-bottom: 1px solid var(--line); color: var(--text); font-size: 14px;
+}
+.lang-hint a { color: var(--cyan); font-weight: 600; }
+.lang-hint-close { border: 0; background: transparent; color: var(--muted); font-size: 18px; line-height: 1; padding: 2px 6px; cursor: pointer; }
+.lang-hint-close:hover { color: var(--text); }
+/* On a phone the switch is one more control in the bar, so the plain Download link steps aside
+   (every page has a download button or link below the header) and the rest stay on one line. */
+@media (max-width: 420px) {
+  .site-header nav { gap: 4px; }
+  .site-header nav a { padding: 8px 8px; white-space: nowrap; }
+  .site-header nav a[href$="/download/"]:not([class]) { display: none; }
+}

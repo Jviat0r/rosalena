@@ -1,0 +1,21 @@
+{
+  "id": "rosa-local-model-switch",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Which local GGUF models are installed, which one llama.cpp is serving, which the card can hold, and the exact llama-server command to switch - without starting, stopping or killing anything",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "baseUrl": "http://127.0.0.1:8080",
+    "planContext": 16384,
+    "timeoutMs": 1500,
+    "extraFlags": [
+      "-fa",
+      "on",
+      "--parallel",
+      "1",
+      "--jinja"
+    ]
+  }
+}

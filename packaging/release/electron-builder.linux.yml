@@ -1,0 +1,141 @@
+# electron-builder - Linux x64: AppImage + .deb.
+#
+# Run it through packaging/release/build.mjs on a Linux machine (or the `linux` job in
+# .github/workflows/release.yml, ubuntu-latest). This file cannot be built on Windows:
+# the .deb is assembled by fpm and the AppImage by mksquashfs, both Linux tools.
+#
+#   node packaging/release/build.mjs linux
+#
+# The project directory is the staged app (build/release/app), so every path below is
+# relative to that directory, NOT to this file.
+#
+# ---------------------------------------------------------------------------------
+# RESOURCE MAP - the same app payload and extraResources as electron-builder.win.yml
+# and electron-builder.mac.yml (check-config.mjs fails if the three lists differ).
+#
+# Linux-only additions:
+#   build/icons/<N>x<N>.png          the hicolor icon set, staged by stage.mjs from
+#                                    packaging/assets/icon/rosalena-<N>.png
+#   extraMetadata                    homepage and desktopName, written into this build's
+#                                    package.json only: fpm refuses a .deb without a
+#                                    homepage, and Electron uses desktopName as the window's
+#                                    app_id / WM_CLASS so the dock matches the window to the
+#                                    launcher entry. The Windows and macOS builds are untouched.
+#
+# Never shipped: node_modules, harness/src/voice/.venv, router/data (API keys),
+# router/logs, router/state, harness/test, harness/.scratch, harness/plugins/store.lock.json
+# ---------------------------------------------------------------------------------
+
+appId: dev.rosalena.harness
+productName: Rosalena Harness
+copyright: Copyright (c) 2026 Rosalena
+
+directories:
+  output: dist
+  buildResources: build
+
+# See electron-builder.win.yml: the layout inside the app must match the repo layout,
+# because the entry dynamically imports ../harness/src/ui.mjs.
+asar: false
+
+extraMetadata:
+  homepage: https://rosalena.pages.dev
+  desktopName: rosalena-harness.desktop
+
+files:
+  - package.json
+  - desktop/main.mjs
+  - desktop/menu.mjs
+  - desktop/notify.mjs
+  - desktop/preload.mjs
+  - desktop/router-supervisor.mjs
+  - desktop/updater.mjs
+  - harness/src/**/*.mjs
+  - harness/src/voice/README.md
+  - harness/src/voice/transcribe.py
+  - harness/src/voice/setup.ps1
+  - harness/src/voice/selftest.ps1
+  - harness/src/voice/win-speech.ps1
+  - harness/ui/**/*
+  - harness/data/model-catalog.json
+  - harness/data/llama-runtime.json
+  - harness/data/media-models.json
+  - harness/data/whisper-runtime.json
+  - harness/data/student-programs.json
+  - harness/data/node-runtime.json
+  - harness/data/comfy-workflows/*.json
+  - harness/harness.config.json
+  - harness/plugins/**/*
+  - harness/plugin-libs/**/*
+  - harness/store/index.json
+  - harness/store/modules/**/*
+  - harness/skills/**/*
+  - "!**/node_modules/**"
+  - "!**/.venv/**"
+  - "!**/__pycache__/**"
+  - "!**/*.pyc"
+  - "!**/*.log"
+  - "!harness/plugins/store.lock.json"
+  - "!harness/**/test/**"
+  - "!harness/.scratch/**"
+  - "!router/**"
+
+extraResources:
+  - from: router
+    to: router
+    filter:
+      - "**/*"
+      - "!**/node_modules/**"
+      - "!**/test/**"
+      - "!**/logs/**"
+      - "!**/state/**"
+      - "!**/data/**"
+      - "!**/scripts/**"
+  # The router's identity prompt (router.config.json reads ../data/prompts/rosalena.md);
+  # without it router/src/persona.mjs exits 2 and no model can answer. One file, no keys.
+  - from: data/prompts
+    to: data/prompts
+    filter:
+      - "rosalena.md"
+
+publish: null
+
+# Default file name for any target that does not override it below. electron-builder's
+# ${arch} is x86_64 for an AppImage and amd64 for a .deb (builder-util getArtifactArchName),
+# which is what the names below spell out; harness/src/update.mjs updateFileName and
+# packaging/release/manifest.mjs expect exactly these two names.
+artifactName: Rosalena-Harness-${version}-${arch}.${ext}
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  # A folder of 16x16.png ... 512x512.png, staged by stage.mjs. It becomes the hicolor icon
+  # set the .deb installs and the icon inside the AppImage.
+  icon: build/icons
+  category: Development
+  executableName: rosalena-harness
+  # The .desktop file is named after desktopName (extraMetadata above), so the running
+  # window's app_id and the launcher entry agree.
+  syncDesktopName: true
+  maintainer: Rosalena <hello@rosalena.dev>
+  vendor: Rosalena
+  synopsis: A desktop AI coding agent that runs local and cloud models
+  description: Rosalena Harness is a desktop AI coding agent with its own model router, local models and plugins.
+  desktop:
+    entry:
+      Name: Rosalena Harness
+      Comment: A desktop AI coding agent
+      Keywords: ai;agent;coding;llm;
+
+appImage:
+  artifactName: Rosalena-Harness-${version}-${arch}.${ext}
+
+deb:
+  artifactName: Rosalena-Harness-${version}-${arch}.${ext}
+  packageCategory: devel
+  priority: optional

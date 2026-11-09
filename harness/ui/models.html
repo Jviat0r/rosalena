@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rosalena Harness - what this PC can run</title>
+<style>
+  :root {
+    --bg: #070c13;
+    --bg-2: #0a111a;
+    --panel: #0d1621;
+    --panel-2: #111c28;
+    --panel-3: #162434;
+    --line: #2b3b4b;
+    --line-soft: #1a2734;
+    --text: #e9f1f9;
+    --text-2: #c4d4e4;
+    --dim: #97abc0;
+    --accent: #5fe3f0;
+    --accent-2: #16b8cc;
+    --accent-soft: #0b2a33;
+    --powder: #b9d7f0;
+    --ok: #56e39f;
+    --warn: #f3c969;
+    --bad: #ff8a8a;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+    --radius-pill: 999px;
+    --t: 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+    --shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(1100px 520px at 12% -12%, rgba(95, 227, 240, 0.09), transparent 60%),
+      radial-gradient(900px 460px at 92% 0%, rgba(185, 215, 240, 0.06), transparent 58%),
+      var(--bg);
+    color: var(--text);
+    font: 14px/1.55 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 28px clamp(16px, 4vw, 44px) 64px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  header.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; margin-bottom: 24px; }
+  .titles h1 { margin: 0 0 6px; font-size: clamp(20px, 2.4vw, 27px); letter-spacing: -0.01em; font-weight: 620; }
+  .titles p { margin: 0; color: var(--dim); max-width: 68ch; }
+  .titles strong { color: var(--text-2); font-weight: 600; }
+  .actions { display: flex; gap: 10px; align-items: center; }
+  /* The way back to the chats: the same pill the other dashboard pages use. */
+  .back {
+    display: inline-block;
+    margin-bottom: 14px;
+    color: var(--dim);
+    border: 1px solid var(--line);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .back:hover { color: var(--text); border-color: var(--accent); }
+  button {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 9px 15px;
+    cursor: pointer;
+    transition: background var(--t), border-color var(--t), transform var(--t);
+  }
+  button:hover { background: var(--panel-3); border-color: var(--accent-2); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[disabled] { opacity: 0.55; cursor: progress; }
+  button.ghost { background: transparent; }
+  .stamp { color: var(--dim); font-size: 12px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 26px; }
+  .card { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .card .k { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+  .card .v { font-size: 15px; color: var(--text); font-weight: 560; word-break: break-word; }
+  .card .s { font-size: 12px; color: var(--dim); margin-top: 4px; }
+  .meter { height: 6px; border-radius: var(--radius-pill); background: var(--line-soft); overflow: hidden; margin-top: 10px; }
+  .meter > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); border-radius: inherit; transition: width var(--t); }
+
+  section.bucket { margin-bottom: 26px; }
+  section.bucket > h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 0 0 10px; display: flex; gap: 10px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.ok { background: var(--ok); }
+  .dot.warn { background: var(--warn); }
+  .dot.bad { background: var(--bad); }
+  .dot.dim { background: var(--dim); }
+  .count { color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: var(--radius-pill); padding: 1px 9px; font-size: 11px; letter-spacing: 0; }
+
+  .row {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: border-color var(--t), background var(--t);
+  }
+  .row:hover { border-color: var(--line); }
+  .row-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  .row-head .name { font-size: 15px; font-weight: 600; }
+  .chip {
+    font-size: 11px; padding: 2px 9px; border-radius: var(--radius-pill);
+    border: 1px solid var(--line); color: var(--text-2); background: var(--panel-2);
+    white-space: nowrap;
+  }
+  .chip.accent { color: var(--accent); border-color: var(--accent-2); background: var(--accent-soft); }
+  .chip.ok { color: var(--ok); border-color: rgba(86, 227, 159, 0.35); }
+  .chip.warn { color: var(--warn); border-color: rgba(243, 201, 105, 0.35); }
+  .chip.bad { color: var(--bad); border-color: rgba(255, 138, 138, 0.35); }
+  .why { color: var(--text-2); margin-top: 8px; font-size: 13px; }
+  .row-foot { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .row-foot .stamp { margin-left: auto; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--dim); font-size: 12px; }
+  summary:hover { color: var(--text-2); }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line-soft); }
+  th { color: var(--dim); font-weight: 500; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--dim); }
+  .empty { color: var(--dim); border: 1px dashed var(--line); border-radius: var(--radius); padding: 18px; }
+  .notes { margin-top: 30px; border-top: 1px solid var(--line-soft); padding-top: 16px; color: var(--dim); font-size: 12.5px; }
+  .notes ul { margin: 8px 0 0; padding-left: 18px; }
+  .notes li { margin-bottom: 4px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px);
+    background: var(--panel-3); border: 1px solid var(--accent-2); color: var(--text);
+    padding: 10px 18px; border-radius: var(--radius-pill); opacity: 0;
+    transition: opacity var(--t), transform var(--t); pointer-events: none; font-size: 13px;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  [hidden] { display: none !important; }
+
+  /* The four kinds of model, one tab each. */
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 18px; }
+  .tab {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: var(--radius-pill); background: transparent; border: 1px solid var(--line-soft); color: var(--dim);
+  }
+  .tab:hover { color: var(--text); border-color: var(--line); background: var(--panel-2); }
+  .tab[aria-selected="true"] { color: var(--text); background: var(--accent-soft); border-color: var(--accent-2); }
+  .tab .n { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .kind-note { color: var(--dim); font-size: 12.5px; margin: -8px 0 18px; max-width: 80ch; }
+
+  button.primary { background: var(--accent-2); border-color: var(--accent-2); color: #021116; font-weight: 600; }
+  button.primary:hover { background: var(--accent); border-color: var(--accent); }
+  button.small { padding: 3px 10px; font-size: 12px; border-radius: var(--radius-xs); }
+  .done { color: var(--ok); font-size: 12.5px; }
+
+  /* Asking before a download, and the download itself. */
+  dialog {
+    background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 22px; max-width: min(520px, calc(100vw - 32px)); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+  }
+  dialog::backdrop { background: rgba(2, 6, 10, 0.62); }
+  dialog h3 { margin: 0 0 10px; font-size: 17px; }
+  dialog dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 12px 0; font-size: 13px; }
+  dialog dt { color: var(--dim); }
+  dialog dd { margin: 0; word-break: break-all; }
+  dialog .warn-line { color: var(--warn); font-size: 13px; margin: 8px 0 0; }
+  dialog .buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .dl-bar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(560px, calc(100vw - 32px));
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px;
+    box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; z-index: 5;
+  }
+  .dl-bar .meter { grid-column: 1 / -1; margin-top: 0; }
+  .dl-bar .what { font-size: 13px; }
+  .dl-bar .what small { display: block; color: var(--dim); font-size: 12px; }
+  /* "On this PC": installed models, how each would load, and the load settings. */
+  .onpc { margin-bottom: 28px; }
+  .onpc > h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 0 0 10px; display: flex; gap: 10px; align-items: center; }
+  .prefs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 16px; margin-top: 10px; }
+  .field { display: grid; gap: 4px; font-size: 12.5px; color: var(--dim); }
+  .field.check { grid-template-columns: auto 1fr; align-items: center; gap: 8px; color: var(--text-2); }
+  select, input[type="number"] {
+    font: inherit; font-size: 13px; color: var(--text); background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: var(--radius-xs); padding: 6px 8px; min-width: 0;
+  }
+  select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  input[type="checkbox"] { accent-color: var(--accent-2); width: 16px; height: 16px; }
+  .mode { display: flex; gap: 14px; margin: 8px 0 4px; font-size: 13px; color: var(--text-2); }
+  .mode label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .manual-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px 14px; margin-top: 8px; }
+  .manual-grid[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
+  .hint { color: var(--dim); font-size: 12px; margin: 8px 0 0; }
+  .runner-line { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="titles">
+    <a class="back" href="/" title="Back to your chats (Esc)">&larr; Back to chats</a>
+    <h1>Models for this PC</h1>
+    <p>
+      Measured here, not guessed: graphics memory comes from <strong>nvidia-smi</strong>, CPU and RAM from the
+      operating system. Pick a model and press <strong>Download</strong>: it comes straight from Hugging Face and its
+      size and checksum are checked before it is kept. The models that are tight or do not fit are listed too, so you
+      can see where this PC's limit is.
+    </p>
+  </div>
+  <div class="actions">
+    <span class="stamp" id="stamp">measuring&hellip;</span>
+    <button id="refresh" type="button">Measure again</button>
+  </div>
+</header>
+
+<div class="cards" id="cards"></div>
+<div class="tabs" role="tablist" aria-label="Kind of model" id="tabs"></div>
+<p class="kind-note" id="kind-note"></p>
+<section class="onpc" id="onpc" aria-live="polite"></section>
+<div id="buckets"></div>
+
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <form method="dialog">
+    <h3 id="confirm-title">Download this model?</h3>
+    <div id="confirm-body"></div>
+    <div class="buttons">
+      <button value="cancel" type="submit" class="ghost">Cancel</button>
+      <button value="go" type="submit" class="primary" id="confirm-go">Download</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="dl-bar" id="dl-bar" hidden role="status" aria-live="polite">
+  <div class="what" id="dl-what"></div>
+  <button type="button" class="small ghost" id="dl-cancel">Cancel</button>
+  <div class="meter"><i id="dl-fill" style="width: 0%"></i></div>
+</div>
+
+<div class="notes" id="notes" hidden>
+  <strong>What this page does not know.</strong>
+  <ul id="note-list"></ul>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+const TOKEN = "__ROSALENA_TOKEN__";
+const GIB = 1024 ** 3;
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined && text !== null) node.textContent = String(text);
+  return node;
+};
+
+/** GiB, one decimal, because a figure that wobbles in the third digit reads as noise. */
+function gib(bytes) {
+  if (bytes === null || bytes === undefined || !Number.isFinite(Number(bytes))) return null;
+  return `${(Number(bytes) / GIB).toFixed(1)} GiB`;
+}
+
+function toast(message) {
+  const node = $("toast");
+  node.textContent = message;
+  node.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => node.classList.remove("show"), 1800);
+}
+
+function card(key, value, sub, meter) {
+  const node = el("div", "card");
+  node.appendChild(el("div", "k", key));
+  node.appendChild(el("div", "v", value));
+  if (sub) node.appendChild(el("div", "s", sub));
+  if (meter !== null && meter !== undefined) {
+    const bar = el("div", "meter");
+    const fill = el("i");
+    fill.style.width = `${Math.max(0, Math.min(100, meter))}%`;
+    bar.appendChild(fill);
+    node.appendChild(bar);
+  }
+  return node;
+}
+
+function drawHardware(hardware) {
+  const cards = $("cards");
+  cards.replaceChildren();
+  if (!hardware) return;
+
+  const gpu = hardware.gpu ?? null;
+  if (gpu && gpu.vramTotalBytes) {
+    const used = gpu.vramTotalBytes - (gpu.vramFreeBytes ?? 0);
+    const pct = (used / gpu.vramTotalBytes) * 100;
+    cards.appendChild(
+      card(
+        "Graphics card",
+        gpu.name ?? "unknown",
+        `${gib(gpu.vramFreeBytes)} free of ${gib(gpu.vramTotalBytes)}` +
+          (gpu.driverVersion ? ` - driver ${gpu.driverVersion}` : "") +
+          (gpu.laptop ? " - laptop" : ""),
+        pct,
+      ),
+    );
+  } else {
+    cards.appendChild(card("Graphics card", "none measured", "the catalog is scored against RAM instead", null));
+  }
+
+  const ram = hardware.ram ?? null;
+  if (ram && ram.totalBytes) {
+    cards.appendChild(
+      card("Memory", `${gib(ram.totalBytes)}`, `${gib(ram.freeBytes)} free right now`, (1 - ram.freeBytes / ram.totalBytes) * 100),
+    );
+  } else {
+    cards.appendChild(card("Memory", "unknown", "the probe could not read total memory", null));
+  }
+
+  const cpu = hardware.cpu ?? null;
+  if (cpu && cpu.model) {
+    const cores = cpu.physicalCores && cpu.logicalCores && cpu.physicalCores !== cpu.logicalCores
+      ? `${cpu.physicalCores} cores / ${cpu.logicalCores} threads`
+      : `${cpu.logicalCores ?? "?"} threads`;
+    cards.appendChild(card("Processor", cpu.model, cores, null));
+  } else {
+    cards.appendChild(card("Processor", "unknown", "the probe could not read the CPU", null));
+  }
+
+  const disk = hardware.disk ?? null;
+  const diskFree = disk?.freeBytes ?? null;
+  if (diskFree) {
+    const where = disk.modelsDir ? ` of ${gib(disk.totalBytes) ?? "?"} on ${disk.modelsDir}` : "";
+    cards.appendChild(card("Disk", `${gib(diskFree)} free`, where.trim() || "of the drive that holds models", null));
+  } else {
+    cards.appendChild(card("Disk", "not configured", "set modelDirs in the local-llm plugin to measure the drive", null));
+  }
+}
+
+// Every bucket is drawn even when it is empty: "nothing is too big" is an answer too, and
+// the tight and too-big rows are the reference for where this PC's limit is.
+const BUCKETS = [
+  { key: "fits", title: "Runs now", dot: "ok", cls: "ok", empty: "Nothing here fits the memory that is free this second. Close other GPU apps and press Measure again." },
+  { key: "tight", title: "Runs, but tight", dot: "warn", cls: "warn", empty: "Nothing here is borderline on this PC." },
+  { key: "tooBig", title: "Does not fit", dot: "bad", cls: "bad", empty: "Everything in this list fits this PC." },
+  { key: "unknown", title: "No figure yet", dot: "dim", cls: "", empty: "" },
+];
+
+const KINDS = [
+  { key: "chat", label: "Chat", note: "Chat models run inside Rosalena. A download lands in the local shelf, so it shows up in the model picker under Local models; if this PC has no llama.cpp runner yet, that is downloaded first." },
+  { key: "image", label: "Image", note: "Image models run in ComfyUI. Rows marked Runs in Rosalena work as soon as they are downloaded: ask a chat for a picture and Rosalena starts ComfyUI, makes room on the card and stops it again when idle. Downloads go to the folder below, in ComfyUI's own subfolders." },
+  { key: "video", label: "Video", note: "Video models also run in ComfyUI, and want the most video memory of anything here. Rows marked Runs in Rosalena bring their text encoder and VAE with them. Downloads go to the folder below, in ComfyUI's subfolders." },
+  { key: "voice", label: "Voice", note: "Speech-to-text (Whisper) models power the microphone beside Send: the first one you download brings the whisper.cpp runner with it, and each dictation loads the model, writes the text and lets it go. Text-to-speech models download only for now." },
+];
+
+const page = { body: null, kind: (location.hash || "#chat").slice(1), job: null, poll: null };
+if (!KINDS.some((k) => k.key === page.kind)) page.kind = "chat";
+
+const bucketsFor = (kind) => (kind === "chat" ? page.body?.rows : page.body?.media?.[kind]) ?? null;
+const countFor = (kind) => {
+  const b = bucketsFor(kind);
+  return b ? ["fits", "tight", "tooBig", "unknown"].reduce((n, key) => n + (b[key]?.length ?? 0), 0) : 0;
+};
+
+function drawTabs() {
+  const host = $("tabs");
+  host.replaceChildren();
+  for (const kind of KINDS) {
+    const tab = el("button", "tab");
+    tab.type = "button";
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-selected", String(kind.key === page.kind));
+    tab.appendChild(el("span", "", kind.label));
+    tab.appendChild(el("span", "n", String(countFor(kind.key))));
+    tab.addEventListener("click", () => {
+      page.kind = kind.key;
+      history.replaceState(null, "", `#${kind.key}`);
+      drawAll();
+    });
+    host.appendChild(tab);
+  }
+  const kind = KINDS.find((k) => k.key === page.kind);
+  const where = page.body?.modelsHome ? ` Folder: ${page.body.modelsHome}${page.kind === "chat" ? "" : `\\${page.kind}`}` : "";
+  $("kind-note").textContent = `${kind.note}${where}`;
+}
+
+function drawAll() {
+  drawTabs();
+  drawOnPc();
+  draw(bucketsFor(page.kind));
+}
+
+// ---------------------------------------------------------------------------
+// On this PC: installed chat models, how each loads, and the settings for it
+// ---------------------------------------------------------------------------
+
+const CONTEXTS = [4096, 8192, 16384, 32768, 65536, 131072, 262144];
+const kTokens = (n) => (n >= 1024 ? `${Math.round(n / 1024)}k` : String(n));
+
+function select(options, value, onChange) {
+  const node = el("select");
+  for (const [v, label] of options) {
+    const opt = el("option", "", label);
+    opt.value = String(v);
+    if (String(v) === String(value)) opt.selected = true;
+    node.appendChild(opt);
+  }
+  node.addEventListener("change", () => onChange(node.value));
+  return node;
+}
+
+function field(label, control, cls = "field") {
+  const node = el("label", cls);
+  if (cls.includes("check")) {
+    node.appendChild(control);
+    node.appendChild(el("span", "", label));
+  } else {
+    node.appendChild(el("span", "", label));
+    node.appendChild(control);
+  }
+  return node;
+}
+
+async function saveLocal(patch, done) {
+  try {
+    await post("/api/local/settings", patch);
+    toast(done);
+    await loadLocal();
+  } catch (err) {
+    toast(`Not saved: ${err.message}`);
+  }
+}
+
+/** The settings every local model shares: when it unloads, the reserve, the auto limits. */
+function prefsBox(prefs, autoContext) {
+  const box = el("div", "row");
+  const head = el("div", "row-head");
+  head.appendChild(el("span", "name", "Loading and unloading"));
+  box.appendChild(head);
+  box.appendChild(el("div", "why muted", "A chat model loads by itself when you send it a prompt, at the biggest context that fits your graphics card with memory to spare, and unloads when it has been idle. Only models Rosalena loaded are ever unloaded."));
+  const grid = el("div", "prefs-grid");
+  grid.appendChild(
+    field("Unload after it sits idle for", select([[0, "Never"], [5, "5 minutes"], [10, "10 minutes"], [15, "15 minutes"], [30, "30 minutes"], [60, "1 hour"], [120, "2 hours"]], prefs.idleUnloadMinutes, (v) => saveLocal({ idleUnloadMinutes: Number(v) }, Number(v) ? `Unloads after ${v} idle minutes` : "Never unloaded for being idle"))),
+  );
+  grid.appendChild(
+    field("Keep this much graphics memory free", select([["", "Auto (6% of the card, 1 GiB at least)"], [0.5, "0.5 GiB"], [1, "1 GiB"], [1.5, "1.5 GiB"], [2, "2 GiB"], [3, "3 GiB"], [4, "4 GiB"], [6, "6 GiB"]], prefs.reserveGiB ?? "", (v) => saveLocal({ reserveGiB: v === "" ? null : Number(v) }, "Reserve saved"))),
+  );
+  grid.appendChild(
+    field(
+      "Auto picks a context up to",
+      select([["", `Auto (${kTokens(autoContext ?? 32768)} tokens)`], ...CONTEXTS.map((n) => [n, `${kTokens(n)} tokens`])], prefs.maxContext ?? "", (v) =>
+        saveLocal({ maxContext: v === "" ? null : Number(v) }, v === "" ? "Auto context cap" : `Auto context up to ${kTokens(Number(v))}`),
+      ),
+    ),
+  );
+  grid.appendChild(
+    field("When a model is too big for the card", select([["auto", "Run part of it from RAM (slower)"], ["never", "Don't load it"]], prefs.offload, (v) => saveLocal({ offload: v }, "Saved"))),
+  );
+  const quit = el("input");
+  quit.type = "checkbox";
+  quit.checked = prefs.unloadOnQuit;
+  quit.addEventListener("change", () => saveLocal({ unloadOnQuit: quit.checked }, quit.checked ? "Unloads when Rosalena closes" : "Stays loaded after Rosalena closes"));
+  grid.appendChild(field("Unload when Rosalena closes", quit, "field check"));
+  box.appendChild(grid);
+  return box;
+}
+
+const VERDICT = {
+  gpu: ["ok", "Fits the card"],
+  offload: ["warn", "Part runs from RAM"],
+  cpu: ["warn", "Processor only"],
+  unknown: ["", "No VRAM reading"],
+};
+
+function localRow(m) {
+  const node = el("div", "row");
+  const head = el("div", "row-head");
+  head.appendChild(el("span", "name", m.alias));
+  if (m.quant) head.appendChild(el("span", "chip", m.quant));
+  head.appendChild(el("span", "chip", `${m.gb.toFixed(1)} GB file`));
+  if (m.params) head.appendChild(el("span", "chip", `${m.params} B parameters`));
+  if (m.loaded) head.appendChild(el("span", "chip accent", m.current?.ours ? (m.current.busy ? "Loaded, answering" : "Loaded") : "Loaded by another program"));
+  const [cls, label] = m.plan.ok ? VERDICT[m.plan.verdict] ?? ["", m.plan.verdict] : ["bad", "Won't load now"];
+  head.appendChild(el("span", `chip ${cls}`, label));
+  if (m.settings?.mode === "manual") head.appendChild(el("span", "chip", "Manual settings"));
+  node.appendChild(head);
+
+  if (m.loaded && m.current?.context) {
+    const now = m.current.plan;
+    node.appendChild(el("div", "why", `On the card now at ${kTokens(m.current.context)} tokens${now ? `, ${now.gpuLayers === "all" ? "every layer" : `${now.gpuLayers} layers`} on the GPU, ${now.kvCache} cache` : ""}.`));
+  }
+  node.appendChild(el("div", m.loaded ? "why muted" : "why", `${m.loaded ? "A reload would put " : "Next load: "}${m.plan.why}`));
+  for (const w of m.plan.warnings ?? []) node.appendChild(el("div", "why muted", w));
+
+  // Manual settings: still checked against the card, so a value that would overfill it is
+  // refused with the numbers rather than loaded.
+  const s = m.settings ?? { mode: "auto", context: null, gpuLayers: "auto", kvCache: "auto" };
+  const details = el("details");
+  details.open = s.mode === "manual";
+  details.appendChild(el("summary", "", "Load settings"));
+  const draft = { ...s };
+  const mode = el("div", "mode");
+  const grid = el("div", "manual-grid");
+  const setMode = (value) => {
+    draft.mode = value;
+    grid.setAttribute("aria-disabled", String(value !== "manual"));
+  };
+  for (const [value, text] of [["auto", "Auto: fit it to this PC"], ["manual", "Manual"]]) {
+    const label = el("label");
+    const radio = el("input");
+    radio.type = "radio";
+    radio.name = `mode-${m.alias}`;
+    radio.value = value;
+    radio.checked = s.mode === value;
+    radio.addEventListener("change", () => setMode(value));
+    label.appendChild(radio);
+    label.appendChild(el("span", "", text));
+    mode.appendChild(label);
+  }
+  details.appendChild(mode);
+
+  const maxCtx = m.plan.trainContext ?? 262144;
+  const ctxOptions = [["", "Auto"], ...CONTEXTS.filter((n) => n <= maxCtx).map((n) => [n, `${kTokens(n)} tokens`])];
+  grid.appendChild(field("Context", select(ctxOptions, s.context ?? "", (v) => (draft.context = v === "" ? null : Number(v)))));
+  const layers = m.plan.layers;
+  const layerMode = select([["auto", "Auto"], ["all", `All${layers ? ` (${layers})` : ""}`], ["n", "A number"]], typeof s.gpuLayers === "number" ? "n" : s.gpuLayers, (v) => {
+    count.hidden = v !== "n";
+    draft.gpuLayers = v === "n" ? Number(count.value) : v;
+  });
+  const count = el("input");
+  count.type = "number";
+  count.min = "0";
+  if (layers) count.max = String(layers);
+  count.value = String(typeof s.gpuLayers === "number" ? s.gpuLayers : Math.floor((layers ?? 32) / 2));
+  count.hidden = typeof s.gpuLayers !== "number";
+  count.setAttribute("aria-label", "Layers on the GPU");
+  count.addEventListener("input", () => (draft.gpuLayers = Number(count.value)));
+  const layerBox = el("div", "field");
+  layerBox.appendChild(el("span", "", "Layers on the GPU"));
+  layerBox.appendChild(layerMode);
+  layerBox.appendChild(count);
+  grid.appendChild(layerBox);
+  grid.appendChild(field("KV cache", select([["auto", "Auto"], ["f16", "f16 (full quality)"], ["q8_0", "q8_0 (half the memory)"], ["q4_0", "q4_0 (a quarter, some quality loss)"]], s.kvCache, (v) => (draft.kvCache = v))));
+  setMode(s.mode);
+  details.appendChild(grid);
+  details.appendChild(el("p", "hint", "Manual values are still checked against your graphics card before the model loads: anything that would overfill it is refused with the numbers. A loaded model picks up new settings the next time you send it a prompt."));
+  const foot = el("div", "row-foot");
+  const save = el("button", "primary small", "Save");
+  save.type = "button";
+  save.addEventListener("click", () =>
+    saveLocal({ models: { [m.alias]: draft.mode === "manual" ? draft : null } }, draft.mode === "manual" ? `${m.alias}: manual settings saved` : `${m.alias}: back to auto`),
+  );
+  foot.appendChild(save);
+  details.appendChild(foot);
+  node.appendChild(details);
+  return node;
+}
+
+/** What runs this tab's models: ComfyUI for image and video, whisper.cpp for voice. */
+function runnerBox(kind) {
+  const r = page.runners;
+  if (!r?.ok) return null;
+  const box = el("div", "row");
+  const head = el("div", "row-head");
+  box.appendChild(head);
+  const line = el("div", "runner-line");
+  if (kind === "voice") {
+    const v = r.voice;
+    head.appendChild(el("span", "name", "Dictation (Whisper)"));
+    head.appendChild(el("span", `chip ${v.ok ? "ok" : "warn"}`, v.ok ? `Ready: ${v.model}` : v.code === "no-model" ? "No Whisper model yet" : "Runner missing"));
+    box.appendChild(el("div", "why", v.ok ? "Press the microphone beside Send in a chat, speak, and press it again: the words land in the prompt for you to check before sending. The model is loaded for that one transcription only." : v.why));
+    if (v.code === "no-runner") {
+      const install = el("button", "primary small", "Install runner");
+      install.type = "button";
+      install.addEventListener("click", async () => {
+        install.disabled = true;
+        install.textContent = "Installing…";
+        try {
+          await post("/api/voice", { action: "install" });
+          toast("whisper.cpp is installed");
+        } catch (err) {
+          toast(`Not installed: ${err.message}`);
+        }
+        await loadLocal();
+      });
+      line.appendChild(install);
+    }
+    box.appendChild(line);
+    return box;
+  }
+  const c = r.comfy;
+  head.appendChild(el("span", "name", "Runs in ComfyUI"));
+  head.appendChild(
+    el("span", `chip ${c.up || c.install ? "ok" : "warn"}`, c.up ? (c.ours ? "Running, started by Rosalena" : "Running, started outside Rosalena") : c.install ? "Installed, starts when needed" : "ComfyUI not found"),
+  );
+  box.appendChild(
+    el(
+      "div",
+      "why",
+      c.up && !c.ours
+        ? `A ComfyUI on ${c.baseUrl} that something else started is used as it is: Rosalena never stops or frees it.`
+        : c.install
+          ? `Found at ${c.install.root}. Rosalena starts it hidden when a chat asks for ${kind === "video" ? "a video" : "an image"}, unloads its own idle chat model first if the card needs the room, and stops it after it sits idle as long as a chat model would.`
+          : "No ComfyUI install was found on this PC. Install ComfyUI (the portable build is the simplest) and Rosalena starts it when it is needed, or set plugins.comfyui.config.root to its folder.",
+    ),
+  );
+  const ready = c.models.filter((m) => m.kind === kind);
+  box.appendChild(
+    el("div", "why muted", ready.length ? `Ready to use: ${ready.map((m) => m.name).join(", ")}. Ask in a chat, for example "make ${kind === "video" ? "a short video" : "an image"} of a lighthouse at dusk".` : `Nothing downloaded yet that Rosalena can run: the rows marked Runs in Rosalena below work with no setup.`),
+  );
+  if (!c.install && !c.up) {
+    const link = el("a", "", "ComfyUI on GitHub");
+    link.href = "https://github.com/comfyanonymous/ComfyUI";
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    line.appendChild(link);
+    box.appendChild(line);
+  }
+  return box;
+}
+
+function drawOnPc() {
+  const host = $("onpc");
+  host.replaceChildren();
+  if (page.kind !== "chat") {
+    const box = runnerBox(page.kind);
+    if (box) host.appendChild(box);
+    return;
+  }
+  const body = page.local;
+  if (!body) return;
+  const title = el("h2");
+  title.appendChild(el("span", "dot ok"));
+  title.appendChild(el("span", "", "On this PC"));
+  if (body.ok) title.appendChild(el("span", "count", String(body.models.length)));
+  host.appendChild(title);
+  if (!body.ok) {
+    host.appendChild(el("div", "empty", body.error ?? "The local model host is not available."));
+    return;
+  }
+  host.appendChild(prefsBox(body.prefs, body.autoContext));
+  if (!body.models.length) host.appendChild(el("div", "empty", "No chat model is downloaded yet. Pick one below and press Download."));
+  for (const m of body.models) host.appendChild(localRow(m));
+}
+
+async function loadLocal() {
+  const get = (path) => fetch(path, { headers: { authorization: `Bearer ${TOKEN}` }, cache: "no-store" }).then((res) => res.json());
+  const [local, runners] = await Promise.allSettled([get("/api/local/plan"), get("/api/media/runners")]);
+  page.local = local.status === "fulfilled" ? local.value : { ok: false, error: local.reason?.message };
+  page.runners = runners.status === "fulfilled" ? runners.value : null;
+  drawOnPc();
+}
+
+/** The question before any download: what, how big, where to, and what runs it. */
+function askDownload({ kind, id, quant, name, bytes, approx, verdict, runner, fileName }) {
+  const dialog = $("confirm");
+  $("confirm-title").textContent = `Download ${name}${quant ? ` (${quant})` : ""}?`;
+  const body = $("confirm-body");
+  body.replaceChildren();
+  body.appendChild(el("p", "", "It downloads from Hugging Face into this PC's model folder. The size and checksum are checked before the file is kept, and a cancelled download picks up where it stopped."));
+  const dl = el("dl");
+  const add = (k, v) => {
+    if (!v) return;
+    dl.appendChild(el("dt", "", k));
+    dl.appendChild(el("dd", "", v));
+  };
+  add("File", fileName);
+  add("Size", bytes ? `${(bytes / 1e9).toFixed(1)} GB` : approx ? `about ${(approx / 1e9).toFixed(1)} GB` : "read from Hugging Face when it starts");
+  add("Saved to", page.body?.modelsHome ? `${page.body.modelsHome}${kind === "chat" ? "" : `\\${kind}`}` : "~/.rosalena/models");
+  add("Runs in", kind === "chat" ? "Rosalena (local models)" : runner);
+  body.appendChild(dl);
+  if (verdict === "tight") body.appendChild(el("p", "warn-line", "This one is tight on this PC: it runs, but part of it sits in RAM and it will be slower."));
+  if (verdict === "tooBig") body.appendChild(el("p", "warn-line", "This one does not fit this PC's memory. It downloads, but expect it to fail to load or to crawl."));
+  dialog.returnValue = "";
+  dialog.showModal();
+  $("confirm-go").focus();
+  dialog.addEventListener(
+    "close",
+    () => {
+      if (dialog.returnValue === "go") void startDownload({ kind, id, quant });
+    },
+    { once: true },
+  );
+}
+
+async function post(path, body) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-rosalena-token": TOKEN, authorization: `Bearer ${TOKEN}` },
+    body: JSON.stringify(body),
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok || out.ok === false) throw new Error(out.error ?? `HTTP ${res.status}`);
+  return out;
+}
+
+async function startDownload({ kind, id, quant }) {
+  try {
+    const out = await post("/api/models/download", { action: "start", kind, id, quant });
+    showJob(out.job);
+    watchJob();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+function watchJob() {
+  page.poll ??= setInterval(async () => {
+    try {
+      const res = await fetch("/api/models/download", { headers: { authorization: `Bearer ${TOKEN}` }, cache: "no-store" });
+      showJob((await res.json()).job);
+    } catch {
+      /* the next tick tries again */
+    }
+  }, 1000);
+}
+
+const PHASES = { starting: "Starting", resolving: "Asking Hugging Face for the file's size and checksum", runtime: "Downloading the runner", model: "Downloading" };
+
+function showJob(job) {
+  const bar = $("dl-bar");
+  const running = job && PHASES[job.phase];
+  if (!running) {
+    clearInterval(page.poll);
+    page.poll = null;
+    bar.hidden = true;
+    // A job this page watched just ended: say how, and redraw the Downloaded marks.
+    if (page.job && job && page.job.key === job.key && page.job.phase !== job.phase) {
+      if (job.phase === "done") toast(job.kind === "chat" ? `${job.name} is downloaded. Pick it in the model picker under Local models.` : `${job.name} is downloaded to ${job.dest}`);
+      else if (job.phase === "failed") toast(`The download stopped: ${job.error}`);
+      else if (job.phase === "cancelled") toast("Cancelled. What was downloaded is kept, so Download again resumes it.");
+      void load(false);
+    }
+    page.job = job;
+    return;
+  }
+  page.job = job;
+  bar.hidden = false;
+  const pct = job.total ? Math.min(100, (job.received / job.total) * 100) : 0;
+  $("dl-fill").style.width = `${pct.toFixed(1)}%`;
+  const what = $("dl-what");
+  what.replaceChildren(el("span", "", job.phase === "runtime" ? `Downloading the ${job.runtime ?? ""} runner for ${job.name}` : `${PHASES[job.phase]} ${job.name}${job.quant ? ` (${job.quant})` : ""}${job.part ? `: file ${job.part}, ${job.file}` : ""}`));
+  if (job.total) what.appendChild(el("small", "", `${(job.received / 1e9).toFixed(2)} of ${(job.total / 1e9).toFixed(2)} GB (${Math.floor(pct)}%)`));
+}
+
+function downloadButton(row, kind, quant, label = "Download", cls = "primary") {
+  const downloaded = quant ? quant.downloaded : row.downloaded;
+  if (downloaded) return el("span", "done", "✓ Downloaded");
+  if (quant?.split) return el("span", "muted", "split file");
+  const button = el("button", cls, label);
+  button.type = "button";
+  button.addEventListener("click", () =>
+    askDownload({
+      kind,
+      id: row.id,
+      quant: quant?.quant ?? (kind === "chat" ? row.quant : null),
+      name: row.name ?? row.id,
+      bytes: kind === "chat" ? null : row.bytes,
+      approx: kind === "chat" ? (quant?.file ?? row.quants?.find((q) => q.quant === row.quant)?.file ?? 0) * 1e9 : null,
+      verdict: quant?.verdict ?? row.verdict,
+      runner: row.runner,
+      fileName: kind === "chat" ? decodeURIComponent((quant?.url ?? row.downloadUrl ?? "").split("/").pop()) : row.fileName,
+    }),
+  );
+  return button;
+}
+
+function rowNode(row, bucket) {
+  const kind = page.kind;
+  const node = el("div", "row");
+  const head = el("div", "row-head");
+  head.appendChild(el("span", "name", row.name ?? row.id));
+  if (row.task) head.appendChild(el("span", "chip accent", row.task));
+  if (row.params) head.appendChild(el("span", "chip", `${row.params} B parameters`));
+  if (row.quant) head.appendChild(el("span", `chip ${bucket.cls}`, row.quant));
+  if (row.bytes) head.appendChild(el("span", "chip", row.files > 1 ? `${(row.bytes / 1e9).toFixed(1)} GB, ${row.files} files` : `${(row.bytes / 1e9).toFixed(1)} GB file`));
+  if (kind !== "chat" && row.runsHere) head.appendChild(el("span", "chip accent", "Runs in Rosalena"));
+  // The difference between "will not fit" and "will not fit while a model is already
+  // loaded" is the difference between advice and a false negative, so the idle card
+  // gets its own chip instead of being buried in the per-quant table.
+  if (row.idleVerdict === "fits" && row.verdict !== "fits") {
+    head.appendChild(el("span", "chip ok", "fits an idle card"));
+  }
+  if (row.context) head.appendChild(el("span", "chip", `${Math.round(row.context / 1024)}k context`));
+  if (row.use) head.appendChild(el("span", "chip", row.use));
+  if (row.license) head.appendChild(el("span", "chip", row.license));
+  node.appendChild(head);
+
+  if (row.reason) node.appendChild(el("div", "why", row.reason));
+  if (row.notes && kind !== "chat") node.appendChild(el("div", "why muted", row.notes));
+  if (row.runner) node.appendChild(el("div", "why muted", `Runs in: ${row.runner}`));
+
+  const foot = el("div", "row-foot");
+  foot.appendChild(downloadButton(row, kind, null));
+  if (kind === "chat") {
+    const copy = el("button", "ghost", "Copy run command");
+    copy.type = "button";
+    copy.addEventListener("click", async () => {
+      const file = row.downloadUrl ? row.downloadUrl.split("/").pop() : `${row.id}.gguf`;
+      const command = `llama-server -m models\\${file} -c ${Math.round(row.context ?? 8192)} -ngl 99`;
+      try {
+        await navigator.clipboard.writeText(command);
+        toast("Command copied");
+      } catch {
+        toast(command);
+      }
+    });
+    foot.appendChild(copy);
+  }
+  const page_ = row.url ?? row.downloadUrl;
+  if (page_) {
+    const link = el("a", "", "Model page on Hugging Face");
+    link.href = page_;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    foot.appendChild(link);
+  }
+  if (row.needBytes) foot.appendChild(el("span", "stamp", `needs ${kind === "chat" ? "" : "about "}${gib(row.needBytes)}`));
+  node.appendChild(foot);
+
+  if (Array.isArray(row.quants) && row.quants.length > 1) {
+    const details = el("details");
+    details.appendChild(el("summary", "", `Every quantisation (${row.quants.length})`));
+    const table = el("table");
+    const thead = el("thead");
+    const hr = el("tr");
+    for (const [label, cls] of [["Quant", ""], ["File", "num"], ["Needs", "num"], ["Free VRAM", ""], ["Idle card", ""], ["", ""]]) {
+      hr.appendChild(el("th", cls, label));
+    }
+    thead.appendChild(hr);
+    table.appendChild(thead);
+    const tbody = el("tbody");
+    for (const q of row.quants) {
+      const tr = el("tr");
+      tr.appendChild(el("td", "", q.quant));
+      tr.appendChild(el("td", "num", q.file ? `${q.file} GB` : "-"));
+      tr.appendChild(el("td", "num", gib(q.needBytes) ?? "-"));
+      tr.appendChild(el("td", "", q.verdict ?? "-"));
+      tr.appendChild(el("td", "muted", q.idleVerdict ?? "-"));
+      const cell = el("td");
+      cell.appendChild(downloadButton(row, kind, q, "Download", "small ghost"));
+      tr.appendChild(cell);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    details.appendChild(table);
+    node.appendChild(details);
+  }
+  return node;
+}
+
+function draw(buckets) {
+  const host = $("buckets");
+  host.replaceChildren();
+  for (const bucket of BUCKETS) {
+    const rows = buckets?.[bucket.key] ?? [];
+    if (rows.length === 0 && !bucket.empty) continue;
+    if (!buckets) continue;
+    const section = el("section", "bucket");
+    const title = el("h2");
+    title.appendChild(el("span", `dot ${bucket.dot}`));
+    title.appendChild(el("span", "", bucket.title));
+    title.appendChild(el("span", "count", String(rows.length)));
+    section.appendChild(title);
+    if (rows.length === 0) section.appendChild(el("div", "empty", bucket.empty));
+    for (const row of rows) section.appendChild(rowNode(row, bucket));
+    host.appendChild(section);
+  }
+}
+
+const NOTES = [
+  "Free VRAM is a moment, not a promise: a game, a browser tab with a 3D scene or a render job can take several gigabytes between this measurement and the load.",
+  "A model that does not fit can still run by spilling layers onto the CPU, which is slower rather than impossible. The tight bucket is where that starts.",
+  "Tokens per second is not shown here because it depends on the card's memory bandwidth, the quantisation and the batch size; a number this page invented would be a guess dressed as a measurement.",
+  "The website version of this page has to guess at your graphics card, because a browser cannot read VRAM. This one asks the driver.",
+];
+
+async function load(fresh) {
+  $("refresh").disabled = true;
+  $("stamp").textContent = "measuring…";
+  try {
+    const res = await fetch(`/api/recommend${fresh ? "?fresh=1" : ""}`, {
+      headers: { authorization: `Bearer ${TOKEN}` },
+      cache: "no-store",
+    });
+    const body = await res.json();
+    if (!res.ok || body.ok !== true) throw new Error(body?.error ?? `HTTP ${res.status}`);
+    page.body = body;
+    drawHardware(body.hardware);
+    drawAll();
+    void loadLocal();
+    // A download started before this page loaded (or in another tab) still shows its bar.
+    if (body.download && PHASES[body.download.phase]) {
+      showJob(body.download);
+      watchJob();
+    }
+    const age = Math.max(0, Math.round((Date.now() - Date.parse(body.at)) / 1000));
+    $("stamp").textContent = body.cached
+      ? age < 3
+        ? "measured just now"
+        : `measured ${age} s ago`
+      : `measured in ${body.tookMs} ms`;
+    const notes = [...(body.hardware?.notes ?? []), ...NOTES];
+    $("note-list").replaceChildren(...notes.map((text) => el("li", "", text)));
+    $("notes").hidden = false;
+  } catch (err) {
+    $("cards").replaceChildren();
+    $("buckets").replaceChildren(el("div", "empty", `Could not measure this machine: ${err.message}`));
+    $("stamp").textContent = "failed";
+  } finally {
+    $("refresh").disabled = false;
+  }
+}
+
+$("refresh").addEventListener("click", () => load(true));
+$("dl-cancel").addEventListener("click", async () => {
+  try {
+    await post("/api/models/download", { action: "cancel" });
+  } catch (err) {
+    toast(err.message);
+  }
+});
+load(false);
+</script>
+<script>
+  // Esc goes back to the chats, the same as the button.
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !event.target.closest?.("input, textarea, select")) location.href = "/";
+  });
+</script>
+</body>
+</html>

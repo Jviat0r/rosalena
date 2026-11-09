@@ -1,0 +1,13 @@
+{
+  "id": "rosa-advisor",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "A reviewer model checks each step that changed something and says so when it sees a concrete problem",
+  "config": {
+    "mode": "off",
+    "class": "fast",
+    "maxTokens": 300,
+    "maxReviews": 40
+  }
+}

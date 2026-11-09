@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local model - Rosalena</title>
+    <!-- The same stylesheet the chat page uses: this page adds a few blocks, not a
+         second design system. -->
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      /* Only what the monitor needs on top of the shell's own tokens. */
+      body.monitor { background: var(--bg); color: var(--text); font-family: var(--sans); margin: 0; }
+      .mon-wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+      .mon-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+      .mon-head h1 { font-size: 19px; margin: 0; letter-spacing: -0.01em; }
+      .mon-back { color: var(--dim); text-decoration: none; font-size: 13px; border: 1px solid var(--line);
+                  padding: 4px 10px; border-radius: 999px; }
+      .mon-back:hover { color: var(--text); border-color: var(--accent); }
+      .mon-badge { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line);
+                   color: var(--dim); font-family: var(--mono); }
+      .mon-badge.up { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+      .mon-badge.down { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+      .mon-badge.loading { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+      .mon-meta { margin-left: auto; color: var(--dim); font-size: 12px; font-family: var(--mono); }
+      .mon-rule { color: var(--dim); font-size: 12.5px; line-height: 1.55; margin: 10px 0 18px;
+                  border-left: 2px solid var(--line); padding-left: 10px; }
+      .mon-rule b { color: var(--text-2, var(--text)); font-weight: 600; }
+      .mon-error { border: 1px solid color-mix(in srgb, var(--bad) 40%, var(--line)); background: var(--panel);
+                   color: var(--text); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 16px;
+                   font-size: 13px; line-height: 1.5; }
+      .mon-error .k { color: var(--bad); font-family: var(--mono); font-size: 12px; margin-right: 8px; }
+      .mon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 14px; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+      .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim);
+                 margin: 0 0 10px; font-weight: 600; }
+      .facts { display: grid; grid-template-columns: 108px 1fr; gap: 6px 10px; margin: 0; font-size: 13px; }
+      .facts dt { color: var(--dim); }
+      .facts dd { margin: 0; font-family: var(--mono); overflow-wrap: anywhere; }
+      table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      th { text-align: left; color: var(--dim); font-weight: 500; padding: 4px 8px 6px 0; font-size: 11px;
+           text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--line); }
+      td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--line-soft, var(--line)); vertical-align: top; font-family: var(--mono); }
+      tr:last-child td { border-bottom: 0; }
+      td.note { font-family: var(--sans); color: var(--dim); }
+      .state { font-family: var(--mono); font-size: 11.5px; }
+      .state.ok, .state.up { color: var(--ok); }
+      .state.bad { color: var(--bad); }
+      .state.warn { color: var(--warn); }
+      .state.dim { color: var(--dim); }
+      .empty { color: var(--dim); font-size: 13px; margin: 4px 0; }
+      .hint { color: var(--dim); font-size: 12px; margin: 8px 0 0; line-height: 1.5; }
+      @media (max-width: 560px) { .facts { grid-template-columns: 92px 1fr; } .mon-meta { margin-left: 0; } }
+    </style>
+  </head>
+  <body class="monitor">
+    <div class="mon-wrap">
+      <div class="mon-head">
+        <a class="mon-back" href="/">&larr; Chats</a>
+        <h1>Local model monitor</h1>
+        <span class="mon-badge" id="badge">checking</span>
+        <span class="mon-meta" id="updated"></span>
+        <button class="mini-btn" id="refresh" title="Probe again now">Refresh</button>
+      </div>
+
+      <p class="mon-rule">
+        <b>Read-only.</b> This page only ever reads the server. A graphics card usually holds one big
+        model at a time, so loading, unloading or restarting llama.cpp is a machine-wide decision made by whatever
+        owns the GPU - never by this page.
+      </p>
+
+      <div class="mon-error" id="error" hidden>
+        <span class="k" id="error-key">error</span><span id="error-text"></span>
+      </div>
+
+      <div class="mon-grid">
+        <section class="card">
+          <h2>Server</h2>
+          <dl class="facts" id="facts"></dl>
+        </section>
+        <section class="card">
+          <h2>Slots</h2>
+          <div id="slots"></div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-bottom: 14px;">
+        <h2>Harness calls</h2>
+        <div id="calls"></div>
+        <p class="hint">
+          Exact, not sampled: the loop reports each model call when the request leaves and again when it
+          settles. Calls to any router target appear here, so a row that says a cloud target did not reach
+          this server - and only rows the server answered can be matched to a slot above.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Recently finished</h2>
+        <div id="ended"></div>
+        <p class="hint">
+          Sampled from /slots. llama.cpp reports no start time and no stop reason, so a duration runs from
+          the first sample that saw the task busy, and "ended" means the slot went idle or another task
+          took it - not that the request succeeded.
+        </p>
+      </section>
+    </div>
+
+    <script type="module">
+      // Polling, not Server-Sent Events: the probe is cheap (four GETs on loopback) and a
+      // page that can be dropped on a second monitor should recover by itself when the
+      // server comes back, without a socket to reset.
+      const REFRESH_MS = 2000;
+      const $ = (id) => document.getElementById(id);
+
+      const el = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+      };
+
+      const when = (ms) => {
+        if (!Number.isFinite(ms)) return "?";
+        if (ms < 1000) return `${Math.round(ms)}ms`;
+        if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
+        const total = Math.round(ms / 1000);
+        return `${Math.floor(total / 60)}m ${String(total % 60).padStart(2, "0")}s`;
+      };
+
+      const tokens = (n) => (n === null || n === undefined ? "?" : String(n));
+
+      function facts(probe) {
+        const box = $("facts");
+        box.replaceChildren();
+        const row = (key, value, className) => {
+          box.append(el("dt", "", key), el("dd", className ?? "", value));
+        };
+        row("status", probe.up ? (probe.loading ? "up, loading its model" : "up") : "not answering", probe.up ? "state ok" : "state bad");
+        row("model", probe.model ?? "not reported");
+        if (probe.modelFtype) row("quantisation", probe.modelFtype);
+        if (probe.modelPath) row("weights", probe.modelPath);
+        row("context", probe.ctx === null ? "not reported" : `${probe.ctx} tokens per slot`);
+        row("slots", probe.slotsAvailable ? `${probe.busy} of ${probe.totalSlots ?? probe.slots.length} busy` : "unavailable");
+        row("queued", probe.queued === null ? "not reported" : String(probe.queued));
+        if (probe.queued === null && probe.queuedNote) {
+          box.append(el("dt", "", ""), el("dd", "note", probe.queuedNote));
+        }
+      }
+
+      function slots(probe) {
+        const box = $("slots");
+        box.replaceChildren();
+        if (!probe.slotsAvailable) {
+          box.append(el("p", "empty", probe.slotsError ?? "This build does not expose /slots, so no slot numbers are shown."));
+          return;
+        }
+        if (!probe.slots.length) {
+          box.append(el("p", "empty", "The server lists no slots."));
+          return;
+        }
+        const table = el("table");
+        const head = el("tr");
+        for (const label of ["Slot", "Task", "State", "Prompt read", "Prompt", "Processed", "Cached", "Decoded", "Left", "Busy for"]) {
+          head.append(el("th", "", label));
+        }
+        table.append(head);
+        for (const slot of probe.slots) {
+          const tr = el("tr");
+          // Prompt read: % over the NEW tokens, from llama-server's log (see the plugin).
+          const pp = slot.promptProgress;
+          const phase = !slot.busy ? "idle" : slot.decoded ? "writing" : "reading prompt";
+          const readCell = el("td", pp ? "state warn" : "state dim",
+            pp ? `${Math.round(pp.progress * 100)}%${pp.etaSec !== null && pp.etaSec !== undefined ? ` · ~${when(pp.etaSec * 1000)}` : ""}`
+               : slot.busy && !slot.decoded ? "reading…" : slot.busy ? "done" : "-");
+          if (pp) readCell.title = `${pp.done} of ${pp.newTokens ?? "?"} new tokens${pp.reused ? `, ${pp.reused} reused from cache` : ""}, ${pp.tps} tok/s (from ${slot.promptProgressSource ?? "the server log"})`;
+          tr.append(
+            el("td", "", slot.id),
+            el("td", "", slot.task ?? "-"),
+            el("td", slot.busy ? "state warn" : "state dim", phase),
+            readCell,
+            el("td", "", tokens(slot.promptTokens)),
+            el("td", "", tokens(slot.promptProcessed)),
+            el("td", "", tokens(slot.promptCached)),
+            el("td", "", tokens(slot.decoded)),
+            el("td", "", slot.remain === null ? "-" : tokens(slot.remain)),
+            el("td", "", slot.busy ? (slot.samples && slot.samples > 1 ? when(slot.busyForMs) : "first sample") : "-"),
+          );
+          table.append(tr);
+        }
+        box.append(table);
+      }
+
+      function calls(probe) {
+        const box = $("calls");
+        box.replaceChildren();
+        const rows = probe.harnessCalls ?? [];
+        if (!rows.length) {
+          box.append(el("p", "empty", "No model call reported yet. Start a chat from the main page; each call appears here with the loop's own timing."));
+          return;
+        }
+        const table = el("table");
+        const head = el("tr");
+        for (const label of ["When", "Took", "State", "Target", "Prompt tokens", "Output tokens", "Outcome"]) {
+          head.append(el("th", "", label));
+        }
+        table.append(head);
+        for (const call of rows) {
+          const tr = el("tr");
+          const age = call.state === "running" ? "running" : when((probe.at ?? Date.now()) - (call.endedAt ?? call.startedAt));
+          const outcome = call.state === "running" ? "in flight" : call.ok ? "ok" : (call.error || call.how);
+          tr.append(
+            el("td", "", call.state === "running" ? "now" : `${age} ago`),
+            el("td", "", call.ms === null || call.ms === undefined ? "-" : when(call.ms)),
+            el("td", call.state === "running" ? "state warn" : call.ok ? "state ok" : "state bad", call.state),
+            el("td", "", call.target ?? call.cls ?? "?"),
+            el("td", "", call.usage ? tokens(call.usage.prompt) : "-"),
+            el("td", "", call.usage ? tokens(call.usage.completion) : "-"),
+            el("td", "note", outcome),
+          );
+          table.append(tr);
+        }
+        box.append(table);
+      }
+
+      function ended(probe) {
+        const box = $("ended");
+        box.replaceChildren();
+        const rows = probe.lastEnded ?? [];
+        if (!rows.length) {
+          box.append(el("p", "empty", "Nothing finished while the page was watching. A task is only seen while a sample catches it busy."));
+          return;
+        }
+        const table = el("table");
+        const head = el("tr");
+        for (const label of ["Task", "Slot", "Samples", "Took", "Ended", "How"]) {
+          head.append(el("th", "", label));
+        }
+        table.append(head);
+        for (const record of rows) {
+          const how =
+            record.how === "replaced"
+              ? "another task took the slot"
+              : record.how === "slot-disappeared"
+                ? "the slot was gone"
+                : "the slot went idle";
+          const tr = el("tr");
+          tr.append(
+            el("td", "", record.task ?? "?"),
+            el("td", "", record.slot ?? "?"),
+            el("td", "", record.samples ?? "?"),
+            el("td", "", when(record.elapsedMs)),
+            el("td", "", `${when((probe.at ?? Date.now()) - record.endedAt)} ago`),
+            el("td", "note", `${how}${record.unseenProbes > 0 ? ` (${record.unseenProbes} probe(s) could not read /slots)` : ""}`),
+          );
+          table.append(tr);
+        }
+        box.append(table);
+      }
+
+      function showError(probe) {
+        const box = $("error");
+        if (!probe.error) {
+          box.hidden = true;
+          return;
+        }
+        box.hidden = false;
+        $("error-key").textContent = probe.up ? "partial" : "down";
+        $("error-text").textContent = probe.error;
+      }
+
+      function badge(probe) {
+        const node = $("badge");
+        node.className = "mon-badge";
+        if (probe.up && probe.loading) {
+          node.classList.add("loading");
+          node.textContent = "loading";
+        } else if (probe.up) {
+          node.classList.add("up");
+          node.textContent = "up";
+        } else {
+          node.classList.add("down");
+          node.textContent = "down";
+        }
+      }
+
+      function render(probe) {
+        badge(probe);
+        showError(probe);
+        facts(probe);
+        slots(probe);
+        calls(probe);
+        ended(probe);
+        $("updated").textContent = `updated ${new Date(probe.at ?? Date.now()).toLocaleTimeString()}`;
+      }
+
+      async function refresh() {
+        try {
+          const res = await fetch("/api/local-model", { cache: "no-store" });
+          const probe = await res.json();
+          render(probe);
+        } catch (err) {
+          // The UI server itself is gone or restarting: say so rather than showing
+          // yesterday's numbers under a fresh timestamp.
+          $("badge").className = "mon-badge down";
+          $("badge").textContent = "ui unreachable";
+          $("error").hidden = false;
+          $("error-key").textContent = "ui";
+          $("error-text").textContent = `the harness UI server did not answer: ${err?.message ?? err}`;
+        }
+      }
+
+      $("refresh").addEventListener("click", refresh);
+      // A hidden tab is a tab nobody is reading: stop asking the server every two
+      // seconds, and catch up the moment it is visible again.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") refresh();
+      });
+      await refresh();
+      setInterval(() => {
+        if (document.visibilityState === "visible") refresh();
+      }, REFRESH_MS);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "$about": "The whisper.cpp build Rosalena downloads to run speech-to-text models from the Models page (ggml-*.bin in ~/.rosalena/models/voice/whisper). DATA: src/voice-runner.mjs picks one asset by platform, checks its sha256 and unpacks it into ~/.rosalena/whisper.cpp. Pinned to a release at least two weeks old, with the digest GitHub reports for the asset. The CPU (BLAS) build on purpose: a CUDA build is 685 MB, and the whisper models people dictate with run in real time on a processor. A model runs as one whisper-cli process per transcription, so it is loaded when you speak and gone when the text comes back.",
+  "tag": "b5454",
+  "published": "2026-10-06",
+  "assets": {
+    "win32-x64": {
+      "name": "whisper-blas-bin-x64.zip",
+      "url": "https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-blas-bin-x64.zip",
+      "bytes": 21715607,
+      "sha256": "b1158bd10edf92c9799149a6fc5d3e58da3f495241d6fb3423088130e88ffbf3"
+    },
+    "linux-x64": {
+      "name": "whisper-bin-ubuntu-x64.tar.gz",
+      "url": "https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-bin-ubuntu-x64.tar.gz",
+      "bytes": 10364195,
+      "sha256": "a72becf15d7917f990f6313867a52638b82b7f9ef237fb0c980dac56a135781c"
+    }
+  }
+}

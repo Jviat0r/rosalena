@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <!-- A paired link is a credential: keep it out of search engines and out of previews. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Remote access - Rosalena</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/remote.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="head">
+        <div class="head-text">
+          <h1>Remote access</h1>
+          <p class="sub" id="sub">This app, on your phone, through a Cloudflare quick tunnel.</p>
+        </div>
+        <span class="pill" id="pill" data-state="idle">Off</span>
+      </header>
+
+      <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+
+      <!-- Off. The ordinary state, and the one the page should make boring. -->
+      <section class="card" id="panel-off" hidden>
+        <h2>Nothing is reachable from the internet</h2>
+        <p>
+          Turning this on starts <code>cloudflared</code>, which opens an outbound connection to Cloudflare and gives
+          this app a public <code>https://&hellip;.trycloudflare.com</code> address. No router change, no port forward,
+          no certificate to install.
+        </p>
+        <p class="warn">
+          While it is on, anyone holding the pairing link can drive this app: read every stored chat, start runs, use
+          the tools. Treat the link like a password.
+        </p>
+        <div class="row">
+          <button class="btn primary" data-action="enable" id="btn-enable">Turn on remote access</button>
+        </div>
+        <p class="note" id="off-note" hidden></p>
+      </section>
+
+      <!-- Starting. Shows the exact command so nobody has to guess what was run. -->
+      <section class="card" id="panel-starting" hidden>
+        <h2>Opening the tunnel&hellip;</h2>
+        <p>
+          cloudflared is asking Cloudflare for a hostname. This normally takes two to five seconds, and the pairing
+          code appears here on its own.
+        </p>
+        <pre class="cmd" id="starting-cmd"></pre>
+        <div class="row">
+          <button class="btn" data-action="disable">Stop</button>
+        </div>
+      </section>
+
+      <!-- Live, seen from this machine: the pairing code is the point of the page. -->
+      <section class="card" id="panel-live" hidden>
+        <h2>Scan this to connect a phone</h2>
+        <figure class="qr">
+          <img id="qr" alt="Pairing QR code for this app" width="260" height="260" decoding="async" />
+          <figcaption id="qr-note">Point the phone's camera at this code.</figcaption>
+        </figure>
+        <label class="field-label" for="link">Or type the link, token included</label>
+        <div class="linkrow">
+          <input class="link" id="link" readonly spellcheck="false" autocomplete="off" />
+          <button class="btn small" data-action="copy" id="btn-copy">Copy</button>
+        </div>
+        <p class="note" id="live-note"></p>
+        <div class="row wrap">
+          <button class="btn" data-action="check">Test this link</button>
+          <button class="btn" data-action="revoke">New code</button>
+          <button class="btn danger" data-action="disable">Turn off</button>
+        </div>
+        <p class="check" id="checked" hidden></p>
+        <p class="warn">
+          A quick-tunnel address is public, random and untrusted: anyone who sees the link gets the app. "New code"
+          kills every link shared so far and leaves the tunnel running.
+        </p>
+      </section>
+
+      <!-- Live, seen from the phone: the phone may disconnect itself and nothing else. -->
+      <section class="card" id="panel-phone" hidden>
+        <h2>You are connected</h2>
+        <p>
+          This page is reaching the app through the tunnel. The machine in front of you is the one that opened it, so
+          the controls live there, not here.
+        </p>
+        <p class="note" id="phone-note"></p>
+        <div class="row">
+          <button class="btn danger" data-action="unpair">Disconnect this phone</button>
+        </div>
+        <p class="note">Disconnecting forgets the pairing token on this device only. The tunnel stays up.</p>
+      </section>
+
+      <!-- Failed. The reason is the whole point of the state. -->
+      <section class="card" id="panel-failed" hidden>
+        <h2>The tunnel is not running</h2>
+        <p class="reason" id="failed-reason"></p>
+        <p class="note" id="failed-download" hidden>
+          cloudflared is free and needs no Cloudflare account for a quick tunnel. Download it from
+          <a id="dl-releases" href="#" rel="noreferrer noopener" target="_blank">the GitHub releases page</a> or read
+          <a id="dl-docs" href="#" rel="noreferrer noopener" target="_blank">Cloudflare's install notes</a>, then try
+          again.
+        </p>
+        <div class="row wrap">
+          <button class="btn primary" data-action="enable">Try again</button>
+          <button class="btn" data-action="disable">Clear</button>
+        </div>
+      </section>
+
+      <!-- Gone: the cookie was just cleared, so the tunnel will refuse this tab from now on. -->
+      <section class="card" id="panel-gone" hidden>
+        <h2>Disconnected</h2>
+        <p>This device has forgotten the pairing token. Close the tab, or scan a fresh code on the machine running the app.</p>
+      </section>
+
+      <section class="card security">
+        <h2>What this really exposes</h2>
+        <p>
+          A paired phone is an operator of this app: it can start runs, read every stored chat and use whatever tools
+          the app has. The token is 256 random bits, held in this server's memory, minted when the tunnel starts and
+          dropped when it stops, so restarting the app invalidates every link ever shared.
+        </p>
+        <p>
+          The tunnel is a Cloudflare quick tunnel, not a VPN: it publishes this app and nothing else on the machine.
+          Closing it closes the door completely. There are no user accounts, no expiry and no second factor - if you
+          would not paste the link into a chat, do not leave the tunnel running.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      window.ROSALENA_TOKEN = "__ROSALENA_TOKEN__";
+    </script>
+    <script src="/remote.js" defer></script>
+  </body>
+</html>

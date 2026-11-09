@@ -1,0 +1,97 @@
+# Cloudflare Pages project `rosalena` (direct upload, no Git).
+#
+# `public/` is the static site and `functions/` is the Pages Functions tree, so
+# `functions/api/trial.js` answers `POST /api/trial`. The deploy command is the one
+# in README.md; this file only adds the bindings and the trial's defaults.
+#
+# Two of the bindings below must exist in the account before a deploy will work:
+# the D1 database id has to be the real one (see TRIAL.md step 1), because Pages
+# refuses to publish a binding it cannot resolve. That is on purpose: a trial that
+# cannot count messages must not go live.
+
+name = "rosalena"
+pages_build_output_dir = "public"
+compatibility_date = "2026-10-20"
+
+# Quota counters and the trial log. Three tables: trial_usage (message counters),
+# trial_tokens (token budgets) and trial_log (the abuse log); see migrations/.
+[[d1_databases]]
+binding = "TRIAL_DB"
+database_name = "rosalena-trial"
+database_id = "96eae454-4915-445d-8b01-6336774f0632" # rosalena-trial, created 2026-10-21 (ENAM)
+migrations_dir = "migrations"
+
+# Workers AI. The default trial provider runs on it, so it is the one provider
+# that costs nothing per key and needs no secret.
+[ai]
+binding = "AI"
+
+[vars]
+# Only these origins may call the trial (comma-separated; the first is the one error
+# messages name). rosalena.dev is the site's address since 2026-11-09; rosalena.pages.dev
+# stays because installed apps and old links still use it. Preview deployments get their
+# own *.pages.dev hostname; set TRIAL_ORIGIN per environment to demo them.
+TRIAL_ORIGIN = "https://rosalena.dev,https://www.rosalena.dev,https://rosalena.pages.dev"
+# ON, pinned to the keyless free tier, which serves DeepSeek V4.1 Flash. The page asks
+# the visitor's own desktop app first; this is the door for visitors who have no app,
+# so that "try it" works in a browser with no install, no account and no key.
+#
+# Two honest limits, both measured:
+#   * Without a key the free window is keyed on the Worker's egress IP, so every visitor
+#     shares one window. Since 2026-10-27 the site has its own OPENCODE_API_KEY secret
+#     (models:request only), which gives it its own window.
+#   * The D1 caps below are the real brake: 5 messages per browser, 15 per address,
+#     1,000 for the day, plus token budgets per scope. A refusal names the cap.
+# When the free window is spent, OmniRoute on the owner's PC answers next, through a
+# Cloudflare quick tunnel (site/tools/omniroute-tunnel.mjs; secrets OMNIROUTE_URL and
+# OMNIROUTE_API_KEY). The PC can be off, so it gets a 20 s first-token deadline and any
+# failure moves on to Llama 3.1 8B on Workers AI. The page names whichever model
+# answered (the done frame's provider / fellBackFrom).
+TRIAL_PROVIDER = "opencode-free,omniroute,workers-ai"
+# auto/fast and auto/chat answered in 6-12 s over the tunnel; plain auto took 56 s.
+OMNIROUTE_MODEL = "auto/fast"
+TRIAL_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8"
+# Left empty on purpose: the label and note are derived from whichever provider is
+# configured (see modelInfo in functions/api/_lib/trial.mjs), so the page can never
+# name the wrong model after this file is edited.
+TRIAL_MODEL_LABEL = ""
+TRIAL_MODEL_NOTE = ""
+
+# Limits. These are the documented defaults and exist here so they are visible in
+# one place; every one of them can be changed without a code deploy.
+# Message counters: the browser is the first wall, the address stops cookie-clearing,
+# the day is the last resort. The cookie is minted by the first request and lasts 180
+# days; clearing it does not clear the address counter.
+TRIAL_SESSION_DAILY_LIMIT = "5"
+TRIAL_IP_DAILY_LIMIT = "15"
+TRIAL_GLOBAL_DAILY_LIMIT = "1000"
+# Token budgets, checked before the provider is asked and written down after the
+# answer lands. A refusal here costs nothing and is logged.
+TRIAL_SESSION_DAILY_TOKENS = "40000"
+TRIAL_IP_DAILY_TOKENS = "120000"
+TRIAL_GLOBAL_DAILY_TOKENS = "1000000"
+# The trial log: off, meta or full. meta (the default) records who hit what and when,
+# never the words; full records the prompt and answer (and the provider's error text)
+# as well, so turn it on only while reviewing abuse and turn it back off before the
+# page's "keeps nothing" sentence would become untrue.
+#
+# FULL IS ON RIGHT NOW, deliberately and temporarily: the first outside testers are
+# reporting answers that come back empty or broken, and a report is only fixable if
+# the prompt, the answer and the provider's error are on the same row. Set this back
+# to "meta" before the page's promise is advertised again.
+TRIAL_LOG_MESSAGES = "full"
+TRIAL_MAX_MESSAGE_CHARS = "1200"
+TRIAL_HISTORY_TURNS = "12"
+TRIAL_HISTORY_TURN_CHARS = "4000"
+TRIAL_PROMPT_CHARS = "12000"
+# The model reasons before it speaks (measured: 55 of 80 tokens spent thinking), so the
+# visible answer is only part of this cap. 700 leaves room for a real answer.
+TRIAL_MAX_TOKENS = "700"
+TRIAL_TEMPERATURE = "0.7"
+TRIAL_TIMEOUT_MS = "30000"
+TRIAL_INFLIGHT_MS = "2000"
+
+# Secrets are NOT here. Set them once with:
+#   npx wrangler pages secret put TRIAL_SALT --project-name rosalena
+#   npx wrangler pages secret put OPENCODE_API_KEY --project-name rosalena   (only for opencode-free)
+#   npx wrangler pages secret put TRIAL_TURNSTILE_SECRET --project-name rosalena

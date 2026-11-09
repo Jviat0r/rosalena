@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!--
+    Hardened-runtime exceptions Electron needs. Chromium compiles and runs JavaScript
+    through a JIT, and its helper frameworks are not signed by this team, so a hardened
+    app without these three keys crashes at launch instead of opening a window.
+
+    Staged into <app>/build/entitlements.mac.plist by stage.mjs, which is where
+    electron-builder looks for it (directories.buildResources = "build").
+
+    These are inert while the app is unsigned (identity: null). They become load-bearing
+    the moment a Developer ID signs it - which is exactly why they are committed now.
+  -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+  <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+  <true/>
+  <key>com.apple.security.network.client</key>
+  <true/>
+</dict>
+</plist>

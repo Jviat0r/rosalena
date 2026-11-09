@@ -1,0 +1,14 @@
+{
+  "id": "rosa-solbrowser",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Your own browser for the agent (SolBrowser): read pages with your logins and act on them, inside iframes too, through the SolBrowser extension",
+  "config": {
+    "launchBrowser": true,
+    "port": null,
+    "stateDir": "",
+    "idleMinutes": 10,
+    "timeoutMs": 60000
+  }
+}

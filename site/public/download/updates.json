@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "product": "Rosalena Harness",
+  "channel": "stable",
+  "version": "0.1.13",
+  "releasedAt": "2026-11-08T17:11:58.392Z",
+  "notes": "Rosalena Harness 0.1.13.\n\n- windows x64: Rosalena-Harness-Setup-0.1.13-x64.exe\n- windows x64: Rosalena-Harness-0.1.13-x64-portable.exe\n- macos arm64: Rosalena-Harness-0.1.13-arm64.dmg\n- macos arm64: Rosalena-Harness-0.1.13-arm64.zip\n- macos x64: Rosalena-Harness-0.1.13-x64.dmg\n- macos x64: Rosalena-Harness-0.1.13-x64.zip\n\nThe app offers Update and restart: it downloads this platform's file, checks its SHA-256 against this feed, installs it and reopens. Version 0.1.0 predates the updater and only shows the release page.",
+  "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/tag/v0.1.13",
+  "artifacts": {
+    "Rosalena-Harness-0.1.13-arm64.dmg": "1f6b787a7f545ae219af45b9781d020629478934324e9881619859fc0cce8d0a",
+    "Rosalena-Harness-0.1.13-arm64.zip": "dcf514d8b0fe549ee4876f7f6d34d3e88ad0ad650477ce071d205e1c63e47f09",
+    "Rosalena-Harness-0.1.13-x64-portable.exe": "5d873ab3ccb0cfd3f62f9e0d5c23cb67ac14651ecaad3325c07a1de2e7395ab7",
+    "Rosalena-Harness-0.1.13-x64.dmg": "6e7b42423182aba70fca80b45d1728c085d37e95ff6da86518c97ed711a4a031",
+    "Rosalena-Harness-0.1.13-x64.zip": "4b0bcf62db23d7509841100ab201ed9c8b8a289b2741a216f5bc51209efcc9de",
+    "Rosalena-Harness-Setup-0.1.13-x64.exe": "35ae539af77307f96cc4890e6ccfa4cf4efc600caa5fd6428af5a4d6dcbec61b"
+  },
+  "updated": "2026-11-08",
+  "generatedBy": "packaging/release/manifest.mjs --updates",
+  "summary": "The newest published version, as the installed app reads it. url is the release page, never a direct file: the app opens it and the person installs. artifacts lists the SHA-256 of every file this run measured."
+}

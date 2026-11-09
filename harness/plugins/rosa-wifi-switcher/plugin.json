@@ -1,0 +1,13 @@
+{
+  "id": "rosa-wifi-switcher",
+  "version": "0.1.0",
+  "bundled": true,
+  "description": "See the Wi-Fi networks this machine can see and connect to one: a saved profile, or a new network with a password typed on the page",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "timeoutMs": 8000,
+    "verifyAttempts": 3,
+    "verifyIntervalMs": 1500
+  }
+}

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paper Reader</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="app" data-view="empty">
+    <header class="toolbar" role="toolbar" aria-label="Reader">
+      <div class="tb-group">
+        <button class="icon-btn doc-only" id="btn-sidebar" data-icon="sidebar" title="Pages and outline" aria-label="Toggle pages and outline"></button>
+        <button class="icon-btn doc-only" id="btn-home" data-icon="home" title="Close and go to recent files" aria-label="Close document"></button>
+        <button class="btn" id="btn-open" data-icon="open" title="Open a PDF (Ctrl+O)">Open</button>
+      </div>
+      <div class="doc-title" id="doc-title">
+        <span class="doc-name" id="doc-name">Paper Reader</span>
+        <span class="doc-sub" id="doc-sub">PDF and research-paper reader</span>
+      </div>
+      <div class="tb-group doc-only" aria-label="Pages">
+        <button class="icon-btn" id="btn-prev" data-icon="up" title="Previous page (PageUp)" aria-label="Previous page"></button>
+        <label class="page-box">
+          <input id="page-input" class="page-input" inputmode="numeric" aria-label="Page number" value="1" />
+          <span class="page-total" id="page-total">/ 1</span>
+        </label>
+        <button class="icon-btn" id="btn-next" data-icon="down" title="Next page (PageDown)" aria-label="Next page"></button>
+      </div>
+      <div class="tb-sep doc-only"></div>
+      <div class="tb-group doc-only" aria-label="Zoom">
+        <button class="icon-btn" id="btn-zoom-out" data-icon="minus" title="Zoom out (-)" aria-label="Zoom out"></button>
+        <select id="zoom-select" class="zoom-select" aria-label="Zoom" title="Zoom">
+          <option value="fit-width">Fit width</option>
+          <option value="fit-page">Fit page</option>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="4">400%</option>
+        </select>
+        <button class="icon-btn" id="btn-zoom-in" data-icon="plus" title="Zoom in (+)" aria-label="Zoom in"></button>
+        <button class="icon-btn" id="btn-rotate" data-icon="rotate" title="Rotate clockwise (R)" aria-label="Rotate pages"></button>
+      </div>
+      <div class="tb-sep doc-only"></div>
+      <div class="tb-group doc-only">
+        <button class="icon-btn" id="btn-search" data-icon="search" title="Find in document (Ctrl+F)" aria-label="Find in document"></button>
+        <button class="icon-btn" id="btn-panel" data-icon="panel" title="Paper card and notes" aria-label="Toggle paper card and notes"></button>
+      </div>
+    </header>
+
+    <div class="body">
+      <aside class="sidebar" id="sidebar" aria-label="Pages and outline">
+        <div class="tabs" role="tablist">
+          <button class="tab on" id="tab-pages" role="tab" aria-selected="true">Pages</button>
+          <button class="tab" id="tab-outline" role="tab" aria-selected="false" hidden>Outline</button>
+        </div>
+        <div class="side-scroll" id="thumbs" role="tabpanel" aria-label="Page thumbnails"></div>
+        <div class="side-scroll outline" id="outline" role="tabpanel" aria-label="Outline" hidden></div>
+      </aside>
+
+      <main class="viewer" id="viewer" tabindex="0" aria-label="Document">
+        <div class="pages" id="pages"></div>
+
+        <section class="empty" id="empty">
+          <div class="empty-card">
+            <svg class="empty-art" viewBox="0 0 120 96" aria-hidden="true">
+              <rect x="30" y="10" width="58" height="76" rx="4" class="art-sheet back" />
+              <rect x="22" y="16" width="58" height="76" rx="4" class="art-sheet" />
+              <rect x="30" y="28" width="34" height="4" rx="2" class="art-line strong" />
+              <rect x="30" y="38" width="42" height="3" rx="1.5" class="art-line" />
+              <rect x="28" y="44.5" width="38" height="6" rx="1.5" class="art-mark" />
+              <rect x="30" y="46" width="34" height="3" rx="1.5" class="art-line" />
+              <rect x="30" y="54" width="42" height="3" rx="1.5" class="art-line" />
+              <rect x="30" y="62" width="28" height="3" rx="1.5" class="art-line" />
+              <rect x="30" y="70" width="38" height="3" rx="1.5" class="art-line" />
+              <circle cx="88" cy="70" r="13" class="art-badge" />
+              <path d="M88 63.5c.6 3.6 2 5 5.6 5.6-3.6.6-5 2-5.6 5.6-.6-3.6-2-5-5.6-5.6 3.6-.6 5-2 5.6-5.6z" class="art-spark" />
+            </svg>
+            <h1>Read papers. Keep your notes.</h1>
+            <p class="lede">Open any PDF to read it, highlight passages, write notes beside them and ask Rosalena to explain what you select. Highlights stay with the file, so they come back whenever you open it again.</p>
+            <div class="empty-actions">
+              <button class="btn primary big" id="empty-open" data-icon="open">Open a PDF</button>
+              <button class="btn big" id="empty-sample" data-icon="file">Open the sample paper</button>
+            </div>
+            <p class="hint">or drop a PDF anywhere in this window</p>
+            <div class="recent" id="recent-wrap" hidden>
+              <h2>Recent</h2>
+              <ul class="recent-list" id="recent-list"></ul>
+            </div>
+            <dl class="keys">
+              <div><dt>Ctrl F</dt><dd>find</dd></div>
+              <div><dt>&larr; &rarr;</dt><dd>pages</dd></div>
+              <div><dt>+ &minus;</dt><dd>zoom</dd></div>
+              <div><dt>R</dt><dd>rotate</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <div class="loading" id="loading" hidden><span class="spinner"></span><span id="loading-text">Opening</span></div>
+      </main>
+
+      <aside class="panel" id="panel" aria-label="Paper card and notes">
+        <section class="card" id="card" aria-label="Paper card">
+          <div class="eyebrow">Paper card</div>
+          <h2 class="card-title" id="card-title">Untitled</h2>
+          <p class="card-authors" id="card-authors" hidden></p>
+          <div class="stats">
+            <div class="stat"><b id="stat-pages">0</b><span>pages</span></div>
+            <div class="stat"><b id="stat-words">&hellip;</b><span>words</span></div>
+            <div class="stat"><b id="stat-read">&hellip;</b><span>to read</span></div>
+          </div>
+          <div class="abstract" id="card-abstract" hidden>
+            <div class="abstract-head">Abstract</div>
+            <p id="card-abstract-text"></p>
+          </div>
+          <div class="card-actions">
+            <button class="btn small" id="btn-summarize" data-icon="summary" title="Send this page's text to the chat box and ask for a summary">Summarize page 1</button>
+          </div>
+        </section>
+        <section class="notes" aria-label="Highlights and notes">
+          <header class="notes-head">
+            <h3>Highlights &amp; notes <span class="count" id="notes-count">0</span></h3>
+            <button class="btn small" id="btn-export" data-icon="download" title="Save all highlights and notes as Markdown">Export</button>
+          </header>
+          <div class="notes-list" id="notes-list"></div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="findbar" id="findbar" role="search" hidden>
+      <span class="find-ico" data-icon="search"></span>
+      <input id="find-input" type="text" placeholder="Find in document" aria-label="Find in document" autocomplete="off" spellcheck="false" />
+      <span class="find-count" id="find-count"></span>
+      <button class="icon-btn" id="find-prev" data-icon="up" title="Previous match (Shift+Enter)" aria-label="Previous match"></button>
+      <button class="icon-btn" id="find-next" data-icon="down" title="Next match (Enter)" aria-label="Next match"></button>
+      <button class="icon-btn" id="find-close" data-icon="close" title="Close (Esc)" aria-label="Close find"></button>
+    </div>
+
+    <div class="floating seltools" id="seltools" role="toolbar" aria-label="Selected text" hidden>
+      <div class="swatches" id="sel-swatches"></div>
+      <span class="fsep"></span>
+      <button class="tool" data-act="note" data-icon="note" title="Highlight and add a note">Note</button>
+      <button class="tool" data-act="copy" data-icon="copy" title="Copy the text">Copy</button>
+      <button class="tool ask" data-act="ask" data-icon="sparkle" title="Put this passage in the chat box and ask Rosalena to explain it">Ask Rosalena</button>
+      <button class="tool" data-act="summary" data-icon="summary" title="Ask Rosalena to summarize this page">Summarize page</button>
+    </div>
+
+    <div class="floating hlpop" id="hlpop" role="dialog" aria-label="Highlight" hidden>
+      <div class="swatches" id="pop-swatches"></div>
+      <span class="fsep"></span>
+      <button class="tool" data-act="note" data-icon="note" title="Edit the note">Note</button>
+      <button class="tool" data-act="copy" data-icon="copy" title="Copy the text">Copy</button>
+      <button class="tool ask" data-act="ask" data-icon="sparkle" title="Ask Rosalena to explain this passage">Ask</button>
+      <button class="tool danger" data-act="delete" data-icon="trash" title="Remove this highlight">Remove</button>
+    </div>
+
+    <div class="scrim" id="dialog" hidden>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+        <h3 id="dlg-title">Note</h3>
+        <blockquote id="dlg-quote" hidden></blockquote>
+        <textarea id="dlg-text" rows="5"></textarea>
+        <input id="dlg-input" type="text" hidden />
+        <p class="dlg-msg" id="dlg-msg" hidden></p>
+        <div class="dlg-actions">
+          <span class="dlg-hint" id="dlg-hint">Ctrl+Enter to save</span>
+          <button class="btn" id="dlg-cancel">Cancel</button>
+          <button class="btn primary" id="dlg-ok">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone" hidden>
+      <div class="drop-inner"><span data-icon="open"></span>Drop the PDF to open it</div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <input type="file" id="file-input" accept="application/pdf,.pdf" hidden />
+  </div>
+
+  <script src="/plugin-sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

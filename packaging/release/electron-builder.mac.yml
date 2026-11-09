@@ -1,0 +1,170 @@
+# electron-builder - macOS 11+: dmg + zip, arm64 and x64.
+#
+# Run it through packaging/release/build.mjs on a macOS machine (or the `macos` job in
+# .github/workflows/release.yml). This file CANNOT be executed on Windows.
+#
+#   node packaging/release/build.mjs mac              # unsigned, drag-to-Applications build
+#   node packaging/release/build.mjs mac --sign "Developer ID Application: Name (TEAMID)"
+#
+# The project directory is the staged app (build/release/app), so every path below is
+# relative to that directory, NOT to this file.
+#
+# ---------------------------------------------------------------------------------
+# RESOURCE MAP - keep in sync with packaging/release/README.md section 1
+#
+# App payload (`files`, packed as a plain directory because asar is off):
+#   package.json                     generated release manifest (main: desktop/main.mjs)
+#   desktop/main.mjs                 Electron entry; imports ../harness/src/ui.mjs
+#   desktop/preload.mjs              loaded by main.mjs via new URL("./preload.mjs", ...)
+#   harness/src/**/*.mjs             the engine (21 modules), imported by main.mjs
+#   harness/ui/**                    served by ui.mjs: UI_DIR = <harness>/ui
+#   harness/data/model-catalog.json  catalog.mjs: CATALOG_PATH = <harness>/data
+#   harness/data/llama-runtime.json  starter-model.mjs: RUNTIME_PATH = <harness>/data
+#   harness/data/media-models.json   model-downloads.mjs: MEDIA_PATH = <harness>/data
+#   harness/data/whisper-runtime.json  voice-runner.mjs: WHISPER_RUNTIME_PATH = <harness>/data
+#   harness/data/comfy-workflows/**  comfy-runner.mjs: WORKFLOW_DIR = <harness>/data/comfy-workflows
+#   harness/harness.config.json      plugins.mjs; rewritten neutral at staging time
+#   harness/plugins/**               plugins.mjs: <harness>/plugins
+#   harness/plugin-libs/**           ui-plugins.mjs: three.js and pdf.js at /plugin-lib
+#   harness/store/index.json        store.mjs: <harness>/store/index.json
+#   harness/store/modules/**         module registry the store index points at
+#   harness/src/voice/**             voice.mjs: VOICE_DIR = <harness>/src/voice
+#
+# extraResources:
+#   router/**                        the model router, a separate process the window
+#                                    talks to over http://127.0.0.1:8077/v1
+#
+# The harness cannot travel as extraResources until main.mjs and harness/src/*.mjs stop
+# resolving ui/, plugins/, data/ and store/ relative to import.meta.url - see README
+# section 5, blockers 2 and 6.
+#
+# Never shipped: node_modules, harness/src/voice/.venv, router/data (API keys),
+# router/logs, router/state, harness/test, harness/.scratch, harness/plugins/store.lock.json
+# ---------------------------------------------------------------------------------
+
+appId: dev.rosalena.harness
+productName: Rosalena Harness
+copyright: Copyright (c) 2026 Rosalena
+
+directories:
+  output: dist
+  buildResources: build
+
+# See electron-builder.win.yml: the layout inside the app must match the repo layout,
+# because the entry dynamically imports ../harness/src/ui.mjs.
+asar: false
+
+files:
+  - package.json
+  - desktop/main.mjs
+  - desktop/menu.mjs
+  - desktop/notify.mjs
+  - desktop/preload.mjs
+  - desktop/router-supervisor.mjs
+  - desktop/updater.mjs
+  - harness/src/**/*.mjs
+  - harness/src/voice/README.md
+  - harness/src/voice/transcribe.py
+  - harness/src/voice/setup.ps1
+  - harness/src/voice/selftest.ps1
+  - harness/src/voice/win-speech.ps1
+  - harness/ui/**/*
+  - harness/data/model-catalog.json
+  - harness/data/llama-runtime.json
+  - harness/data/media-models.json
+  - harness/data/whisper-runtime.json
+  - harness/data/student-programs.json
+  - harness/data/node-runtime.json
+  - harness/data/comfy-workflows/*.json
+  - harness/harness.config.json
+  - harness/plugins/**/*
+  - harness/plugin-libs/**/*
+  - harness/store/index.json
+  - harness/store/modules/**/*
+  - harness/skills/**/*
+  - "!**/node_modules/**"
+  - "!**/.venv/**"
+  - "!**/__pycache__/**"
+  - "!**/*.pyc"
+  - "!**/*.log"
+  - "!harness/plugins/store.lock.json"
+  - "!harness/**/test/**"
+  - "!harness/.scratch/**"
+  - "!router/**"
+
+extraResources:
+  - from: router
+    to: router
+    filter:
+      - "**/*"
+      - "!**/node_modules/**"
+      - "!**/test/**"
+      - "!**/logs/**"
+      - "!**/state/**"
+      - "!**/data/**"
+      - "!**/scripts/**"
+  # The router's identity prompt, which router.config.json reads as
+  # `../data/prompts/rosalena.md` (relative to <resources>/router/router.config.json, so it
+  # has to land at <resources>/data/prompts/rosalena.md). Without it router/src/persona.mjs
+  # exits 2 and the router never starts - the app would open its window with no model
+  # behind it, which is exactly the "it launched but nothing works" failure this file is
+  # supposed to prevent. One file, no keys: router/data/** is still excluded above.
+  - from: data/prompts
+    to: data/prompts
+    filter:
+      - "rosalena.md"
+
+publish: null
+
+# Default file name for any target that does not override it below.
+artifactName: Rosalena-Harness-${version}-${arch}.${ext}
+
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  # The macOS icon. stage.mjs copies packaging/assets/rosalena.icns to <app>/build/icon.icns,
+  # and `directories.buildResources: build` is the folder electron-builder also looks in by
+  # default - so this path and the default agree, and there is no way for the build to pick
+  # up a different file than the one checked in. The .icns is 7 PNG entries, 16 to 1024 px
+  # (icp4, ic11, ic12, ic07, ic08, ic09, ic10), generated by packaging/tools/make-icon.mjs;
+  # `node packaging/tools/make-icon.mjs --check` parses it back and verifies every payload.
+  icon: build/icon.icns
+  darkModeSupport: true
+  minimumSystemVersion: "11.0"
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # The honest default: this repository has no Developer ID, so the build is unsigned.
+  # identity: null disables signing even when a certificate is present; the release
+  # workflow overrides identity with -c.mac.identity only when the Apple secrets exist.
+  # An unsigned app works once the quarantine bit is removed:
+  #   xattr -dr com.apple.quarantine "/Applications/Rosalena Harness.app"
+  identity: null
+  notarize: false
+  extendInfo:
+    NSHighResolutionCapable: true
+    LSApplicationCategoryType: public.app-category.developer-tools
+
+dmg:
+  title: Rosalena Harness ${version}
+  artifactName: Rosalena-Harness-${version}-${arch}.${ext}
+  window:
+    width: 540
+    height: 380
+  contents:
+    - x: 140
+      y: 190
+      type: file
+    - x: 400
+      y: 190
+      type: link
+      path: /Applications

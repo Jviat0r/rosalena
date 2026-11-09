@@ -1,0 +1,7 @@
+{
+  "name": "pdfjs",
+  "version": "4.10.38",
+  "license": "Apache-2.0",
+  "files": ["pdf.min.mjs", "pdf.worker.min.mjs"],
+  "usage": "const worker = await import(\"/plugin-lib/pdfjs/pdf.worker.min.mjs\"); globalThis.pdfjsWorker = worker; const pdfjs = await import(\"/plugin-lib/pdfjs/pdf.min.mjs\"); pdfjs.GlobalWorkerOptions.workerSrc = \"/plugin-lib/pdfjs/pdf.worker.min.mjs\";"
+}

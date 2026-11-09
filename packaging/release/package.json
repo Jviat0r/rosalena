@@ -1,0 +1,20 @@
+{
+  "$comment": "Build tooling only. The app itself has zero dependencies: everything that ships is plain .mjs/.json, and Electron is the runtime. Nothing here is installed into the app payload - stage.mjs copies files, never node_modules.",
+  "name": "@rosalena/release",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "electron-builder configuration and build scripts for Rosalena Harness (Windows installer/portable, macOS dmg/zip).",
+  "scripts": {
+    "check": "node stage.mjs --check && node check-config.mjs",
+    "stage": "node stage.mjs",
+    "build:win": "node build.mjs win",
+    "build:mac": "node build.mjs mac",
+    "build:linux": "node build.mjs linux",
+    "manifest": "node manifest.mjs"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.0.12"
+  }
+}

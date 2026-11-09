@@ -1,0 +1,1380 @@
+[
+ {
+  "name": "status",
+  "description": "Server role, extension connection, this session's tabs. Never fails; call it first when anything is off.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {}
+  }
+ },
+ {
+  "name": "tabs",
+  "description": "Manage tabs: list, new (opens url and makes it current), close, select (make current; attaches).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "action": {
+     "type": "string",
+     "enum": [
+      "list",
+      "new",
+      "close",
+      "select"
+     ]
+    },
+    "url": {
+     "description": "For new (default about:blank).",
+     "type": "string"
+    },
+    "tabId": {
+     "description": "For close/select (default: current tab).",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "force": {
+     "description": "select: take a tab another session uses.",
+     "type": "boolean"
+    },
+    "background": {
+     "description": "new: open without focusing it (it still becomes current).",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "action"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "list_tabs",
+  "description": "List open tabs (alias of tabs {action:'list'}).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {}
+  }
+ },
+ {
+  "name": "attach",
+  "description": "Attach a tab (default: the active tab) and make it current. Usually unnecessary: tools auto-attach.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "tabId": {
+     "description": "Tab to attach. Omit for the active tab.",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "force": {
+     "description": "Take the tab even if another session uses it.",
+     "type": "boolean"
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "detach",
+  "description": "Detach a tab (default: current) and release it.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "list_frames",
+  "description": "List the tab's frames (frameId, parent, url, responding). Live, never cached.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "find_element",
+  "description": "Find elements by visible text/label/placeholder/value across all frames; returns refs and viewport rects.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "query": {
+     "type": "string",
+     "description": "Text to look for (case-insensitive substring unless exact is true)."
+    },
+    "frameId": {
+     "description": "Restrict to one frame. Omit to search every frame.",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "role": {
+     "description": "Filter by role (button, link, textbox, ...).",
+     "type": "string"
+    },
+    "exact": {
+     "description": "Require the whole trimmed string to equal query.",
+     "type": "boolean"
+    },
+    "limit": {
+     "description": "Max matches to return (default 10).",
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 50
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "query"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "extract_text",
+  "description": "Visible text of the page or a frame; mainContent:true keeps just the article. Says when it is truncated.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "mainContent": {
+     "description": "Only the main prose (article/main), without nav, sidebars and footers.",
+     "type": "boolean"
+    },
+    "selector": {
+     "description": "CSS selector to scope the read.",
+     "type": "string"
+    },
+    "maxChars": {
+     "description": "Budget (default 16000).",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 200000
+    },
+    "offset": {
+     "description": "Start at this char (to page through long text).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 9007199254740991
+    },
+    "frameId": {
+     "description": "Frame (default 0, the top frame).",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "get_page_text",
+  "description": "Alias of extract_text (page text; mainContent:true for the article only).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "mainContent": {
+     "description": "Only the main prose (article/main), without nav, sidebars and footers.",
+     "type": "boolean"
+    },
+    "selector": {
+     "description": "CSS selector to scope the read.",
+     "type": "string"
+    },
+    "maxChars": {
+     "description": "Budget (default 16000).",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 200000
+    },
+    "offset": {
+     "description": "Start at this char (to page through long text).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 9007199254740991
+    },
+    "frameId": {
+     "description": "Frame (default 0, the top frame).",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "read_monaco",
+  "description": "Read the full buffer of a Monaco editor (e.g. the Power Apps formula bar), not just the visible lines.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "frameId": {
+     "description": "Frame to read. Omit to try every responding frame.",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "maxChars": {
+     "description": "Per-model truncation (default 20000).",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 200000
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "click",
+  "description": "Click by ref (auto-waits, scrolls; works in cross-origin iframes), by visible text, or at x,y CSS px. Returns what changed.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ref": {
+     "type": "string",
+     "description": "Element ref from snapshot, e.g. e12 or f3e12."
+    },
+    "text": {
+     "description": "Click the best match for this visible text.",
+     "type": "string"
+    },
+    "x": {
+     "type": "number"
+    },
+    "y": {
+     "type": "number"
+    },
+    "button": {
+     "type": "string",
+     "enum": [
+      "left",
+      "right",
+      "middle"
+     ]
+    },
+    "clickCount": {
+     "description": "2 = double click.",
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 3
+    },
+    "modifiers": {
+     "description": "e.g. [\"Shift\"] or \"ctrl+shift\".",
+     "anyOf": [
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      {
+       "type": "string"
+      }
+     ]
+    },
+    "fromScreenshot": {
+     "description": "x/y were read off a downscaled screenshot.",
+     "type": "boolean"
+    },
+    "force": {
+     "description": "Skip the covered/disabled checks.",
+     "type": "boolean"
+    },
+    "timeoutMs": {
+     "description": "Auto-wait ms (default 2000).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 30000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "click_element",
+  "description": "v1: find an element by text across all frames and click its centre; found:false when nothing matches. Prefer click {ref} or {text}, which also return what changed.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "query": {
+     "type": "string"
+    },
+    "frameId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "role": {
+     "type": "string"
+    },
+    "exact": {
+     "type": "boolean"
+    },
+    "index": {
+     "description": "Which match to click (default 0, the best-ranked).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 9007199254740991
+    },
+    "returnSnapshot": {
+     "description": "true: settle and add what changed (v1 default: off).",
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "query"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "hover",
+  "description": "Move the mouse over a ref or x,y without clicking (tooltips, menus, hover-only buttons). Returns what appeared.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ref": {
+     "type": "string"
+    },
+    "x": {
+     "type": "number"
+    },
+    "y": {
+     "type": "number"
+    },
+    "timeoutMs": {
+     "description": "Auto-wait ms (default 2000).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 30000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "drag",
+  "description": "Drag from one element/point to another (press, moves, release; HTML5 drag-and-drop works). from/to: a ref (\"e12\"), {x,y} or {text}.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "from": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "object",
+       "properties": {},
+       "additionalProperties": {}
+      }
+     ]
+    },
+    "to": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "object",
+       "properties": {},
+       "additionalProperties": {}
+      }
+     ]
+    },
+    "fromX": {
+     "type": "number"
+    },
+    "fromY": {
+     "type": "number"
+    },
+    "toX": {
+     "type": "number"
+    },
+    "toY": {
+     "type": "number"
+    },
+    "steps": {
+     "description": "Intermediate moves (default 5).",
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 50
+    },
+    "delayMs": {
+     "description": "Pause between moves (default none).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 200
+    },
+    "timeoutMs": {
+     "description": "Auto-wait ms (default 2000).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 30000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "type",
+  "description": "Type text as trusted input into ref (focused first; clear:true replaces its content) or the focused element; submit:true presses Enter.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "text": {
+     "type": "string"
+    },
+    "ref": {
+     "type": "string"
+    },
+    "clear": {
+     "description": "Replace the field's content (default: append).",
+     "type": "boolean"
+    },
+    "submit": {
+     "type": "boolean"
+    },
+    "timeoutMs": {
+     "description": "Auto-wait ms (default 2000).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 30000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "text"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "key",
+  "description": "Press keys as trusted input: \"Enter\", \"ctrl+a\", \"Tab Tab Enter\" (a sequence), or key + modifiers. ref focuses that element first.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "keys": {
+     "description": "Chord(s): \"Enter\", \"ctrl+shift+k\", \"Tab Tab\".",
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     ]
+    },
+    "key": {
+     "description": "One key (v1); combine with modifiers.",
+     "type": "string"
+    },
+    "text": {
+     "type": "string"
+    },
+    "modifiers": {
+     "description": "e.g. [\"Shift\"] or \"ctrl+shift\".",
+     "anyOf": [
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      {
+       "type": "string"
+      }
+     ]
+    },
+    "repeat": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100
+    },
+    "ref": {
+     "type": "string"
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "scroll",
+  "description": "Scroll: ref alone brings it into view; direction + amount (100 px notches, or \"page\") scrolls the page or the container at ref/x,y; to: top|bottom.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ref": {
+     "type": "string"
+    },
+    "direction": {
+     "type": "string",
+     "enum": [
+      "up",
+      "down",
+      "left",
+      "right"
+     ]
+    },
+    "amount": {
+     "anyOf": [
+      {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      {
+       "type": "string",
+       "const": "page"
+      }
+     ]
+    },
+    "to": {
+     "type": "string",
+     "enum": [
+      "top",
+      "bottom",
+      "left",
+      "right"
+     ]
+    },
+    "x": {
+     "type": "number"
+    },
+    "y": {
+     "type": "number"
+    },
+    "deltaX": {
+     "description": "v1: a wheel event at x,y (px; positive = down/right).",
+     "type": "number"
+    },
+    "deltaY": {
+     "type": "number"
+    },
+    "modifiers": {
+     "description": "e.g. [\"Shift\"] or \"ctrl+shift\".",
+     "anyOf": [
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      {
+       "type": "string"
+      }
+     ]
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "read_clipboard",
+  "description": "Read the system clipboard (after key ctrl+a, ctrl+c in an editor that hides its text).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "frameId": {
+     "description": "Frame to read from (default the top frame). The document must be focused.",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "write_clipboard",
+  "description": "Put text on the system clipboard, to paste with key ctrl+v (large text, reformatting editors).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "text": {
+     "type": "string"
+    },
+    "frameId": {
+     "description": "Frame to run the copy in (default the top frame).",
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "text"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "screenshot",
+  "description": "Viewport image (JPEG). annotate:true labels every ref on screen (Set-of-Marks) and lists them; zoom or fromRef re-captures a region at up to 4x. Prefer snapshot for reading.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "format": {
+     "description": "Default jpeg.",
+     "type": "string",
+     "enum": [
+      "jpeg",
+      "png",
+      "webp"
+     ]
+    },
+    "quality": {
+     "description": "Default 70.",
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100
+    },
+    "maxWidth": {
+     "description": "Long-edge cap in px (default 1568).",
+     "type": "integer",
+     "minimum": 200,
+     "maximum": 4000
+    },
+    "annotate": {
+     "description": "Draw ref labels on the image.",
+     "type": "boolean"
+    },
+    "zoom": {
+     "description": "CSS-px viewport region.",
+     "type": "object",
+     "properties": {
+      "x": {
+       "type": "number"
+      },
+      "y": {
+       "type": "number"
+      },
+      "w": {
+       "type": "number",
+       "exclusiveMinimum": 0
+      },
+      "h": {
+       "type": "number",
+       "exclusiveMinimum": 0
+      }
+     },
+     "required": [
+      "x",
+      "y",
+      "w",
+      "h"
+     ]
+    },
+    "fromRef": {
+     "description": "Zoom on this element.",
+     "type": "string"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "snapshot",
+  "description": "Page (all frames, incl. cross-origin iframes) as role/name lines; [e12]/[f3e12] refs feed click/type etc. diff:true returns only what changed since your last snapshot.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "mode": {
+     "description": "interactive (default): controls, headings, landmarks. all: plus text.",
+     "type": "string",
+     "enum": [
+      "interactive",
+      "all"
+     ]
+    },
+    "viewportOnly": {
+     "description": "Only what is on screen.",
+     "type": "boolean"
+    },
+    "ref": {
+     "description": "Only this element's subtree.",
+     "type": "string"
+    },
+    "maxChars": {
+     "description": "Output budget (default 40000).",
+     "type": "integer",
+     "minimum": 200,
+     "maximum": 400000
+    },
+    "diff": {
+     "description": "Changes since the last snapshot with the same options.",
+     "type": "boolean"
+    },
+    "search": {
+     "description": "Only lines matching this text or /regex/, with their ancestors.",
+     "type": "string"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "fill_form",
+  "description": "Fill many fields in one call: text (trusted typing), selects (value or label), checkboxes/radios (true/false), dates. submit:true submits the form after.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "fields": {
+     "minItems": 1,
+     "maxItems": 200,
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "ref": {
+        "type": "string"
+       },
+       "value": {
+        "anyOf": [
+         {
+          "type": "string"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "boolean"
+         },
+         {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         }
+        ]
+       }
+      },
+      "required": [
+       "ref",
+       "value"
+      ],
+      "additionalProperties": {}
+     }
+    },
+    "submit": {
+     "description": "true: click the form's submit button; or a ref to click.",
+     "type": [
+      "boolean",
+      "string"
+     ]
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "fields"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "select_option",
+  "description": "Choose option(s) of a <select> by value or visible label.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ref": {
+     "type": "string"
+    },
+    "values": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     ]
+    },
+    "value": {
+     "type": "string"
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "ref"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "upload_file",
+  "description": "Set local files on a file input (ref). Paths must exist, be regular files of at most 50 MB; credential files are refused.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ref": {
+     "type": "string"
+    },
+    "paths": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     ]
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "paths"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "navigate",
+  "description": "Open a url in the current tab (no scheme = https://), or \"back\" / \"forward\" / \"reload\". Waits for load and returns the page's state; opens a tab if none.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "url": {
+     "type": "string",
+     "description": "Url, or \"back\" | \"forward\" | \"reload\"."
+    },
+    "wait": {
+     "description": "Default load.",
+     "type": "string",
+     "enum": [
+      "load",
+      "domcontentloaded",
+      "none"
+     ]
+    },
+    "timeoutMs": {
+     "description": "Default 15000.",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 120000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "url"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "wait_for",
+  "description": "Wait until text/selector/ref appears (gone: disappears) in any frame, the url matches, or the network is idle. Event-driven: returns as soon as it holds.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "text": {
+     "type": "string"
+    },
+    "selector": {
+     "description": "CSS; must be visible.",
+     "type": "string"
+    },
+    "ref": {
+     "type": "string"
+    },
+    "gone": {
+     "description": "Text that must disappear, or true to invert text/selector/ref.",
+     "type": [
+      "string",
+      "boolean"
+     ]
+    },
+    "url": {
+     "description": "Substring, glob with *, or /regex/.",
+     "type": "string"
+    },
+    "networkIdle": {
+     "description": "No request in flight for 500 ms.",
+     "type": "boolean"
+    },
+    "timeoutMs": {
+     "description": "Default 10000.",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 120000
+    },
+    "returnSnapshot": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "wait",
+  "description": "Fixed pause. Prefer wait_for, which returns as soon as the page is ready.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "ms": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 60000
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "console_messages",
+  "description": "Console of the tab incl. iframes and uncaught errors, kept across navigations: [level] time text @source:line.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "level": {
+     "description": "Minimum level (default all).",
+     "type": "string",
+     "enum": [
+      "error",
+      "warn",
+      "info",
+      "log",
+      "debug",
+      "all"
+     ]
+    },
+    "pattern": {
+     "description": "Substring or /regex/ on text or source url.",
+     "type": "string"
+    },
+    "limit": {
+     "description": "Last N matches (default 50).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 5000
+    },
+    "sinceLast": {
+     "description": "Only messages since your last console_messages call.",
+     "type": "boolean"
+    },
+    "clear": {
+     "description": "Empty the buffer after reading.",
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "network_requests",
+  "description": "Network requests of the tab incl. iframes, kept across navigations: method status type size time url.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "pattern": {
+     "description": "Substring or /regex/ on the url.",
+     "type": "string"
+    },
+    "limit": {
+     "description": "Last N matches (default 50).",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 1000
+    },
+    "failedOnly": {
+     "description": "Only failed or status >= 400.",
+     "type": "boolean"
+    },
+    "includeBody": {
+     "description": "Add response bodies (text, <= 20KB each).",
+     "type": "boolean"
+    },
+    "clear": {
+     "description": "Empty the buffer after reading.",
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "evaluate",
+  "description": "Run JavaScript in the page and return its JSON value (promises awaited; a function is called). frame: f3, a ref or url part for an iframe.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "expression": {
+     "type": "string",
+     "description": "JS expression, statements, or a function."
+    },
+    "frame": {
+     "description": "Child frame (default main frame).",
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "integer",
+       "minimum": -9007199254740991,
+       "maximum": 9007199254740991
+      }
+     ]
+    },
+    "timeoutMs": {
+     "description": "Default 10000.",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 120000
+    },
+    "maxChars": {
+     "description": "Output cap (default 10000).",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 200000
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "expression"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "handle_dialog",
+  "description": "Accept or dismiss the open confirm/prompt dialog (promptText answers a prompt). Alerts are auto-accepted.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "accept": {
+     "type": "boolean"
+    },
+    "promptText": {
+     "type": "string"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "accept"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "viewport",
+  "description": "Emulate a width x height CSS px viewport for the tab (reset:true restores the window's own size).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "width": {
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 10000
+    },
+    "height": {
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 10000
+    },
+    "reset": {
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "pdf",
+  "description": "Save the page as a PDF at path (refuses to overwrite unless overwrite:true).",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "path": {
+     "type": "string",
+     "description": "Output .pdf: a relative name is saved in the default output folder (<cwd>/solbrowser-out); absolute only under an allowed folder (that one, ~/Downloads, the temp dir, or SOLBROWSER_OUTPUT_DIRS)."
+    },
+    "overwrite": {
+     "type": "boolean"
+    },
+    "landscape": {
+     "type": "boolean"
+    },
+    "printBackground": {
+     "description": "Default true.",
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "path"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "batch",
+  "description": "Run several tools in order in ONE call (e.g. fill fields, click, wait_for) and get one final page state: the biggest turn-saver.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "actions": {
+     "minItems": 1,
+     "maxItems": 50,
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "tool": {
+        "description": "Tool name, e.g. click.",
+        "type": "string"
+       },
+       "args": {
+        "type": "object",
+        "propertyNames": {
+         "type": "string"
+        },
+        "additionalProperties": {}
+       }
+      },
+      "additionalProperties": {}
+     },
+     "description": "[{tool, args}]"
+    },
+    "stopOnError": {
+     "description": "Default true.",
+     "type": "boolean"
+    },
+    "tabId": {
+     "type": "integer",
+     "minimum": -9007199254740991,
+     "maximum": 9007199254740991
+    }
+   },
+   "required": [
+    "actions"
+   ],
+   "additionalProperties": {}
+  }
+ },
+ {
+  "name": "read_url",
+  "description": "Read a url for information WITHOUT using the current tab: fast and light (plain HTTP first, no browser for most pages). Escalates by itself when a page needs JavaScript or the user's login. Use it for research and reading; use navigate + click/type/fill_form when you must act on a page or work inside its iframes.",
+  "inputSchema": {
+   "type": "object",
+   "properties": {
+    "url": {
+     "type": "string",
+     "description": "http(s) url (no scheme = https://)."
+    },
+    "mainContent": {
+     "description": "Just the article/main text (default true). false = whole page.",
+     "type": "boolean"
+    },
+    "maxChars": {
+     "description": "Budget (default 16000).",
+     "type": "integer",
+     "minimum": 100,
+     "maximum": 200000
+    },
+    "offset": {
+     "description": "Start at this char, to page through long text.",
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 9007199254740991
+    },
+    "links": {
+     "description": "Also list the page's links (http rung only).",
+     "type": "boolean"
+    },
+    "engine": {
+     "description": "Default auto.",
+     "type": "string",
+     "enum": [
+      "auto",
+      "http",
+      "lightpanda",
+      "browser"
+     ]
+    },
+    "timeoutMs": {
+     "description": "Per rung (default 15000).",
+     "type": "integer",
+     "minimum": 1000,
+     "maximum": 60000
+    }
+   },
+   "required": [
+    "url"
+   ],
+   "additionalProperties": {}
+  }
+ }
+]

@@ -1,0 +1,9 @@
+# Keep line endings identical on every machine: source is LF everywhere, and the
+# shell scripts and .mjs entry points must never arrive on macOS with CRLF.
+* text=auto eol=lf
+
+*.ico binary
+*.png binary
+*.jpg binary
+*.dmg binary
+*.icns binary

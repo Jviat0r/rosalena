@@ -1,0 +1,11 @@
+{
+  "id": "rosa-reveal-file-location",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Resolves a file's real path and can select it in the OS file manager",
+  "config": {
+    "allowLaunch": false,
+    "withinRoot": true
+  }
+}

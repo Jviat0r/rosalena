@@ -1,0 +1,16 @@
+{
+  "name": "@rosalena/router",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "T0.1 Model Router v0 - an OpenAI-compatible endpoint that routes by task class across local and cloud providers with fallback, budget caps and a key pool. Zero dependencies.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "node --watch src/index.mjs",
+    "test": "node --test",
+    "accept": "node scripts/loadtest.mjs"
+  }
+}

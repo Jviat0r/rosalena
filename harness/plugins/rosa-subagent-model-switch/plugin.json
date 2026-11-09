@@ -1,0 +1,13 @@
+{
+  "id": "rosa-subagent-model-switch",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Read and write the role presets in data/roles.json - which model a worker of each role starts on, with its title, prompt addendum, judge flag and optional effort level - validating every write against the router",
+  "entry": "plugin.mjs",
+  "enabled": true,
+  "config": {
+    "rolesFile": null,
+    "routerFile": null
+  }
+}

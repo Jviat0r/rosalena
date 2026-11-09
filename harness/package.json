@@ -1,0 +1,15 @@
+{
+  "name": "@rosalena/harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The agent runtime that sits on top of the model router: orchestrator/worker/judge roles, a bounded tool loop, and a headless CLI.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs",
+    "check": "node src/cli.mjs --check",
+    "test": "node --import ./test/isolate.mjs --test"
+  }
+}

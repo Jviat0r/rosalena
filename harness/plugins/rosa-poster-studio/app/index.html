@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Poster Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="panel" aria-label="Poster settings">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M5 10.5c2.4-2 4.6 1.6 7 0s4.6-2 7-.4"/><path d="M8 15h8"/><path d="M8 18h5"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Poster Studio</h1>
+          <p>Live posters, exported at full size</p>
+        </div>
+      </header>
+
+      <div class="scroll">
+        <section class="group" aria-labelledby="h-copy">
+          <h2 id="h-copy">Copy</h2>
+          <label class="field"><span>Eyebrow</span><input type="text" data-key="eyebrow" maxlength="80" spellcheck="false" /></label>
+          <label class="field"><span>Title, line 1</span><input type="text" data-key="title1" maxlength="160" /></label>
+          <label class="field"><span>Title, line 2 <em>accent colour</em></span><input type="text" data-key="title2" maxlength="160" /></label>
+          <label class="field"><span>Subtitle</span><input type="text" data-key="subtitle" maxlength="200" /></label>
+          <label class="field"><span>Description <em id="desc-count"></em></span><textarea data-key="description" rows="4" maxlength="600"></textarea></label>
+          <div class="row2">
+            <label class="field"><span>Footer left</span><input type="text" data-key="footerLeft" maxlength="80" spellcheck="false" /></label>
+            <label class="field"><span>Footer right</span><input type="text" data-key="footerRight" maxlength="80" spellcheck="false" /></label>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="h-format">
+          <h2 id="h-format">Format</h2>
+          <div class="formats" id="formats" role="group" aria-labelledby="h-format"></div>
+        </section>
+
+        <section class="group" aria-labelledby="h-layout">
+          <h2 id="h-layout">Layout</h2>
+          <div class="seg" id="align" role="group" aria-label="Text alignment">
+            <button type="button" data-align="left" title="Align left">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5h12M2 6.5h8M2 9.5h12M2 12.5h7"/></svg>
+              Left
+            </button>
+            <button type="button" data-align="center" title="Align centre">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5h12M4 6.5h8M2 9.5h12M4.5 12.5h7"/></svg>
+              Center
+            </button>
+          </div>
+          <div class="toggle-row">
+            <div class="t-label"><b>Modular shapes</b><small>A geometric grid motif above the title</small></div>
+            <button type="button" class="switch" id="shapes" role="switch" aria-checked="true" aria-label="Modular shapes"></button>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="h-palette">
+          <h2 id="h-palette">Palette <span class="h-note" id="palette-name"></span></h2>
+          <div class="palettes" id="palettes" role="group" aria-labelledby="h-palette"></div>
+        </section>
+
+        <section class="group" aria-labelledby="h-bg">
+          <h2 id="h-bg">Background</h2>
+          <label class="field slider-field">
+            <span>Flow speed <em class="val" id="speed-val"></em></span>
+            <input type="range" id="speed" min="0" max="100" step="1" aria-label="Flow speed" />
+          </label>
+          <div class="seed-row">
+            <div class="seed"><small>Seed</small><b id="seed-val">#00000</b></div>
+            <button type="button" class="btn" id="shuffle" title="New background seed (Alt+S)">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4.5h2.5c3.5 0 4 7 7.5 7H14"/><path d="M2 11.5h2.5c1.4 0 2.2-1.1 2.9-2.4"/><path d="M9.1 6.6c.7-1.2 1.5-2.1 2.9-2.1H14"/><path d="M12.2 2.6 14 4.5l-1.8 1.9"/><path d="M12.2 9.6 14 11.5l-1.8 1.9"/></svg>
+              Shuffle
+            </button>
+          </div>
+          <div class="toggle-row">
+            <div class="t-label"><b>Film grain</b><small>Fine noise that keeps gradients smooth</small></div>
+            <button type="button" class="switch" id="grain" role="switch" aria-checked="true" aria-label="Film grain"></button>
+          </div>
+        </section>
+      </div>
+
+      <footer class="panel-foot">
+        <span class="save-state" id="save-state"><i></i><span>Loading</span></span>
+        <button type="button" class="btn ghost" id="reset" title="Put back the default design">Reset</button>
+      </footer>
+    </aside>
+
+    <main class="stage-wrap">
+      <div class="toolbar">
+        <div class="tb-left">
+          <span class="live" id="live" title="The preview redraws as you type"><i></i>Live</span>
+          <span class="chip" id="size-chip">1080 × 1350 px</span>
+          <span class="chip dim" id="format-chip">4:5 Portrait</span>
+        </div>
+        <div class="tb-right">
+          <button type="button" class="btn" id="export-jpg" title="Export JPG at full size (Ctrl+Shift+E)">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8"/><path d="m4.8 7 3.2 3.2L11.2 7"/><path d="M2.5 11.5v1.2c0 .7.6 1.3 1.3 1.3h8.4c.7 0 1.3-.6 1.3-1.3v-1.2"/></svg>
+            JPG
+          </button>
+          <button type="button" class="btn primary" id="export-png" title="Export PNG at full size (Ctrl+E)">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8"/><path d="m4.8 7 3.2 3.2L11.2 7"/><path d="M2.5 11.5v1.2c0 .7.6 1.3 1.3 1.3h8.4c.7 0 1.3-.6 1.3-1.3v-1.2"/></svg>
+            <span>Export PNG</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="frame-wrap" id="frame">
+          <i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+          <div class="frame"><canvas id="preview" aria-label="Poster preview"></canvas></div>
+        </div>
+      </div>
+
+      <div class="stage-foot">
+        <span class="keys"><kbd>Ctrl</kbd><kbd>E</kbd> PNG <span class="sep"></span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>E</kbd> JPG <span class="sep"></span><kbd>Alt</kbd><kbd>S</kbd> shuffle</span>
+        <span id="export-note">Exports render at the format's full pixel size</span>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <script src="/plugin-sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

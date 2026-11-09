@@ -1,0 +1,610 @@
+/* Rosalena Harness inspector panels.
+ *
+ * Every rule is scoped under `.pnl` and every class carries the `pnl-` prefix, so this
+ * sheet can be linked next to the shell's own and cannot collide with it.
+ *
+ * Two rules drive the whole file:
+ *   - colour comes only from the shell's custom properties, and every var() carries the
+ *     dark literal as a fallback, so the preview page is readable with no shell at all;
+ *   - nothing moves on a status change. Chips hold a fixed minimum width and metadata
+ *     rows hold a fixed height, so a run going from `running` to `failed` repaints text
+ *     and never shifts a single box.
+ */
+
+/* ------------------------------------------------------------------ scoped base */
+
+.pnl,
+.pnl * { box-sizing: border-box; }
+
+.pnl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  height: 100%;
+  min-height: 180px;
+  min-width: 0;
+  padding: var(--space-2, 8px);
+  background: var(--panel, #0d1621);
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius, 14px);
+  color: var(--text, #e9f1f9);
+  font-family: var(--sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.pnl [hidden] { display: none; }
+
+.pnl :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent, #5fe3f0);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs, 6px);
+}
+
+/* ------------------------------------------------------------------ header */
+
+.pnl-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  min-height: 24px;
+  flex: 0 0 auto;
+}
+
+.pnl-title {
+  font-size: 11px;
+  font-weight: 620;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim, #97abc0);
+  white-space: nowrap;
+}
+
+.pnl-counts {
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10.5px;
+  color: var(--dim-2, #8297ad);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pnl-spacer { flex: 1 1 auto; min-width: 8px; }
+
+.pnl-zoom {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--panel-2, #111c28);
+  flex: 0 0 auto;
+}
+
+.pnl-zbtn {
+  min-width: 24px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill, 999px);
+  background: transparent;
+  color: var(--dim, #97abc0);
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1)), background-color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-zbtn:hover { color: var(--text, #e9f1f9); background: var(--panel-3, #162434); }
+.pnl-zbtn[aria-pressed="true"] { color: var(--accent, #5fe3f0); border-color: color-mix(in srgb, var(--accent, #5fe3f0) 40%, transparent); }
+
+.pnl-znow {
+  padding: 0 5px 0 3px;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10px;
+  color: var(--accent, #5fe3f0);
+  font-variant-numeric: tabular-nums;
+}
+
+.pnl-btn {
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius-xs, 6px);
+  background: var(--panel-2, #111c28);
+  color: var(--dim, #97abc0);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1)), border-color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-btn:hover { color: var(--text, #e9f1f9); border-color: var(--line, #2b3b4b); background: var(--panel-3, #162434); }
+
+/* ------------------------------------------------------------------ notes and empty states */
+
+.pnl-note {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--bad, #ff8a8a) 40%, transparent);
+  border-radius: var(--radius-xs, 6px);
+  background: color-mix(in srgb, var(--bad, #ff8a8a) 8%, transparent);
+  color: var(--text-2, #c4d4e4);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.pnl-note[data-kind="warn"] {
+  border-color: color-mix(in srgb, var(--warn, #f3c969) 40%, transparent);
+  background: color-mix(in srgb, var(--warn, #f3c969) 8%, transparent);
+}
+
+.pnl-foot {
+  flex: 0 0 auto;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--dim-2, #8297ad);
+}
+
+.pnl-empty {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--space-4, 16px);
+  border: 1px dashed var(--line-soft, #1a2734);
+  border-radius: var(--radius-sm, 10px);
+  color: var(--dim, #97abc0);
+  font-size: 12px;
+}
+
+.pnl-empty-line { margin: 0; }
+.pnl-empty-line.is-warn { color: var(--warn, #f3c969); }
+/* The block is a column, so an unconstrained button would stretch across the whole panel
+   and read as a separator rather than an action. */
+.pnl-empty-btn { align-self: flex-start; margin-top: 8px; padding: 0 10px; }
+
+/* ------------------------------------------------------------------ graph viewport */
+
+.pnl-gviewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: auto;
+  border: 1px solid var(--line-soft, #1a2734);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--bg-2, #0a111a);
+  cursor: grab;
+  scrollbar-gutter: stable;
+  /* The ring the tree lives in. Without it a tree wider than the panel starts flush on the
+     border, which reads as cropped rather than scrollable; the same inset on all four
+     sides keeps a fitted tree off the scrollbar and the card edge. */
+  padding: var(--space-3, 12px);
+  /* A themed thin bar: the platform default is a heavy grey slab in the light theme and a
+     bright strip in the dark one. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line, #2b3b4b) transparent;
+  /* A re-layout (compact switch, new node set) must not drag the scroll offset along with
+     an anchor node: the panel sets its own offset, and Chromium's anchoring would undo it. */
+  overflow-anchor: none;
+}
+
+.pnl-gviewport.is-panning { cursor: grabbing; user-select: none; }
+
+.pnl-gsizer {
+  position: relative;
+  /* Auto margins keep a fitted tree centred in the viewport's content box, and collapse to
+     zero when it is wider; the viewport's own padding is what keeps it off the border. */
+  margin: 0 auto;
+}
+
+.pnl-gstage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.pnl-glinks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pnl-gnodes { position: absolute; inset: 0; }
+
+.pnl-edge {
+  /* Edges are structure, not content: bright enough to read the tree, quieter than any
+     node border so the boxes still win the eye. Mixing a quarter line with three quarters
+     dim tracks both themes: darker on paper, lighter on ink. */
+  stroke: color-mix(in srgb, var(--line, #2b3b4b) 30%, var(--dim, #97abc0) 70%);
+  stroke-width: 1.5;
+  transition: stroke var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-edge.is-path {
+  stroke: var(--accent, #5fe3f0);
+  stroke-width: 1.75;
+}
+
+/* ------------------------------------------------------------------ graph nodes */
+
+/* One row per task. The tree is an outline, so a row is wide and short: status dot, the
+   task's own words, then the chip and metadata on the right. It used to be a square card,
+   which is the shape that forced the old side-by-side canvas. */
+.pnl-gnode {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius-xs, 6px);
+  background: var(--panel-2, #111c28);
+  color: var(--text, #e9f1f9);
+  font-family: inherit;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: text;
+  transition: border-color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1)), background-color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1)), box-shadow var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-gnode:hover { background: var(--panel-3, #162434); border-color: var(--dim-2, #8297ad); }
+.pnl-gnode.is-hover { background: var(--panel-3, #162434); }
+.pnl-gnode.is-path { border-color: color-mix(in srgb, var(--accent, #5fe3f0) 55%, transparent); }
+
+/* A row is one line: the whole task text is in the title attribute, so the row clips with an
+   ellipsis rather than wrapping into a shape the fixed row height cannot hold. */
+.pnl-gtitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--text, #e9f1f9);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pnl-gfoot {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.pnl-gmeta {
+  min-width: 0;
+  min-height: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10px;
+  line-height: 13px;
+  color: var(--dim-2, #8297ad);
+  font-variant-numeric: tabular-nums;
+}
+
+.pnl-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 64px;
+  padding: 1px 6px;
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--dim, #97abc0);
+  font-family: var(--sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  line-height: 13px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1)), border-color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1)), background-color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-chip.st-ok { color: var(--ok, #56e39f); border-color: color-mix(in srgb, var(--ok, #56e39f) 42%, transparent); }
+.pnl-chip.st-failed { color: var(--bad, #ff8a8a); border-color: color-mix(in srgb, var(--bad, #ff8a8a) 42%, transparent); }
+.pnl-chip.st-stale { color: var(--warn, #f3c969); border-color: color-mix(in srgb, var(--warn, #f3c969) 42%, transparent); }
+.pnl-chip.st-stopped { color: var(--dim, #97abc0); }
+.pnl-chip.st-other { color: var(--dim-2, #8297ad); border-style: dashed; }
+.pnl-chip.st-running {
+  color: var(--live, #7fe9f6);
+  border-color: color-mix(in srgb, var(--live, #7fe9f6) 45%, transparent);
+  background: color-mix(in srgb, var(--live, #7fe9f6) 10%, transparent);
+}
+
+/* The live run is the one thing in the panel allowed to move: an accent ring and a slow
+   pulse, both of which stop entirely when the person asked for less motion. */
+.pnl-gnode.st-running {
+  border-color: color-mix(in srgb, var(--accent, #5fe3f0) 62%, transparent);
+  animation: pnl-pulse 2.6s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}
+
+@keyframes pnl-pulse {
+  0%,
+  100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #5fe3f0) 55%, transparent); }
+  50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #5fe3f0) 55%, transparent), 0 0 0 5px color-mix(in srgb, var(--accent, #5fe3f0) 12%, transparent); }
+}
+
+.pnl-orphan {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  border: 1px solid color-mix(in srgb, var(--warn, #f3c969) 45%, transparent);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--panel-2, #111c28);
+  color: var(--warn, #f3c969);
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  line-height: 12px;
+  text-transform: uppercase;
+}
+
+.pnl-gnode.is-orphan .pnl-gtitle { padding-right: 32px; }
+
+/* The dot is the row's status light, so it is always on: in a one-line row it is the fastest
+   read of what the run did, and the chip that used to carry that at the bottom of a card now
+   sits beside it. */
+.pnl-gdot {
+  display: block;
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dim-2, #8297ad);
+  transition: background-color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-gnode.st-ok .pnl-gdot { background: var(--ok, #56e39f); }
+.pnl-gnode.st-running .pnl-gdot { background: var(--live, #7fe9f6); }
+.pnl-gnode.st-failed .pnl-gdot { background: var(--bad, #ff8a8a); }
+.pnl-gnode.st-stopped .pnl-gdot { background: var(--dim, #97abc0); }
+.pnl-gnode.st-stale .pnl-gdot { background: var(--warn, #f3c969); }
+
+/* Compact: the same row, tighter. The chip and the metadata are dropped rather than shrunk,
+   because a 34px row cannot hold them honestly. */
+.pnl-compact .pnl-gnode {
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.pnl-compact .pnl-gfoot { display: none; }
+.pnl-compact .pnl-gtitle {
+  font-size: 11.5px;
+  line-height: 1.25;
+}
+.pnl-compact .pnl-orphan { display: none; }
+.pnl-compact .pnl-gnode.is-orphan .pnl-gtitle { padding-right: 0; }
+.pnl-compact .pnl-gnode.is-orphan { border-style: dashed; border-color: color-mix(in srgb, var(--warn, #f3c969) 55%, transparent); }
+.pnl-compact .pnl-counts { display: none; }
+
+/* ------------------------------------------------------------------ files: crumbs and filter */
+
+.pnl-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10.5px;
+  color: var(--dim-2, #8297ad);
+}
+
+.pnl-crumb {
+  max-width: 180px;
+  padding: 1px 5px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs, 6px);
+  background: transparent;
+  color: var(--dim, #97abc0);
+  font: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1)), background-color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-crumb:hover { color: var(--text, #e9f1f9); background: var(--panel-2, #111c28); }
+.pnl-crumb.is-current { color: var(--text-2, #c4d4e4); }
+
+.pnl-crumb-sep { color: var(--line, #2b3b4b); }
+
+.pnl-filter-row { display: grid; gap: 4px; flex: 0 0 auto; }
+
+.pnl-filter {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--line, #2b3b4b);
+  border-radius: var(--radius-xs, 6px);
+  background: var(--bg-2, #0a111a);
+  color: var(--text, #e9f1f9);
+  font-family: var(--sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--t, 180ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-filter:hover { border-color: var(--dim-2, #8297ad); }
+.pnl-filter:focus { border-color: var(--accent, #5fe3f0); }
+
+.pnl-filter-note {
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 9.5px;
+  color: var(--warn, #f3c969);
+}
+
+/* ------------------------------------------------------------------ files: tree */
+
+.pnl-tree {
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: auto;
+  border-top: 1px solid var(--line-soft, #1a2734);
+  padding: 2px 0;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line, #2b3b4b) transparent;
+}
+
+.pnl-frow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 2px 8px 2px 0;
+  border-left: 2px solid transparent;
+  color: var(--text-2, #c4d4e4);
+  cursor: pointer;
+  transition: background-color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1)), color var(--t-fast, 150ms cubic-bezier(0.2, 0.7, 0.3, 1));
+}
+
+.pnl-frow:hover { background: var(--panel-2, #111c28); }
+.pnl-frow:focus { outline: none; }
+.pnl-frow:focus-visible {
+  outline: 2px solid var(--accent, #5fe3f0);
+  outline-offset: -2px;
+}
+.pnl-frow.is-selected {
+  background: var(--accent-soft, #0b2a33);
+  border-left-color: var(--accent, #5fe3f0);
+  color: var(--text, #e9f1f9);
+}
+
+.pnl-fchev {
+  flex: 0 0 12px;
+  width: 12px;
+  color: var(--dim-2, #8297ad);
+  font-size: 9px;
+  text-align: center;
+  line-height: 1;
+}
+
+.pnl-fname {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 11.5px;
+}
+
+.pnl-frow.is-dir .pnl-fname,
+.pnl-frow.is-root .pnl-fname { color: var(--text, #e9f1f9); }
+
+.pnl-hit {
+  padding: 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--warn, #f3c969) 26%, transparent);
+  color: inherit;
+}
+
+.pnl-flink {
+  flex: 0 0 auto;
+  padding: 0 4px;
+  border: 1px solid color-mix(in srgb, var(--powder, #b9d7f0) 40%, transparent);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--powder, #b9d7f0);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  line-height: 12px;
+  text-transform: uppercase;
+}
+
+.pnl-fmeta {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono, ui-monospace, "Cascadia Mono", Consolas, monospace);
+  font-size: 10px;
+  color: var(--dim-2, #8297ad);
+  font-variant-numeric: tabular-nums;
+}
+
+.pnl-fsize { width: 56px; text-align: right; }
+.pnl-ftime { width: 54px; text-align: right; }
+.pnl-frow.is-root .pnl-fmeta { width: auto; text-align: left; }
+
+.pnl-frow.is-busy .pnl-fname { opacity: 0.6; }
+
+.pnl-fnote {
+  padding: 3px 8px;
+  color: var(--dim-2, #8297ad);
+  font-size: 10.5px;
+  font-style: italic;
+}
+
+/* A tight panel drops the time column before it starts clipping names. */
+.pnl-files { container-type: inline-size; }
+
+@container (max-width: 260px) {
+  .pnl-files .pnl-ftime { display: none; }
+  .pnl-files .pnl-fsize { width: auto; }
+  .pnl-files .pnl-crumb { max-width: 110px; }
+}
+
+/* ------------------------------------------------------------------ motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .pnl-gnode.st-running { animation: none; }
+  .pnl-gnode,
+  .pnl-chip,
+  .pnl-frow,
+  .pnl-crumb,
+  .pnl-zbtn,
+  .pnl-btn,
+  .pnl-edge,
+  .pnl-gdot,
+  .pnl-filter { transition: none; }
+}
+
+/* ------------------------------------------------------------------ light theme */
+
+/* The panel is self-contained: flipping the attribute on any ancestor is enough, and a host
+   that publishes the same token names gets the same picture. Nothing below is a colour the
+   dark rules read directly - both themes run through the same custom properties. */
+[data-theme="light"] .pnl {
+  color-scheme: light;
+  --bg: #f4f2ec;
+  --bg-2: #eae7de;
+  --panel: #fbfaf6;
+  --panel-2: #f0ede5;
+  --panel-3: #e2ded2;
+  --line: #cbc4b2;
+  --line-soft: #e6e1d5;
+  --text: #0b262b;
+  --text-2: #1f4048;
+  --dim: #40606a;
+  --dim-2: #48656f;
+  --accent: #0a6f79;
+  --accent-2: #075a62;
+  --accent-soft: #dceff0;
+  --powder: #2c5f86;
+  --ok: #0f6b46;
+  --warn: #7a5606;
+  --bad: #a3282f;
+  --live: #0a6f79;
+}

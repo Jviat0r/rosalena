@@ -1,0 +1,114 @@
+/* Palettes: the colour family under the theme (Settings > account panel > Palette).
+ *
+ * `data-theme` still decides dark or light (or follows the OS on "auto"); `data-palette`
+ * decides which dark and which light. Petrol is the original palette and has no rules
+ * here, so it falls through to styles.css untouched. The accent (data-accent) is separate
+ * and works on every palette. Only surface and text tokens are set: lines are worked out
+ * from them in refine.css, so every palette gets the same soft edges.
+ */
+
+/* ------------------------------------------------------------------ midnight: neutral near-black */
+html[data-palette="midnight"] {
+  --bg: #0d0e10; --bg-2: #111215; --panel: #16171a; --panel-2: #1b1c20; --panel-3: #222328;
+  --text: #ececee; --text-2: #c9c9ce; --dim: #9a9aa3; --dim-2: #82828b;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #16171a);
+}
+html[data-palette="midnight"][data-theme="light"] {
+  --bg: #fafafa; --bg-2: #f3f3f4; --panel: #ffffff; --panel-2: #f4f4f5; --panel-3: #ebebed;
+  --text: #18181b; --text-2: #3f3f46; --dim: #5f5f69; --dim-2: #6b6b75;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #ffffff);
+}
+
+/* ------------------------------------------------------------------ graphite: soft grey */
+html[data-palette="graphite"] {
+  --bg: #17181b; --bg-2: #1c1d21; --panel: #222328; --panel-2: #282a30; --panel-3: #30323a;
+  --text: #e8e9ec; --text-2: #c4c6cc; --dim: #a0a3ab; --dim-2: #888c95;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #222328);
+}
+html[data-palette="graphite"][data-theme="light"] {
+  --bg: #eef0f2; --bg-2: #e6e8eb; --panel: #f8f9fa; --panel-2: #eceef1; --panel-3: #e1e4e8;
+  --text: #1b1e23; --text-2: #3a3f47; --dim: #555c67; --dim-2: #646b76;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #f8f9fa);
+}
+
+/* ------------------------------------------------------------------ nord: arctic blue-grey */
+html[data-palette="nord"] {
+  --bg: #242933; --bg-2: #2a303b; --panel: #2e3440; --panel-2: #343b48; --panel-3: #3b4252;
+  --text: #eceff4; --text-2: #d8dee9; --dim: #aab3c3; --dim-2: #96a0b2;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #2e3440);
+}
+html[data-palette="nord"][data-theme="light"] {
+  --bg: #eceff4; --bg-2: #e5e9f0; --panel: #f7f9fc; --panel-2: #e9edf3; --panel-3: #dfe4ec;
+  --text: #2e3440; --text-2: #3b4252; --dim: #4c566a; --dim-2: #586377;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #f7f9fc);
+}
+
+/* ------------------------------------------------------------------ dusk: deep violet */
+html[data-palette="dusk"] {
+  --bg: #14111f; --bg-2: #191527; --panel: #1f1a30; --panel-2: #262039; --panel-3: #2e2744;
+  --text: #efeaff; --text-2: #d3cbea; --dim: #aca2c7; --dim-2: #958bb1;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #1f1a30);
+}
+html[data-palette="dusk"][data-theme="light"] {
+  --bg: #f6f3fc; --bg-2: #efeaf8; --panel: #fdfcff; --panel-2: #f1ecfa; --panel-3: #e7e0f5;
+  --text: #221a35; --text-2: #3c3254; --dim: #5a5075; --dim-2: #685e83;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #fdfcff);
+}
+
+/* ------------------------------------------------------------------ forest: pine green */
+html[data-palette="forest"] {
+  --bg: #0f1a15; --bg-2: #13201a; --panel: #182820; --panel-2: #1d3027; --panel-3: #24392f;
+  --text: #e9f4ee; --text-2: #c7dccf; --dim: #a0bbab; --dim-2: #8aa695;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #182820);
+}
+html[data-palette="forest"][data-theme="light"] {
+  --bg: #f2f6f2; --bg-2: #e9f0ea; --panel: #fbfdfb; --panel-2: #edf3ee; --panel-3: #e1eae3;
+  --text: #14261c; --text-2: #2c4236; --dim: #485f51; --dim-2: #566e60;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #fbfdfb);
+}
+
+/* ------------------------------------------------------------------ mocha: warm brown */
+html[data-palette="mocha"] {
+  --bg: #1a1614; --bg-2: #201b18; --panel: #26201c; --panel-2: #2d2621; --panel-3: #362d27;
+  --text: #f3ece6; --text-2: #dbcfc5; --dim: #b5a699; --dim-2: #9e8f82;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, #26201c);
+}
+html[data-palette="mocha"][data-theme="light"] {
+  --bg: #f7f2ec; --bg-2: #f0e9e0; --panel: #fdfaf6; --panel-2: #f2ebe2; --panel-3: #e8dfd3;
+  --text: #2a211b; --text-2: #46392f; --dim: #625346; --dim-2: #706153;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, #fdfaf6);
+}
+
+/* "auto" follows the operating system: the light sets above, when it asks for light. */
+@media (prefers-color-scheme: light) {
+  html[data-palette="midnight"][data-theme="auto"] {
+    --bg: #fafafa; --bg-2: #f3f3f4; --panel: #ffffff; --panel-2: #f4f4f5; --panel-3: #ebebed;
+    --text: #18181b; --text-2: #3f3f46; --dim: #5f5f69; --dim-2: #6b6b75;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #ffffff);
+  }
+  html[data-palette="graphite"][data-theme="auto"] {
+    --bg: #eef0f2; --bg-2: #e6e8eb; --panel: #f8f9fa; --panel-2: #eceef1; --panel-3: #e1e4e8;
+    --text: #1b1e23; --text-2: #3a3f47; --dim: #555c67; --dim-2: #646b76;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #f8f9fa);
+  }
+  html[data-palette="nord"][data-theme="auto"] {
+    --bg: #eceff4; --bg-2: #e5e9f0; --panel: #f7f9fc; --panel-2: #e9edf3; --panel-3: #dfe4ec;
+    --text: #2e3440; --text-2: #3b4252; --dim: #4c566a; --dim-2: #586377;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #f7f9fc);
+  }
+  html[data-palette="dusk"][data-theme="auto"] {
+    --bg: #f6f3fc; --bg-2: #efeaf8; --panel: #fdfcff; --panel-2: #f1ecfa; --panel-3: #e7e0f5;
+    --text: #221a35; --text-2: #3c3254; --dim: #5a5075; --dim-2: #685e83;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #fdfcff);
+  }
+  html[data-palette="forest"][data-theme="auto"] {
+    --bg: #f2f6f2; --bg-2: #e9f0ea; --panel: #fbfdfb; --panel-2: #edf3ee; --panel-3: #e1eae3;
+    --text: #14261c; --text-2: #2c4236; --dim: #485f51; --dim-2: #566e60;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #fbfdfb);
+  }
+  html[data-palette="mocha"][data-theme="auto"] {
+    --bg: #f7f2ec; --bg-2: #f0e9e0; --panel: #fdfaf6; --panel-2: #f2ebe2; --panel-3: #e8dfd3;
+    --text: #2a211b; --text-2: #46392f; --dim: #625346; --dim-2: #706153;
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, #fdfaf6);
+  }
+}

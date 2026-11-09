@@ -1,0 +1,13 @@
+{
+  "id": "rosa-world-architecture-3d",
+  "version": "1.0.0",
+  "description": "Famous landmarks rebuilt to scale in 3D: the Eiffel Tower, the Great Wall, the Hall of Supreme Harmony and the Colosseum, with fact sheets and day, dusk and night lighting.",
+  "bundled": true,
+  "ui": {
+    "title": "World Architecture 3D",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "chat.compose"],
+    "libs": ["three"]
+  }
+}

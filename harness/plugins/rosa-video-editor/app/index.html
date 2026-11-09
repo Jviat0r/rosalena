@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Editor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2.5" /><path class="fill" d="M10.5 7.6v4.8l3.9-2.4z" /><path d="M3 20h4M9 20h6M17 20h4" /></svg>
+        <span>Video Editor</span>
+      </div>
+      <input id="projectName" class="project-name" aria-label="Project name" spellcheck="false" maxlength="80" />
+      <span class="save-state" id="saveState" aria-live="polite"></span>
+      <div class="grow"></div>
+      <label class="select-wrap" title="Canvas shape">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2" /></svg>
+        <select id="aspect" aria-label="Canvas shape">
+          <option value="16:9">Landscape 16:9</option>
+          <option value="9:16">Vertical 9:16</option>
+          <option value="1:1">Square 1:1</option>
+        </select>
+      </label>
+      <div class="btn-group">
+        <button class="icon-btn" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></svg></button>
+        <button class="icon-btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" /></svg></button>
+      </div>
+      <button class="btn ghost" id="newBtn" title="Start a new, empty project">New</button>
+      <button class="btn" id="frameBtn" title="Save the frame under the playhead as a PNG">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="m21 16-5-5-8 8" /></svg>
+        Export frame
+      </button>
+      <button class="btn primary" id="exportBtn" title="Render the whole sequence to a WebM video (Ctrl+E)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11" /><path d="m7 10 5 5 5-5" /><path d="M5 20h14" /></svg>
+        Export video
+      </button>
+    </header>
+
+    <main class="workspace">
+      <section class="panel bin" id="bin" aria-label="Media bin">
+        <div class="panel-head">
+          <h2>Media</h2>
+          <span class="count" id="binCount"></span>
+          <div class="grow"></div>
+          <button class="btn small" id="importBtn" title="Import video, image or audio files">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            Import
+          </button>
+        </div>
+        <input type="file" id="fileInput" multiple accept="video/*,image/*,audio/*" hidden />
+        <input type="file" id="relinkInput" accept="video/*,image/*,audio/*" hidden />
+        <div class="bin-body" id="binBody">
+          <div class="bin-empty" id="binEmpty">
+            <div class="drop-art" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <rect class="a" x="10" y="14" width="34" height="26" rx="4" />
+                <rect class="b" x="20" y="24" width="34" height="26" rx="4" />
+                <path class="c" d="M33 32.5v9l7.5-4.5z" />
+              </svg>
+            </div>
+            <p class="lead">Drop files here</p>
+            <p class="sub">Video (MP4, WebM, MOV), images (PNG, JPG, WebP) and audio (MP3, WAV, M4A)</p>
+            <div class="row">
+              <button class="btn small" id="binImport">Browse files</button>
+              <button class="btn small ghost" id="binSample">Try a sample</button>
+            </div>
+          </div>
+          <div class="bin-grid" id="binGrid"></div>
+          <div class="bin-busy" id="binBusy" hidden><span class="spinner"></span><span id="binBusyText">Importing</span></div>
+        </div>
+      </section>
+
+      <section class="viewer" aria-label="Preview">
+        <div class="stage" id="stage">
+          <canvas id="preview" width="1280" height="720" aria-label="Sequence preview"></canvas>
+          <div class="stage-badge" id="stageBadge" hidden></div>
+          <div class="stage-empty" id="stageEmpty">
+            <div class="hero-art" aria-hidden="true">
+              <svg viewBox="0 0 120 84">
+                <rect class="frame" x="6" y="6" width="108" height="64" rx="8" />
+                <rect class="strip s1" x="6" y="76" width="30" height="6" rx="3" />
+                <rect class="strip s2" x="40" y="76" width="44" height="6" rx="3" />
+                <rect class="strip s3" x="88" y="76" width="26" height="6" rx="3" />
+                <circle class="glow" cx="60" cy="38" r="17" />
+                <path class="play" d="M55 29v18l14-9z" />
+              </svg>
+            </div>
+            <h1 id="stageTitle">Start your edit</h1>
+            <p id="stageText">Import video, images and music, then drag them onto the timeline. Everything stays on this computer.</p>
+            <div class="row" id="stageActions">
+              <button class="btn primary" id="stageImport">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                Import media
+              </button>
+              <button class="btn" id="stageSample">Try a sample project</button>
+            </div>
+            <p class="hint">or drop files anywhere in this window</p>
+          </div>
+        </div>
+        <div class="transport">
+          <div class="tc" title="Playhead / sequence length">
+            <span id="tcNow">00:00:00</span><span class="sep">/</span><span id="tcTotal" class="dim">00:00:00</span>
+          </div>
+          <div class="transport-buttons">
+            <button class="icon-btn" id="tStart" title="Go to start (Home)" aria-label="Go to start"><svg viewBox="0 0 24 24"><path d="M6 5v14" /><path class="fill" d="M19 6v12l-9-6z" /></svg></button>
+            <button class="icon-btn" id="tBack" title="Back one frame (Left arrow)" aria-label="Back one frame"><svg viewBox="0 0 24 24"><path d="m14 7-5 5 5 5" /></svg></button>
+            <button class="play-btn" id="tPlay" title="Play / pause (Space)" aria-label="Play">
+              <svg class="i-play" viewBox="0 0 24 24"><path class="fill" d="M8 5.5v13l11-6.5z" /></svg>
+              <svg class="i-pause" viewBox="0 0 24 24"><path class="fill" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /></svg>
+            </button>
+            <button class="icon-btn" id="tFwd" title="Forward one frame (Right arrow)" aria-label="Forward one frame"><svg viewBox="0 0 24 24"><path d="m10 7 5 5-5 5" /></svg></button>
+            <button class="icon-btn" id="tEnd" title="Go to end (End)" aria-label="Go to end"><svg viewBox="0 0 24 24"><path d="M18 5v14" /><path class="fill" d="M5 6v12l9-6z" /></svg></button>
+          </div>
+          <div class="transport-right">
+            <span class="rate" id="rate" hidden></span>
+            <span class="canvas-size" id="canvasSize">1280 x 720</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel inspector" id="inspector" aria-label="Inspector"></aside>
+    </main>
+
+    <section class="timeline" id="timeline" aria-label="Timeline">
+      <div class="tl-toolbar">
+        <button class="btn small" id="addTitleBtn" title="Add a title at the playhead (T)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M12 6v13" /></svg>
+          Title
+        </button>
+        <span class="tb-sep"></span>
+        <button class="icon-btn" id="splitBtn" title="Split at the playhead (S)" aria-label="Split at the playhead"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.6" /><circle cx="6" cy="17" r="2.6" /><path d="M8.2 8.4 19 17M8.2 15.6 19 7" /></svg></button>
+        <button class="icon-btn" id="deleteBtn" title="Delete the selected clip (Del)" aria-label="Delete the selected clip"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" /></svg></button>
+        <span class="tb-sep"></span>
+        <button class="toggle" id="snapBtn" title="Snap to clip edges and the playhead (N)" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v7a5 5 0 0 0 10 0V4" /><path d="M7 4h3M14 4h3" /></svg>
+          Snap
+        </button>
+        <div class="grow"></div>
+        <span class="tl-info" id="tlInfo"></span>
+        <div class="zoom">
+          <button class="icon-btn" id="zoomOut" title="Zoom out (-)" aria-label="Zoom out"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" /><path d="M8.5 11h5M16 16l4 4" /></svg></button>
+          <input type="range" id="zoomRange" min="0" max="100" step="0.5" aria-label="Timeline zoom" />
+          <button class="icon-btn" id="zoomIn" title="Zoom in (+)" aria-label="Zoom in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" /><path d="M8.5 11h5M11 8.5v5M16 16l4 4" /></svg></button>
+          <button class="btn small ghost" id="zoomFit" title="Fit the sequence (\)">Fit</button>
+        </div>
+      </div>
+      <div class="tl-body">
+        <div class="tl-heads">
+          <div class="tl-head-ruler"></div>
+          <div class="tl-head" data-track="text">
+            <span class="tag t">T1</span><span class="name">Titles</span>
+          </div>
+          <div class="tl-head" data-track="video">
+            <span class="tag v">V1</span><span class="name">Video</span>
+            <button class="mute" id="muteVideo" title="Mute the sound of video clips" aria-pressed="false" aria-label="Mute video sound"><svg viewBox="0 0 24 24"><path class="fill" d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" /><path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /><path class="off" d="m16 9.5 5 5M21 9.5l-5 5" /></svg></button>
+          </div>
+          <div class="tl-head" data-track="audio">
+            <span class="tag a">A1</span><span class="name">Audio</span>
+            <button class="mute" id="muteAudio" title="Mute the audio track" aria-pressed="false" aria-label="Mute audio track"><svg viewBox="0 0 24 24"><path class="fill" d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" /><path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /><path class="off" d="m16 9.5 5 5M21 9.5l-5 5" /></svg></button>
+          </div>
+        </div>
+        <div class="tl-scroll" id="tlScroll">
+          <div class="tl-content" id="tlContent">
+            <canvas class="tl-ruler" id="tlRuler" height="26"></canvas>
+            <div class="tl-track" data-track="text"><div class="tl-hint">Titles go here. Press T to add one at the playhead</div></div>
+            <div class="tl-track" data-track="video"><div class="tl-hint">Drag video clips and images here</div></div>
+            <div class="tl-track" data-track="audio"><div class="tl-hint">Drop music or a voice-over here</div></div>
+            <div class="tl-insert" id="tlInsert" hidden></div>
+            <div class="tl-snap" id="tlSnap" hidden></div>
+            <div class="tl-ghost" id="tlGhost" hidden></div>
+            <div class="tl-playhead" id="tlPlayhead"><div class="cap"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="drop-overlay" id="dropOverlay" hidden>
+      <div class="drop-card">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11" /><path d="m7 10 5 5 5-5" /><path d="M5 20h14" /></svg>
+        <span>Drop to import</span>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <h2 id="modalTitle"></h2>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions" id="modalActions"></div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="/plugin-sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

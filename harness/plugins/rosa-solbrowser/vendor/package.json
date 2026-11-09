@@ -1,0 +1,24 @@
+{
+  "name": "solbrowser",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Frame-aware browser control for AI agents: Chrome MV3 extension + Node MCP server",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "fixtures": "node selftest/serve-fixtures.js",
+    "selftest": "node selftest/run.js",
+    "check": "node selftest/check.js",
+    "test": "node selftest/check.js && node selftest/run.js mock",
+    "e2e": "node selftest/e2e/run.js",
+    "bench": "node selftest/bench.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ws": "^8.18.0",
+    "zod": "^4.6.7"
+  }
+}

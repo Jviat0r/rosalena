@@ -1,0 +1,10 @@
+{
+  "id": "rosa-nested-instructions",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Loads a subfolder's own AGENTS.md / CLAUDE.md the first time the run touches a file there",
+  "config": {
+    "maxChars": 4000
+  }
+}

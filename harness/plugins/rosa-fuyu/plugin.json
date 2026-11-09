@@ -1,0 +1,13 @@
+{
+  "id": "rosa-fuyu",
+  "version": "1.0.0",
+  "bundled": true,
+  "description": "A cozy voxel island sandbox: build with ten block types, auto-build little houses, and watch the day turn to lantern-lit night.",
+  "ui": {
+    "title": "Fuyu",
+    "icon": "icon.svg",
+    "page": "app/index.html",
+    "permissions": ["storage", "files.save"],
+    "libs": ["three"]
+  }
+}

@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="rosalena-token" content="__ROSALENA_TOKEN__" />
+    <title>VPN exits - Rosalena</title>
+    <!-- The theme choice is applied before the body paints, so a light-theme person
+         does not get a dark flash on the way in. Same key as the chat page; this
+         page owns no theme of its own. -->
+    <script>
+      try {
+        const saved = localStorage.getItem("rosalena-theme");
+        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+      } catch {}
+    </script>
+    <style>
+      /* Self-contained on purpose: one file, no stylesheet request, no build step.
+         The tokens below are the palette the other standalone page (network.html)
+         copied from the chat page, copied again verbatim - a third colour scheme
+         would be a bug, so this block is a copy and not a redesign. */
+      :root {
+        color-scheme: dark;
+        --bg: #0e1116;
+        --bg-2: #12161d;
+        --panel: #161b23;
+        --panel-2: #1b212b;
+        --panel-3: #222a36;
+        --line: #262f3d;
+        --line-soft: #1e252f;
+        --text: #e6edf6;
+        --text-2: #b8c4d4;
+        --dim: #8593a6;
+        --dim-2: #64748b;
+        --accent: #6ea8fe;
+        --accent-2: #4f8ef7;
+        --accent-soft: #16283f;
+        --ok: #4ade80;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+        --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+      }
+      html[data-theme="light"] {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --bg-2: #eef1f5;
+        --panel: #ffffff;
+        --panel-2: #f4f6f9;
+        --panel-3: #e9edf3;
+        --line: #d9e0ea;
+        --line-soft: #e6ebf2;
+        --text: #16202c;
+        --text-2: #3c4a5a;
+        --dim: #5f6f80;
+        --dim-2: #8695a6;
+        --accent: #1f6feb;
+        --accent-2: #1a60d0;
+        --accent-soft: #e7effd;
+        --ok: #17803d;
+        --warn: #a16207;
+        --bad: #b42318;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+      .wrap { max-width: 880px; margin: 0 auto; padding: 24px 20px 80px; }
+      a { color: var(--accent); }
+
+      .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+      .head h1 { font-size: 19px; margin: 0; letter-spacing: -0.01em; }
+      .back { color: var(--dim); text-decoration: none; font-size: 13px; border: 1px solid var(--line);
+              padding: 4px 10px; border-radius: 999px; }
+      .back:hover { color: var(--text); border-color: var(--accent); }
+      .badge { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line);
+               color: var(--dim); font-family: var(--mono); }
+      .badge.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+      .badge.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+      .badge.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+      .meta { margin-left: auto; color: var(--dim); font-size: 12px; font-family: var(--mono); }
+
+      .lede { color: var(--dim); font-size: 12.5px; line-height: 1.55; margin: 10px 0 18px;
+              border-left: 2px solid var(--line); padding-left: 10px; }
+      .lede b { color: var(--text-2); font-weight: 600; }
+
+      .headline { font-family: var(--serif); font-weight: 500; font-size: 26px; line-height: 1.25;
+                  margin: 0 0 2px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+      .headline.off { color: var(--dim); }
+      .detail { color: var(--dim); font-size: 12.5px; margin: 0 0 14px; font-family: var(--mono); overflow-wrap: anywhere; }
+
+      .status { margin: 0 0 16px; min-height: 1.2em; font-size: 13px; line-height: 1.5;
+                border-left: 2px solid var(--line); padding: 2px 0 2px 10px; color: var(--dim); }
+      .status.ok { border-left-color: var(--ok); color: var(--text-2); }
+      .status.bad { border-left-color: var(--bad); color: var(--text); }
+      .status.busy { border-left-color: var(--warn); color: var(--text-2); }
+
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }
+      .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim);
+                 margin: 0 0 10px; font-weight: 600; }
+      .card p { margin: 0; }
+
+      /* One card per client. The dot is the state, the switch is the action, and the
+         path is always printed: "not installed" is only useful with "where I looked". */
+      .exit-card { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: start; }
+      .exit-main { min-width: 0; }
+      .exit-head { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+      .exit-head h2 { margin: 0; font-size: 15px; text-transform: none; letter-spacing: -0.01em; color: var(--text); font-weight: 600; }
+      .exit-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--panel-3); border: 1px solid var(--line); flex: 0 0 auto; }
+      .exit-dot.on { background: var(--ok); border-color: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 18%, transparent); }
+      .exit-dot.off { background: var(--panel-3); }
+      .exit-dot.unknown { background: var(--warn); border-color: var(--warn); }
+      .exit-state { font-family: var(--mono); font-size: 12.5px; color: var(--text-2); margin: 2px 0 0; overflow-wrap: anywhere; }
+      .exit-path { font-family: var(--mono); font-size: 11.5px; color: var(--dim); margin: 6px 0 0; overflow-wrap: anywhere; }
+      .exit-path.missing { color: var(--bad); }
+      .exit-path.unknown { color: var(--warn); }
+      .exit-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+      .exit-note { grid-column: 1 / -1; font-size: 12px; color: var(--dim); margin: 2px 0 0; }
+      .exit-note.warn { color: var(--warn); }
+
+      /* The switch: a real button with role="switch", so space and enter work and a
+         screen reader reads the state rather than the colour. */
+      .exit-switch { position: relative; width: 40px; height: 23px; border-radius: 999px; padding: 0;
+                     background: var(--panel-3); border: 1px solid var(--line); cursor: pointer; flex: 0 0 auto; }
+      .exit-switch:disabled { opacity: 0.5; cursor: default; }
+      .exit-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .exit-knob { position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%;
+                   background: var(--dim); transition: transform 120ms ease, background 120ms ease; display: block; }
+      .exit-switch[aria-checked="true"] { background: color-mix(in srgb, var(--ok) 30%, var(--panel-3));
+                                          border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+      .exit-switch[aria-checked="true"] .exit-knob { transform: translateX(17px); background: var(--ok); }
+      .exit-switch[aria-busy="true"] .exit-knob { opacity: 0.6; }
+
+      .btn { font: inherit; font-size: 12.5px; color: var(--text-2); background: var(--panel-2);
+             border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+      .btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+      .btn:disabled { color: var(--dim-2); cursor: default; opacity: 0.75; }
+      .btn.primary { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); }
+      .btn.ghost { background: transparent; }
+      .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+      .steps { margin: 10px 0 0; padding: 0; list-style: none; font-family: var(--mono); font-size: 11.5px; color: var(--dim); }
+      .steps li { padding: 3px 0 3px 18px; position: relative; overflow-wrap: anywhere; border-top: 1px solid var(--line-soft); }
+      .steps li:first-child { border-top: 0; }
+      .steps li::before { position: absolute; left: 0; }
+      .steps li.ok::before { content: "ok"; color: var(--ok); }
+      .steps li.bad::before { content: "no"; color: var(--bad); }
+
+      .empty { color: var(--dim); font-size: 13px; line-height: 1.6; margin: 2px 0 0; }
+      .empty b { color: var(--text-2); font-weight: 600; }
+      .errors { margin: 10px 0 0; padding-left: 18px; color: var(--dim); font-size: 12px; font-family: var(--mono); }
+      .errors li { margin: 2px 0; overflow-wrap: anywhere; }
+      .hint { color: var(--dim); font-size: 12px; margin: 8px 0 0; }
+
+      .foot { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line);
+              display: flex; gap: 16px; flex-wrap: wrap; align-items: baseline;
+              color: var(--dim); font-size: 12.5px; }
+      .foot a { color: var(--dim); text-decoration: none; }
+      .foot a:hover { color: var(--text); }
+      .foot .why { margin-left: auto; color: var(--dim-2); font-size: 11.5px; }
+      @media (max-width: 640px) {
+        .meta { margin-left: 0; }
+        .headline { font-size: 21px; }
+        .exit-card { grid-template-columns: 1fr; }
+        .exit-actions { flex-direction: row; align-items: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <a class="back" href="/">&larr; Chats</a>
+        <h1>VPN exits</h1>
+        <span class="badge" id="badge">checking</span>
+        <button class="btn ghost" id="refresh" type="button">Refresh</button>
+        <span class="meta" id="meta"></span>
+      </header>
+
+      <p class="lede">
+        Two clients, <b>one at a time</b>. Turning one on turns the other off first,
+        because two VPN clients sharing the default route is a broken network rather
+        than a faster one. A client is started detached, so closing the harness does
+        not close it, and a client is stopped by the exact process, never by name and
+        never by wildcard. Everything below is read from <b>tasklist</b>: when that
+        cannot answer, the state says <b>unknown</b> and never "off".
+      </p>
+
+      <h2 class="headline" id="headline">Checking&hellip;</h2>
+      <p class="detail" id="detail"></p>
+      <p class="status" id="status" role="status" aria-live="polite">Nothing has been changed from this page yet.</p>
+
+      <!-- Drawn only when this machine cannot do it at all: another platform, or no
+           client installed anywhere the plugin looks. A deliberate panel, not an
+           error, because nothing on the page is broken. -->
+      <section class="card" id="notice" hidden>
+        <h2 id="notice-title">VPN exits are not available here</h2>
+        <p class="empty" id="notice-text"></p>
+        <ul class="errors" id="notice-errors" hidden></ul>
+      </section>
+
+      <div id="cards"></div>
+
+      <ul class="steps" id="steps" hidden></ul>
+
+      <p class="errors" id="errors" hidden></p>
+
+      <footer class="foot">
+        <a href="/">&#9673; Rosalena harness</a>
+        <a href="/monitor">&#9673; Local model monitor</a>
+        <a href="/network">&#9673; Wi-Fi</a>
+        <span class="why">Clients only, never services. Windows only.</span>
+      </footer>
+    </div>
+
+    <script type="module">
+      // The page is the same shape as the Wi-Fi page: read the state, draw it, and
+      // only draw a change after the plugin has confirmed it. No optimistic
+      // switches - a switch that flips before the process table agrees is a lie
+      // that lasts until the next poll.
+      const token = document.querySelector('meta[name="rosalena-token"]')?.content ?? "";
+      const $ = (id) => document.getElementById(id);
+
+      const els = {
+        badge: $("badge"),
+        meta: $("meta"),
+        headline: $("headline"),
+        detail: $("detail"),
+        status: $("status"),
+        notice: $("notice"),
+        noticeTitle: $("notice-title"),
+        noticeText: $("notice-text"),
+        noticeErrors: $("notice-errors"),
+        cards: $("cards"),
+        steps: $("steps"),
+        errors: $("errors"),
+        refresh: $("refresh"),
+      };
+
+      let state = null;
+      let busy = false;
+      let lastPolled = 0;
+
+      // 15 s: the sidebar calls the same endpoint on the same cadence, and this
+      // endpoint only lists processes, so a poll costs two tasklist reads.
+      const POLL_MS = 15_000;
+
+      const bytes = (size) => {
+        const value = Number(size);
+        if (size === null || size === undefined || !Number.isFinite(value)) return "size not reported";
+        if (value >= 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+        if (value >= 1024) return `${(value / 1024).toFixed(1)} KB`;
+        return `${value} B`;
+      };
+
+      const clock = (at) => {
+        const when = new Date(Number(at) || Date.now());
+        return when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      };
+
+      const pids = (list) => (list.length === 1 ? `pid ${list[0]}` : `pids ${list.join(", ")}`);
+
+      function setStatus(text, kind) {
+        els.status.textContent = text;
+        els.status.className = `status${kind ? ` ${kind}` : ""}`;
+      }
+
+      function drawSteps(steps) {
+        els.steps.textContent = "";
+        if (!steps || !steps.length) {
+          els.steps.hidden = true;
+          return;
+        }
+        for (const step of steps) {
+          const li = document.createElement("li");
+          li.className = step.ok ? "ok" : "bad";
+          li.textContent = step.detail ? `${step.command} - ${step.detail}` : step.command;
+          els.steps.append(li);
+        }
+        els.steps.hidden = false;
+      }
+
+      function stateWord(entry) {
+        if (entry.running === true) return `running - ${entry.pids.length === 1 ? "1 process" : `${entry.pids.length} processes`} (${pids(entry.pids)})`;
+        if (entry.running === false) return `not running - tasklist lists no ${entry.image}`;
+        return "unknown - the process list could not be read, so this is not off";
+      }
+
+      function dotClass(entry) {
+        if (entry.running === true) return "on";
+        if (entry.running === false) return "off";
+        return "unknown";
+      }
+
+      function pathLine(entry) {
+        if (entry.installed === true) return { text: `installed at ${entry.path} (${bytes(entry.size)})`, cls: "" };
+        if (entry.installed === false) return { text: `not installed - looked in ${(entry.searched || []).join(", ")}`, cls: "missing" };
+        return { text: `install not checked - looked in ${(entry.searched || []).join(", ")}`, cls: "unknown" };
+      }
+
+      /** True when a request may be made about this entry at all, and why not if not. */
+      function blockedReason(entry, others) {
+        if (entry.installed === false) return `${entry.label} is not installed`;
+        if (entry.running === null) return `${entry.label}'s state is unknown`;
+        return "";
+      }
+
+      function drawCard(entry, others) {
+        const card = document.createElement("section");
+        card.className = "card exit-card";
+        card.dataset.provider = entry.id;
+
+        const main = document.createElement("div");
+        main.className = "exit-main";
+
+        const head = document.createElement("div");
+        head.className = "exit-head";
+        const dot = document.createElement("span");
+        dot.className = `exit-dot ${dotClass(entry)}`;
+        dot.setAttribute("aria-hidden", "true");
+        const name = document.createElement("h2");
+        name.textContent = entry.label;
+        head.append(dot, name);
+
+        const stateEl = document.createElement("p");
+        stateEl.className = "exit-state";
+        stateEl.textContent = stateWord(entry);
+
+        const path = pathLine(entry);
+        const pathEl = document.createElement("p");
+        pathEl.className = `exit-path${path.cls ? ` ${path.cls}` : ""}`;
+        pathEl.textContent = path.text;
+
+        main.append(head, stateEl, pathEl);
+
+        const actions = document.createElement("div");
+        actions.className = "exit-actions";
+
+        const reason = blockedReason(entry, others);
+        const sw = document.createElement("button");
+        sw.type = "button";
+        sw.className = "exit-switch";
+        sw.setAttribute("role", "switch");
+        sw.setAttribute("aria-checked", entry.running === true ? "true" : "false");
+        sw.setAttribute("aria-label", `Turn ${entry.label} ${entry.running === true ? "off" : "on"}`);
+        sw.title = reason || (entry.running === true ? `Turn ${entry.label} off` : `Turn ${entry.label} on`);
+        sw.disabled = busy || Boolean(reason);
+        sw.dataset.action = "toggle";
+        sw.dataset.provider = entry.id;
+        sw.dataset.on = entry.running === true ? "false" : "true";
+        const knob = document.createElement("span");
+        knob.className = "exit-knob";
+        sw.append(knob);
+
+        const rotate = document.createElement("button");
+        rotate.type = "button";
+        rotate.className = "btn primary";
+        rotate.textContent = "Rotate to the other exit";
+        rotate.dataset.action = "rotate";
+        rotate.dataset.provider = entry.id;
+        const other = others.find((candidate) => candidate.id !== entry.id) ?? null;
+        const canRotate = !busy && entry.running === true && other !== null && other.running === false && other.installed !== false;
+        rotate.disabled = !canRotate;
+        if (entry.running === true) {
+          rotate.title = `Stop ${entry.label} first, then start ${other?.label ?? "the other client"}`;
+        } else if (other?.running === true) {
+          rotate.title = `${entry.label} is not the active exit - rotate from ${other.label} instead`;
+        } else {
+          rotate.title = "No exit is up to rotate away from - turn one on";
+        }
+
+        actions.append(sw, rotate);
+
+        card.append(main, actions);
+
+        if (entry.error) {
+          const note = document.createElement("p");
+          note.className = "exit-note warn";
+          note.textContent = entry.error;
+          card.append(note);
+        }
+        return card;
+      }
+
+      function draw() {
+        if (!state) return;
+        els.badge.textContent = busy ? "working" : state.unknown ? "unknown" : state.conflict ? "conflict" : state.supported === false ? "unsupported" : "live";
+        els.badge.className = `badge ${busy ? "warn" : state.unknown || state.supported === false ? "warn" : state.conflict ? "bad" : "ok"}`;
+
+        const running = (state.providers || []).filter((entry) => entry.running === true);
+        let headline;
+        let kind = "";
+        if (state.supported === false) {
+          headline = "VPN exits are Windows only";
+        } else if (state.unknown) {
+          headline = "Which exit is up: unknown";
+          kind = "warn";
+        } else if (state.conflict) {
+          headline = `Both ${running.map((entry) => entry.label).join(" and ")} are running`;
+          kind = "bad";
+        } else if (running.length === 1) {
+          headline = `${running[0].label} is the exit`;
+        } else {
+          headline = "No exit is up";
+          kind = "off";
+        }
+        els.headline.textContent = headline;
+        els.headline.className = `headline${kind ? ` ${kind}` : ""}`;
+        // Not "off means no VPN": a client is not a tunnel.
+        els.detail.textContent = `${running.length ? `${running[0]?.label ?? "a client"} client is running` : "no client is running"} - checked ${clock(state.at)}${
+          state.how ? ` via ${state.how}` : ""
+        }${state.supported === false ? "" : "; a closed client does not prove the tunnel is down"}`;
+
+        els.cards.textContent = "";
+        for (const entry of state.providers || []) {
+          els.cards.append(drawCard(entry, state.providers || []));
+        }
+
+        // The one place the page states what it cannot do, in the words the plugin
+        // used, so nothing is softened on the way out.
+        const noneInstalled =
+          state.supported !== false && (state.providers || []).length > 0 && (state.providers || []).every((entry) => entry.installed === false);
+        els.notice.hidden = state.supported !== false && !noneInstalled;
+        if (state.supported === false) {
+          els.noticeTitle.textContent = "VPN exits are not available here";
+          els.noticeText.textContent = state.note || "This machine cannot list or start VPN clients from here.";
+          els.noticeErrors.textContent = "";
+          els.noticeErrors.hidden = true;
+        } else if (noneInstalled) {
+          // Nothing to switch on this PC: say which clients are supported, not "off".
+          els.noticeTitle.textContent = "No supported VPN client is installed on this PC";
+          els.noticeText.textContent = `Install ${(state.providers || []).map((entry) => entry.label).join(" or ")} and it will appear here and in the sidebar.`;
+          els.noticeErrors.textContent = "";
+          els.noticeErrors.hidden = true;
+        }
+
+        if (state.errors && state.errors.length) {
+          els.errors.textContent = "";
+          for (const error of state.errors) {
+            const li = document.createElement("li");
+            li.textContent = error;
+            els.errors.append(li);
+          }
+          els.errors.hidden = false;
+        } else {
+          els.errors.textContent = "";
+          els.errors.hidden = true;
+        }
+      }
+
+      async function call(path, init) {
+        const response = await fetch(path, init);
+        const text = await response.text();
+        let body = null;
+        try {
+          body = text ? JSON.parse(text) : null;
+        } catch {
+          body = null;
+        }
+        return { ok: response.ok, status: response.status, body, text };
+      }
+
+      /** Re-read the state. Returns true when the page now knows what the machine is doing. */
+      async function load() {
+        try {
+          const answer = await call("/api/exits");
+          if (!answer.ok || !answer.body) {
+            setStatus(`The harness answered ${answer.status} for /api/exits${answer.text ? `: ${answer.text.slice(0, 200)}` : ""}. Nothing here is known.`, "bad");
+            els.badge.textContent = "unknown";
+            els.badge.className = "badge warn";
+            return false;
+          }
+          state = answer.body;
+          lastPolled = Date.now();
+          els.meta.textContent = `checked ${clock(state.at)}`;
+          draw();
+          return true;
+        } catch (error) {
+          setStatus(`Could not reach the harness: ${error?.message ?? error}. Nothing is claimed either way.`, "bad");
+          els.badge.textContent = "offline";
+          els.badge.className = "badge warn";
+          return false;
+        }
+      }
+
+      async function act(request, what) {
+        if (busy) return;
+        busy = true;
+        draw();
+        setStatus(`${what}...`, "busy");
+        els.refresh.disabled = true;
+
+        let message = "The request did not complete, and nothing is claimed.";
+        let kind = "bad";
+        let steps = [];
+
+        try {
+          const answer = await call("/api/exits/toggle", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-rosalena-token": token },
+            body: JSON.stringify(request),
+          });
+          if (!answer.ok) {
+            // A 403 here is the harness refusing the token, which is a different
+            // failure from the plugin refusing the action.
+            message =
+              answer.status === 403
+                ? "The harness refused the request token (403). Nothing was changed from this page."
+                : `The harness answered ${answer.status}${answer.text ? `: ${answer.text.slice(0, 200)}` : ""}. Nothing is claimed.`;
+          } else {
+            const outcome = answer.body ?? {};
+            // The plugin's own sentence, unedited: it already says what ran, what it
+            // found, and what it refuses to claim.
+            message = outcome.message || "The plugin answered without a message. Nothing is claimed.";
+            kind = outcome.ok ? "ok" : "bad";
+            steps = outcome.steps ?? [];
+            if (outcome.after) {
+              state = outcome.after;
+              els.meta.textContent = `checked ${clock(state.at)}`;
+            }
+          }
+        } catch (error) {
+          message = `The request did not complete: ${error?.message ?? error}. Nothing is claimed.`;
+        } finally {
+          busy = false;
+          els.refresh.disabled = false;
+        }
+
+        // Redraw from a fresh read, then put the action's own report back on top: the
+        // page shows what tasklist says, never what the button asked for.
+        const fresh = await load();
+        if (!fresh && state) draw();
+        setStatus(message, kind);
+        drawSteps(steps);
+      }
+
+      els.refresh.addEventListener("click", () => {
+        load();
+        setStatus("Re-read the process table. Nothing was changed.", "");
+        drawSteps([]);
+      });
+
+      els.cards.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button || button.disabled) return;
+        const provider = button.dataset.provider;
+        if (button.dataset.action === "toggle") {
+          const on = button.dataset.on === "true";
+          act({ provider, on }, on ? `Starting ${provider}` : `Stopping ${provider}`);
+        } else if (button.dataset.action === "rotate") {
+          act({ rotate: true }, `Rotating away from ${provider}`);
+        }
+      });
+
+      // Poll while the tab is visible, and re-read the moment it comes back: a
+      // stale "running" is the one thing this page must not show.
+      setInterval(() => {
+        if (document.visibilityState !== "visible" || busy) return;
+        if (Date.now() - lastPolled < POLL_MS - 1000) return;
+        load();
+      }, 3000);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && !busy) load();
+      });
+
+      load();
+    </script>
+  </body>
+</html>

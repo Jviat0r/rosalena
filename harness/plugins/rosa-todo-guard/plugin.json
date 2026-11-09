@@ -1,0 +1,11 @@
+{
+  "id": "rosa-todo-guard",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Adds a task list, nudges the model when it stops writing back to it, and sends a final answer back while items are still open",
+  "config": {
+    "every": 12,
+    "cooldown": 2
+  }
+}

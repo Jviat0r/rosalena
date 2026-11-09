@@ -1,0 +1,92 @@
+/* The looks a UI style can carry (ui-styles.js sets html[data-ui-style]).
+ *
+ *   default   the refined look in refine.css
+ *   classic   the original bordered look (refine.css switches itself off)
+ *   minimal   one calm column: the sidebar shares the chat's surface, no edges between
+ *             regions, the top bar and tab row recede, the composer floats as one card
+ *   compact   more on screen: shorter bars, tighter rows, a smaller composer
+ */
+
+/* ------------------------------------------------------------------ minimal */
+html[data-ui-style="minimal"] {
+  --bg-2: var(--bg);
+  --hair: transparent;
+}
+html[data-ui-style="minimal"] :is(.dock-left, .dock-right) { border-color: transparent; }
+html[data-ui-style="minimal"] .dock-left { background: color-mix(in srgb, var(--text) 2%, var(--bg)); }
+html[data-ui-style="minimal"] .topbar { min-height: 50px; }
+html[data-ui-style="minimal"] #chat-meta { display: none; }
+html[data-ui-style="minimal"] .view-tabs { border-bottom-color: transparent; min-height: 28px; }
+html[data-ui-style="minimal"] .view-note { display: none; }
+html[data-ui-style="minimal"] .sidebar-foot { border-top-color: transparent; }
+html[data-ui-style="minimal"] .group-label { letter-spacing: 0.08em; opacity: 0.8; }
+
+/* The composer as one floating card: controls and prompt on the same surface. */
+html[data-ui-style="minimal"] .composer { padding: var(--space-2) var(--space-5) var(--space-4); }
+html[data-ui-style="minimal"] .composer-row {
+  padding: 8px;
+  border-radius: calc(var(--radius) + 6px);
+  background: color-mix(in srgb, var(--text) 5%, var(--bg));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22), 0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent);
+  max-width: 980px;
+  margin: 0 auto;
+}
+html[data-ui-style="minimal"] .composer-foot { max-width: 980px; margin-left: auto; margin-right: auto; }
+html[data-ui-style="minimal"] #prompt { background: transparent; border-color: transparent; box-shadow: none; }
+html[data-ui-style="minimal"] #prompt:focus { box-shadow: none; }
+html[data-ui-style="minimal"] .composer-row:focus-within {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22), 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+html[data-ui-style="minimal"] .quick-pick .quick-label { display: none; }
+html[data-ui-style="minimal"] :is(.quick-pick, .plan-toggle, .icon-btn.attach) { background: transparent; }
+html[data-ui-style="minimal"] :is(.quick-pick, .plan-toggle, .icon-btn.attach):hover { background: var(--fill-hover); }
+html[data-ui-style="minimal"] .quick-pick { height: 40px; }
+html[data-ui-style="minimal"] .plan-toggle { height: 34px; margin-bottom: 3px; }
+
+/* ------------------------------------------------------------------ compact */
+html[data-ui-style="compact"] .topbar { min-height: 44px; padding-top: 4px; padding-bottom: 4px; }
+html[data-ui-style="compact"] .topbar h1 { font-size: 14px; }
+html[data-ui-style="compact"] #chat-meta { font-size: 10.5px; }
+html[data-ui-style="compact"] .view-tabs { min-height: 26px; }
+html[data-ui-style="compact"] .composer { padding: var(--space-2) var(--space-3); }
+html[data-ui-style="compact"] .quick-pick { height: 38px; }
+html[data-ui-style="compact"] #prompt { min-height: 38px; padding: 8px var(--space-3); font-size: 13.5px; }
+html[data-ui-style="compact"] :is(.plan-toggle) { height: 30px; }
+html[data-ui-style="compact"] .chat-item { height: 26px; }
+html[data-ui-style="compact"] .side-top { gap: 6px; padding: 6px; }
+html[data-ui-style="compact"] :is(.new-chat, .sidebar-search input) { height: 28px; }
+html[data-ui-style="compact"] .side-group { margin-bottom: 2px; }
+html[data-ui-style="compact"] .panel-head { height: 26px; }
+html[data-ui-style="compact"] .statusbar { height: 22px; }
+
+/* ------------------------------------------------------------------ the style rows in the View menu */
+.ui-style-row { display: flex; align-items: center; gap: 4px; padding: 0; }
+.ui-style-row .ui-style-pick { flex: 1 1 auto; min-width: 0; }
+.ui-style-act { flex: none; font-size: 11px; }
+.ui-style-rename { font: inherit; font-size: 12.5px; width: 12ch; padding: 1px 4px; border-radius: 4px; border: 1px solid var(--accent); background: var(--panel); color: var(--text); }
+#sb-layout { cursor: pointer; }
+#sb-layout:hover { color: var(--text); }
+
+/* ------------------------------------------------------------------ palette picker (account panel) */
+.acct-palettes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.acct-palette {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 5px 2px 4px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+.acct-palette:hover { background: var(--fill-hover, var(--panel-2)); color: var(--text); }
+.acct-palette[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
+.acct-palette-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 18%, transparent);
+}

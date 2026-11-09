@@ -1,0 +1,15 @@
+{
+  "id": "rosa-commit-cadence",
+  "version": "0.1.0",
+  "bundled": true,
+  "core": true,
+  "description": "Commits small finished pieces itself and saves big changes for one question at the end",
+  "config": {
+    "mode": "ask",
+    "maxLines": 300,
+    "maxFiles": 12,
+    "maxDeletedFiles": 0,
+    "maxFileBytes": 5242880,
+    "trailer": "Rosalena-Checkpoint: auto"
+  }
+}

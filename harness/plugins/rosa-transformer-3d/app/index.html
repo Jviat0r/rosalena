@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transformer 3D Lab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 20 7.4v9.2L12 21.2 4 16.6V7.4z"/><path d="M4 7.4 12 12l8-4.6M12 12v9.2"/><path d="M7.6 14.2v2.4M16.4 11.4v5.2"/></svg>
+        <div>
+          <div class="brand-title">Transformer 3D Lab</div>
+          <div class="brand-sub">a real 1-block transformer, computed live: 16 words, d<sub>model</sub> 8, 2 heads</div>
+        </div>
+      </div>
+      <form id="prompt-form" class="prompt" autocomplete="off">
+        <label for="prompt-input" class="sr">Sentence</label>
+        <input id="prompt-input" type="text" spellcheck="false" placeholder="the cat sat on the" title="Type up to 8 words from the vocabulary, then press Enter" />
+        <button type="submit" class="btn primary" title="Run the model on this sentence (Enter)">Run</button>
+        <button type="button" id="prompt-reset" class="btn ghost" title="Back to the example sentence">Example</button>
+      </form>
+      <div id="prompt-error" class="prompt-error" role="alert" hidden></div>
+      <div class="vocab" aria-label="Words the model knows">
+        <span class="vocab-label">Add a word:</span>
+        <div id="vocab-chips" class="chips"></div>
+        <button type="button" id="prompt-back" class="chip back" title="Remove the last word">&#9003; undo</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <section id="view" aria-label="3D view of the transformer">
+        <div class="hud" role="toolbar" aria-label="Lab controls">
+          <div class="seg" role="group" aria-label="Mode">
+            <button type="button" id="mode-explore" class="on" title="Orbit freely and click anything">Explore</button>
+            <button type="button" id="mode-play" title="Animated walkthrough of the 7 steps (Space)">&#9654; Play</button>
+          </div>
+          <div class="stepper" role="group" aria-label="Step">
+            <button type="button" id="step-prev" title="Previous step (Left arrow)" aria-label="Previous step">&#8249;</button>
+            <span id="step-label" class="step-label">1 / 7</span>
+            <button type="button" id="step-next" title="Next step (Right arrow)" aria-label="Next step">&#8250;</button>
+          </div>
+          <div class="seg" role="group" aria-label="Attention head">
+            <button type="button" id="head-0" class="on" title="Show head 1, the preposition finder (key 1)">Head 1</button>
+            <button type="button" id="head-1" title="Show head 2, the verb finder (key 2)">Head 2</button>
+          </div>
+          <button type="button" id="reset-view" class="hud-btn" title="Reset the camera to the overview (R)">Reset view</button>
+        </div>
+        <div id="stage-note" class="stage-note"></div>
+        <div id="tooltip" class="tooltip" hidden></div>
+        <div id="gl-fallback" class="gl-fallback" hidden></div>
+        <div class="hint">
+          <span><kbd>drag</kbd> orbit</span>
+          <span><kbd>scroll</kbd> zoom</span>
+          <span><kbd>right-drag</kbd> pan</span>
+          <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> step</span>
+          <span><kbd>R</kbd> reset camera</span>
+          <span><kbd>click</kbd> a cube to inspect</span>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <section class="card predict">
+          <div class="card-head">
+            <h2>Next word</h2>
+            <span class="muted" id="predict-context"></span>
+          </div>
+          <div id="predict-top" class="predict-top"></div>
+          <div id="predict-list" class="predict-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Pipeline</h2><span class="muted">click a step to fly there</span></div>
+          <ol id="pipeline" class="pipeline"></ol>
+        </section>
+
+        <section class="card inspector">
+          <div class="card-head"><h2>Inspector</h2><span class="muted" id="inspector-kind"></span></div>
+          <div id="inspector-body"></div>
+          <div class="ask-row">
+            <button type="button" id="ask" class="btn primary" title="Put a question about the selected value in Rosalena's chat box">Ask Rosalena</button>
+            <span id="ask-status" class="muted" role="status"></span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Token vectors</h2><span class="muted">one word through the block</span></div>
+          <div id="token-chips" class="token-chips"></div>
+          <div id="token-vec" class="token-vec"></div>
+        </section>
+
+        <section class="card legend">
+          <div class="card-head"><h2>What you are looking at</h2></div>
+          <ul class="legend-list">
+            <li><i class="sw pos"></i>Blue cube: a positive number</li>
+            <li><i class="sw neg"></i>Orange cube: a negative number</li>
+            <li><i class="sw h"></i>Height: how big the number is</li>
+            <li><i class="sw mask"></i>Dark red cell: masked (a future word)</li>
+            <li><i class="sw off"></i>Flat grey tile: a ReLU unit that is off</li>
+            <li><i class="sw top"></i>Gold tower: the model's top guess</li>
+          </ul>
+          <p class="muted small">Rows are words (first word at the back). Columns are the 8 dimensions of each word's vector. The weights are hand-designed so each dimension means something:</p>
+          <dl id="dim-list" class="dim-list"></dl>
+        </section>
+      </aside>
+    </div>
+  </div>
+  <script src="/plugin-sdk.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

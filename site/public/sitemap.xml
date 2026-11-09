@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://rosalena.dev/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/harness/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/harness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/harness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/harness/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/try/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/try/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/try/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/check/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/check/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/check/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/check/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/preview/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/preview/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/preview/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/preview/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/download/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/download/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/download/solbrowser/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/download/solbrowser/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/solbrowser/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/solbrowser/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/harness/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/harness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/harness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/harness/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/try/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/try/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/try/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/check/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/check/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/check/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/check/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/preview/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/preview/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/preview/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/preview/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/download/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/download/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/"/>
+  </url>
+  <url>
+    <loc>https://rosalena.dev/es/download/solbrowser/</loc><lastmod>2026-11-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rosalena.dev/download/solbrowser/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/solbrowser/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/solbrowser/"/>
+  </url>
+</urlset>
