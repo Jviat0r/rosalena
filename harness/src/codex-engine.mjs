@@ -25,7 +25,10 @@
 import { execFile, spawn, spawnSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { delimiter, dirname, join, sep } from "node:path";
+import { delimiter, dirname, join, posix, win32 } from "node:path";
+
+/** Paths for the platform being searched, not the host: the finder is tested as Windows on Linux CI. */
+const pathsFor = (platform) => (platform === "win32" ? win32 : posix);
 
 import { cancelRequested, openRun } from "./runs.mjs";
 import { createUsageTally } from "./usage.mjs";
@@ -102,6 +105,7 @@ const NPM_PLATFORM_PACKAGE = {
  * only start through cmd.exe.
  */
 function nativeFromNpm(npmDir, { platform, arch, exists }) {
+  const { join } = pathsFor(platform);
   const triple = targetTriple(platform, arch);
   const exe = platform === "win32" ? "codex.exe" : "codex";
   const pkg = join(npmDir, "node_modules", "@openai", "codex");
@@ -130,6 +134,7 @@ function nativeFromNpm(npmDir, { platform, arch, exists }) {
  */
 export function findCodex({ env = process.env, platform = process.platform, arch = process.arch, exists = existsSync } = {}) {
   if (env.ROSALENA_CODEX_EXE) return exists(env.ROSALENA_CODEX_EXE) ? env.ROSALENA_CODEX_EXE : null;
+  const { join } = pathsFor(platform);
   const win = platform === "win32";
   const home = env.USERPROFILE || env.HOME || homedir();
   const codexHome = env.CODEX_HOME || join(home, ".codex");
@@ -173,7 +178,8 @@ export function launchFor(exe, { platform = process.platform } = {}) {
     return { command: process.execPath, prefix: [path], shell: false, env: process.versions.electron ? { ELECTRON_RUN_AS_NODE: "1" } : {} };
   }
   if (platform === "win32" && /\.(cmd|bat)$/i.test(path)) return { command: path, prefix: [], shell: true, env: {} };
-  const marker = `${sep}node_modules${sep}@openai${sep}codex`;
+  const s = pathsFor(platform).sep;
+  const marker = `${s}node_modules${s}@openai${s}codex`;
   const at = path.indexOf(marker);
   const env = at >= 0 ? { CODEX_MANAGED_BY_NPM: "1", CODEX_MANAGED_PACKAGE_ROOT: path.slice(0, at + marker.length) } : {};
   return { command: path, prefix: [], shell: false, env };

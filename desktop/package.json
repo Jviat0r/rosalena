@@ -1,7 +1,7 @@
 {
   "name": "rosalena-desktop",
   "productName": "Rosalena Harness",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": true,
   "description": "The default Rosalena Harness desktop app: an Electron window around the same UI server the browser version uses.",
   "main": "main.mjs",

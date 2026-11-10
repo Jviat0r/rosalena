@@ -21,7 +21,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, posix, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -51,27 +51,28 @@ test("Codex is found: the override, PATH, the native binary behind npm's codex.c
 
   // npm global: %APPDATA%\npm\codex.cmd launches the platform package's native binary.
   const npm = "C:\\Users\\me\\AppData\\Roaming\\npm";
-  const native = join(npm, "node_modules", "@openai", "codex", "node_modules", "@openai", "codex-win32-x64", "vendor", "x86_64-pc-windows-msvc", "bin", "codex.exe");
-  const npmFiles = new Set([join(npm, "codex.cmd"), native]);
+  // Windows paths whatever the host is (the release gate runs this on Linux).
+  const native = win32.join(npm, "node_modules", "@openai", "codex", "node_modules", "@openai", "codex-win32-x64", "vendor", "x86_64-pc-windows-msvc", "bin", "codex.exe");
+  const npmFiles = new Set([win32.join(npm, "codex.cmd"), native]);
   const viaPath = findCodex({ env: { PATH: `C:\\Windows;${npm}`, APPDATA: "" }, platform: "win32", arch: "x64", exists: (p) => npmFiles.has(p) });
   assert.equal(viaPath, native, "codex.cmd on PATH is swapped for the binary it starts");
   const viaAppData = findCodex({ env: { PATH: "", APPDATA: "C:\\Users\\me\\AppData\\Roaming" }, platform: "win32", arch: "x64", exists: (p) => npmFiles.has(p) });
   assert.equal(viaAppData, native, "the npm global folder is looked in even when it is not on PATH");
-  const cmdOnly = findCodex({ env: { PATH: npm, APPDATA: "" }, platform: "win32", arch: "x64", exists: (p) => p === join(npm, "codex.cmd") });
-  assert.equal(cmdOnly, join(npm, "codex.cmd"), "a codex.cmd without its binary is the last resort, not nothing");
+  const cmdOnly = findCodex({ env: { PATH: npm, APPDATA: "" }, platform: "win32", arch: "x64", exists: (p) => p === win32.join(npm, "codex.cmd") });
+  assert.equal(cmdOnly, win32.join(npm, "codex.cmd"),"a codex.cmd without its binary is the last resort, not nothing");
 
   // OpenAI's standalone installer (install.ps1) puts it under %LOCALAPPDATA%\Programs\OpenAI\Codex\bin.
   const L = "C:\\Users\\me\\AppData\\Local";
-  const standalone = join(L, "Programs", "OpenAI", "Codex", "bin", "codex.exe");
+  const standalone = win32.join(L, "Programs", "OpenAI", "Codex", "bin", "codex.exe");
   assert.equal(findCodex({ env: { PATH: "", LOCALAPPDATA: L, USERPROFILE: "C:\\Users\\me" }, platform: "win32", exists: (p) => p === standalone }), standalone);
   // ~/.local/bin on Linux and macOS (install.sh).
-  assert.equal(findCodex({ env: { PATH: "", HOME: "/home/me" }, platform: "linux", exists: (p) => p === join("/home/me", ".local", "bin", "codex") }), join("/home/me", ".local", "bin", "codex"));
+  assert.equal(findCodex({ env: { PATH: "", HOME: "/home/me" }, platform: "linux", exists: (p) => p === posix.join("/home/me", ".local", "bin", "codex") }), posix.join("/home/me", ".local", "bin", "codex"));
   // Nothing installed anywhere: null, not a guess.
   assert.equal(findCodex({ env: { PATH: "C:\\Windows", APPDATA: "C:\\x", LOCALAPPDATA: L, USERPROFILE: "C:\\Users\\me" }, platform: "win32", exists: () => false }), null);
 
   assert.equal(launchFor("C:\\a\\fake-codex.mjs").command, process.execPath, "a .js launcher runs through Node");
   assert.equal(launchFor(join(npm, "codex.cmd"), { platform: "win32" }).shell, true);
-  assert.equal(launchFor(native).env.CODEX_MANAGED_BY_NPM, "1", "npm's binary gets the variable its own launcher sets");
+  assert.equal(launchFor(native, { platform: "win32" }).env.CODEX_MANAGED_BY_NPM, "1", "npm's binary gets the variable its own launcher sets");
 });
 
 test("`codex login status` is read: ChatGPT plan, API key, not signed in", async () => {

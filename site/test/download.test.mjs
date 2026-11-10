@@ -192,17 +192,17 @@ test('a platform is marked available only when one of its files is', () => {
 
 test('the committed manifest claims a file only with evidence behind it', () => {
   // This was the honest state of the repository while nothing was built: zero available
-  // entries. v0.1.13 is published now, so the test flips to the rule that replaced it - an
+  // entries. v0.1.14 is published now, so the test flips to the rule that replaced it - an
   // available entry has to look like a file someone measured, and the downloads have to
   // live on the public binaries repo, because a Pages site cannot serve a 107 MB installer.
   const published = manifest.artifacts.filter((entry) => entry.available);
-  assert.ok(published.length > 0, 'v0.1.13 is published, so something must be available');
+  assert.ok(published.length > 0, 'v0.1.14 is published, so something must be available');
   for (const entry of published) {
     assert.ok(entry.size > 1024 * 1024, `${entry.id} size is not a plausible installer: ${entry.size}`);
     assert.match(entry.url, /^https:\/\/github\.com\/Jviat0r\/rosalena-harness-downloads\/releases\/download\//);
     assert.ok(entry.url.endsWith(`/${entry.fileName}`), `${entry.id} url does not end in its own file name`);
   }
-  assert.equal(manifest.version, '0.1.13');
+  assert.equal(manifest.version, '0.1.14');
 });
 
 test('every checksum in the committed manifest is a real sha256, and there is one per file', () => {
@@ -276,7 +276,7 @@ test('the page degrades honestly without JavaScript', () => {
   assert.match(pageHtml, /id="artifact-rows"[\s\S]*in releases\.json/);
   // And the reader is not left with nothing to click: the release page is a page, not a file.
   const noscript = /<noscript>([\s\S]*?)<\/noscript>/.exec(pageHtml)?.[1] ?? '';
-  assert.match(noscript, /releases\/tag\/v0\.1\.13/);
+  assert.match(noscript, /releases\/tag\/v0\.1\.14/);
   assert.ok(!/\.(exe|dmg|zip)["']/.test(noscript), 'the no-JavaScript path must not link a file');
 });
 

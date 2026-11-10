@@ -100,13 +100,26 @@ export const MANIFEST_ES = {
     "Aún no compilado: ninguna compilación produjo este archivo. El AppImage y el .deb de Linux salen del job de Linux del pipeline de lanzamiento.",
   "The file was built but no --base-url was given, so no download URL is published yet.":
     "El archivo se compiló, pero no se pasó --base-url, así que todavía no hay una URL de descarga publicada.",
+  // Names files, so the version is written {v} and filled back in (see manifestText).
+  "Not signed. AppImage: run chmod +x Rosalena-Harness-{v}-x86_64.AppImage, then open it (Ubuntu 22.04 and newer need FUSE 2: sudo apt install libfuse2t64 on 24.04, libfuse2 on 22.04); it updates itself from inside the app. .deb: sudo apt install ./Rosalena-Harness-{v}-amd64.deb; a .deb install updates by installing the next .deb from this page.":
+    "Sin firmar. AppImage: corre chmod +x Rosalena-Harness-{v}-x86_64.AppImage y luego ábrelo (Ubuntu 22.04 y posteriores necesitan FUSE 2: sudo apt install libfuse2t64 en 24.04, libfuse2 en 22.04); se actualiza solo desde dentro de la app. .deb: sudo apt install ./Rosalena-Harness-{v}-amd64.deb; una instalación con .deb se actualiza instalando el siguiente .deb desde esta página.",
 };
 
-/** A manifest sentence in the page language (unknown sentences stay as written). */
+const VERSION = /\b\d+\.\d+\.\d+\b/g;
+
+/**
+ * A manifest sentence in the page language (unknown sentences stay as written). A sentence
+ * that names versioned files is matched with its version numbers written {v}, so the table
+ * does not need a new row every release.
+ */
 function manifestText(text) {
   if (lang !== "es") return text;
   const value = String(text ?? "");
-  return MANIFEST_ES[value] ?? value;
+  if (MANIFEST_ES[value]) return MANIFEST_ES[value];
+  const versions = value.match(VERSION) ?? [];
+  const shaped = MANIFEST_ES[value.replace(VERSION, "{v}")];
+  if (!shaped || versions.length === 0 || new Set(versions).size !== 1) return value;
+  return shaped.split("{v}").join(versions[0]);
 }
 
 /** Every sentence this module writes, per language. Functions take the escaped values. */

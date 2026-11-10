@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Download Rosalena Harness (Windows and macOS)</title>
-<meta name="description" content="Rosalena Harness is a desktop app for local and free AI models. Version 0.1.13 is built for Windows and macOS, with a size and a SHA-256 for every file. Both builds are unsigned, and this page says what the first launch looks like.">
+<title>Download Rosalena Harness (Windows, macOS and Linux)</title>
+<meta name="description" content="Rosalena Harness is a desktop app for local and free AI models. Version 0.1.14 is built for Windows, macOS and Linux, with a size and a SHA-256 for every file. The builds are unsigned, and this page says what the first launch looks like.">
 <link rel="canonical" href="https://rosalena.dev/download/">
 <link rel="alternate" hreflang="en" href="https://rosalena.dev/download/">
 <link rel="alternate" hreflang="es" href="https://rosalena.dev/es/download/">
 <link rel="alternate" hreflang="x-default" href="https://rosalena.dev/download/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rosalena.dev/download/">
-<meta property="og:title" content="Download Rosalena Harness (Windows and macOS)">
-<meta property="og:description" content="Version 0.1.13 is built: two files for Windows, four for macOS. Every row carries its size and its SHA-256, both read off the file the build produced.">
+<meta property="og:title" content="Download Rosalena Harness (Windows, macOS and Linux)">
+<meta property="og:description" content="Version 0.1.14 is built: two files for Windows, four for macOS, two for Linux. Every row carries its size and its SHA-256, both read off the file the build produced.">
 <meta name="theme-color" content="#051217">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
@@ -25,8 +25,8 @@
   "name": "Rosalena Harness",
   "url": "https://rosalena.dev/download/",
   "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "Windows 10, Windows 11, macOS 11",
-  "description": "Early preview of a desktop app for local and free AI models. Version 0.1.13 is built for Windows and macOS, with sizes and SHA-256 checksums published for every file."
+  "operatingSystem": "Windows 10, Windows 11, macOS 11, Linux (x86_64)",
+  "description": "Early preview of a desktop app for local and free AI models. Version 0.1.14 is built for Windows, macOS and Linux, with sizes and SHA-256 checksums published for every file."
 }
 </script>
 <style>
@@ -135,7 +135,7 @@
 <main>
   <div class="hero hero-compact">
     <div class="wrap">
-      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Early preview · version 0.1.13</span>
+      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Early preview · version 0.1.14</span>
       <h1>Download Rosalena <em>Harness</em></h1>
       <p class="lede">A desktop app for local and free AI models. No account, no key needed to start.</p>
 
@@ -178,7 +178,7 @@
         how many tokens your chats used on Rosalena's free cloud models, so nobody can drain the free tier everyone shares.</p>
       <noscript>
         <p class="hero-note">JavaScript is off, so these buttons go to the list at the bottom. Every file is also on the
-          release page, <a href="https://github.com/Jviat0r/rosalena-harness-downloads/releases/tag/v0.1.13" rel="noopener noreferrer">Rosalena Harness v0.1.13</a>.</p>
+          release page, <a href="https://github.com/Jviat0r/rosalena-harness-downloads/releases/tag/v0.1.14" rel="noopener noreferrer">Rosalena Harness v0.1.14</a>.</p>
       </noscript>
       <p class="hero-note"><a href="#downloads">All downloads and checksums</a> · <a href="/preview/">See the window preview</a></p>
       <p class="hero-note" id="manifest-stamp">Checking the build list…</p>
@@ -230,7 +230,7 @@
       </div>
       <noscript>
         <p class="manifest-note">JavaScript is off, so this block cannot read <code>updates.json</code>.
-          The feed names version 0.1.13, so an installed 0.1.13 reports that it is up to date and an older copy is offered the update.</p>
+          The feed names version 0.1.14, so an installed 0.1.14 reports that it is up to date and an older copy is offered the update.</p>
       </noscript>
     </div>
   </section>
@@ -264,7 +264,7 @@
         <div class="card">
           <h3>Linux</h3>
           <ul class="status-list">
-            <li><span class="ok" aria-hidden="true">&#10003;</span><span>Built by the release pipeline's Linux job: an AppImage that runs on most distributions and a .deb for Debian and Ubuntu, both 64-bit (x86_64). The box at the top of this page turns into a download once a release includes them.</span></li>
+            <li><span class="ok" aria-hidden="true">&#10003;</span><span>Built by the release pipeline's Linux job: an AppImage that runs on most distributions and a .deb for Debian and Ubuntu, both 64-bit (x86_64), first released in 0.1.14.</span></li>
             <li><span class="todo" aria-hidden="true">&#9675;</span><span>Unsigned. AppImage: run <code>chmod +x</code> on the file, then open it. Ubuntu 22.04 and newer need FUSE 2 for AppImages: <code>sudo apt install libfuse2t64</code> on 24.04, <code>libfuse2</code> on 22.04. .deb: <code>sudo apt install ./</code> followed by the file name.</span></li>
             <li><span class="ok" aria-hidden="true">&#10003;</span><span>The AppImage updates itself from inside the app, the same way the Windows installer does. A .deb install updates by installing the next .deb from this page.</span></li>
             <li><span class="todo" aria-hidden="true">&#9675;</span><span>Nobody has opened it on a Linux desktop yet. It is built and tested in the pipeline, but this page will not claim more than that.</span></li>
@@ -295,7 +295,7 @@
           <tbody>
             <tr><td><strong>Windows 10 or 11</strong><small>64-bit</small></td><td>The free cloud models, with no key and no account, plus paid models if you add your own key</td></tr>
             <tr><td><strong>macOS 11 or newer</strong><small>Apple silicon or Intel</small></td><td>The same free cloud models. Older macOS versions are not targeted.</td></tr>
-            <tr><td><strong>64-bit Linux</strong><small>x86_64; AppImage or .deb</small></td><td>The same free cloud models, once a release includes the Linux build</td></tr>
+            <tr><td><strong>64-bit Linux</strong><small>x86_64; AppImage or .deb</small></td><td>The same free cloud models</td></tr>
             <tr><td><strong>A graphics card with 24 GB</strong><small>for example an RTX 3090 or 4090</small></td><td>Qwen3.8 27B on your own machine, plus local pictures, video and music</td></tr>
           </tbody>
         </table>
@@ -334,11 +334,11 @@
           <ul class="artifacts">
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Installer (.exe)</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-Setup-0.1.13-x64.exe</div>
+              <div class="artifact-file">Rosalena-Harness-Setup-0.1.14-x64.exe</div>
             </li>
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Portable app (.exe)</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-0.1.13-x64-portable.exe</div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-x64-portable.exe</div>
             </li>
           </ul>
         </div>
@@ -348,25 +348,35 @@
           <ul class="artifacts">
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Disk image (.dmg) · Apple silicon</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-0.1.13-arm64.dmg</div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-arm64.dmg</div>
             </li>
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Zip archive · Apple silicon</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-0.1.13-arm64.zip</div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-arm64.zip</div>
             </li>
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Disk image (.dmg) · Intel</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-0.1.13-x64.dmg</div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-x64.dmg</div>
             </li>
             <li class="artifact" data-available="false">
               <div class="artifact-head"><span class="artifact-kind">Zip archive · Intel</span><span class="badge" data-status="loading">See the list below</span></div>
-              <div class="artifact-file">Rosalena-Harness-0.1.13-x64.zip</div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-x64.zip</div>
             </li>
           </ul>
         </div>
         <div class="card" data-platform="linux">
           <h3>Linux <span class="badge" data-status="loading">See the list below</span></h3>
           <p>64-bit Linux (x86_64): the AppImage runs on most distributions, the .deb installs on Debian and Ubuntu</p>
+          <ul class="artifacts">
+            <li class="artifact" data-available="false">
+              <div class="artifact-head"><span class="artifact-kind">AppImage (.AppImage)</span><span class="badge" data-status="loading">See the list below</span></div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-x86_64.AppImage</div>
+            </li>
+            <li class="artifact" data-available="false">
+              <div class="artifact-head"><span class="artifact-kind">Debian package (.deb)</span><span class="badge" data-status="loading">See the list below</span></div>
+              <div class="artifact-file">Rosalena-Harness-0.1.14-amd64.deb</div>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -381,7 +391,7 @@
       <noscript>
         <p class="manifest-note">JavaScript is off, so this page cannot read <code>releases.json</code> and cannot
           show the sizes or the checksums. The file names above are the real ones; every size, every SHA-256 and the
-          downloads themselves are on the release page, <a href="https://github.com/Jviat0r/rosalena-harness-downloads/releases/tag/v0.1.13" rel="noopener noreferrer">Rosalena Harness v0.1.13</a>.</p>
+          downloads themselves are on the release page, <a href="https://github.com/Jviat0r/rosalena-harness-downloads/releases/tag/v0.1.14" rel="noopener noreferrer">Rosalena Harness v0.1.14</a>.</p>
       </noscript>
     </div>
   </section>
@@ -411,12 +421,14 @@
                a size or a checksum, which only releases.json can make.
                download.js replaces this body with the rows read from releases.json. -->
           <tbody id="artifact-rows">
-            <tr data-available="false"><td>Windows</td><td>x64</td><td class="file">Rosalena-Harness-Setup-0.1.13-x64.exe</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
-            <tr data-available="false"><td>Windows</td><td>x64</td><td class="file">Rosalena-Harness-0.1.13-x64-portable.exe</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
-            <tr data-available="false"><td>macOS</td><td>Apple silicon (arm64)</td><td class="file">Rosalena-Harness-0.1.13-arm64.dmg</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
-            <tr data-available="false"><td>macOS</td><td>Apple silicon (arm64)</td><td class="file">Rosalena-Harness-0.1.13-arm64.zip</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
-            <tr data-available="false"><td>macOS</td><td>Intel (x64)</td><td class="file">Rosalena-Harness-0.1.13-x64.dmg</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
-            <tr data-available="false"><td>macOS</td><td>Intel (x64)</td><td class="file">Rosalena-Harness-0.1.13-x64.zip</td><td class="none">in releases.json</td><td>0.1.13</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>Windows</td><td>x64</td><td class="file">Rosalena-Harness-Setup-0.1.14-x64.exe</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>Windows</td><td>x64</td><td class="file">Rosalena-Harness-0.1.14-x64-portable.exe</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>macOS</td><td>Apple silicon (arm64)</td><td class="file">Rosalena-Harness-0.1.14-arm64.dmg</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>macOS</td><td>Apple silicon (arm64)</td><td class="file">Rosalena-Harness-0.1.14-arm64.zip</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>macOS</td><td>Intel (x64)</td><td class="file">Rosalena-Harness-0.1.14-x64.dmg</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>macOS</td><td>Intel (x64)</td><td class="file">Rosalena-Harness-0.1.14-x64.zip</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>Linux</td><td>x64</td><td class="file">Rosalena-Harness-0.1.14-x86_64.AppImage</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
+            <tr data-available="false"><td>Linux</td><td>x64</td><td class="file">Rosalena-Harness-0.1.14-amd64.deb</td><td class="none">in releases.json</td><td>0.1.14</td><td class="none">in releases.json</td><td><span class="badge" data-status="loading">See the list below</span></td></tr>
           </tbody>
         </table>
       </div>

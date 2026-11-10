@@ -19,12 +19,12 @@ test('Windows gets the Setup installer, not the portable exe', () => {
 
 test('Mac gets the disk image for the detected Mac, with the other one offered', () => {
   const silicon = quickPick(manifest.artifacts, { macArch: 'arm64' });
-  assert.equal(silicon.mac.fileName, 'Rosalena-Harness-0.1.13-arm64.dmg');
-  assert.equal(silicon.macOther.fileName, 'Rosalena-Harness-0.1.13-x64.dmg');
+  assert.equal(silicon.mac.fileName, 'Rosalena-Harness-0.1.14-arm64.dmg');
+  assert.equal(silicon.macOther.fileName, 'Rosalena-Harness-0.1.14-x64.dmg');
 
   const intel = quickPick(manifest.artifacts, { macArch: 'x64' });
-  assert.equal(intel.mac.fileName, 'Rosalena-Harness-0.1.13-x64.dmg');
-  assert.equal(intel.macOther.fileName, 'Rosalena-Harness-0.1.13-arm64.dmg');
+  assert.equal(intel.mac.fileName, 'Rosalena-Harness-0.1.14-x64.dmg');
+  assert.equal(intel.macOther.fileName, 'Rosalena-Harness-0.1.14-arm64.dmg');
 
   // Unknown Mac: Apple silicon.
   assert.equal(quickPick(manifest.artifacts).mac.arch, 'arm64');
@@ -55,16 +55,14 @@ const linuxEntry = (kind, fileName) => ({
 });
 
 test('Linux gets the AppImage, with the .deb offered under it', () => {
-  const withLinux = [
-    ...manifest.artifacts,
-    linuxEntry('appimage', 'Rosalena-Harness-0.1.14-x86_64.AppImage'),
-    linuxEntry('deb', 'Rosalena-Harness-0.1.14-amd64.deb'),
-  ];
-  const pick = quickPick(withLinux);
+  // The committed manifest (0.1.14 on) has both Linux files.
+  const pick = quickPick(manifest.artifacts);
   assert.equal(pick.linux.kind, 'appimage');
+  assert.match(pick.linux.fileName, /^Rosalena-Harness-.*-x86_64\.AppImage$/);
   assert.equal(pick.linuxOther.kind, 'deb');
   // Only a .deb: it becomes the button, with nothing under it.
-  const debOnly = quickPick([...manifest.artifacts, linuxEntry('deb', 'Rosalena-Harness-0.1.14-amd64.deb')]);
+  const others = manifest.artifacts.filter((entry) => entry.platform !== 'linux');
+  const debOnly = quickPick([...others, linuxEntry('deb', 'Rosalena-Harness-0.1.14-amd64.deb')]);
   assert.equal(debOnly.linux.kind, 'deb');
   assert.equal(debOnly.linuxOther, null);
 });

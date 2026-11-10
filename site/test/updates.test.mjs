@@ -3,7 +3,7 @@
 // The rule being protected is the same one test/download.test.mjs protects for the
 // download list, one step earlier in the chain: the page and the app may describe what
 // has been published, and they may not claim a release that does not exist. Today the
-// committed updates.json names version 0.1.13, carries the date the files were published,
+// committed updates.json names version 0.1.14, carries the date the files were published,
 // the release page on the public downloads repository, the release notes, and the size and
 // SHA-256 of every file - because that release does exist. The same file, stated the other
 // way, is releases.json, and the two are cross-checked here so they cannot drift apart.
@@ -66,17 +66,18 @@ test('the committed feed passes the validator the app itself runs', () => {
   // Cleaning must not have dropped the fields the app reads.
   assert.equal(checked.manifest.schema, 1);
   assert.equal(checked.manifest.channel, 'stable');
-  assert.equal(checked.manifest.version, '0.1.13');
+  assert.equal(checked.manifest.version, '0.1.14');
   assert.equal(Number.isFinite(Date.parse(checked.manifest.releasedAt)), true, 'the release has a date');
   assert.equal(checked.manifest.url, RELEASE_PAGE, 'the app is given the release page');
   assert.ok(checked.manifest.notes.trim().length > 200, 'the feed quotes the release notes');
-  assert.equal(Object.keys(checked.manifest.artifacts).length, 6, 'all six files are described');
+  // Eight since 0.1.14: Windows 2, macOS 4, Linux 2 (AppImage and .deb).
+  assert.equal(Object.keys(checked.manifest.artifacts).length, 8, 'all eight files are described');
 });
 
 test('the feed names exactly the version the app is', () => {
   // A feed pointing at a version this build is not is how "you are up to date" turns
   // into "you are behind" on the very first launch.
-  assert.equal(appVersion, '0.1.13');
+  assert.equal(appVersion, '0.1.14');
   assert.equal(updates.version, appVersion);
   assert.equal(parseVersion(updates.version).prerelease.length, 0, 'stable channel means no prerelease');
 });
@@ -85,7 +86,7 @@ test('the committed feed describes a release that exists, with nothing invented'
   assert.equal(typeof updates.releasedAt, 'string', 'a published release has a date');
   assert.match(updates.releasedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/);
   assert.equal(updates.url, RELEASE_PAGE, 'the feed links the release page, never a file');
-  assert.ok(updates.notes.includes('Rosalena Harness 0.1.13'), 'the notes it quotes are this release');
+  assert.ok(updates.notes.includes('Rosalena Harness 0.1.14'), 'the notes it quotes are this release');
   // Every url the feed mentions has to be the downloads repository, and a page rather than
   // a file: the app renders this with a single link and must not become a second downloader.
   for (const match of updatesText.matchAll(/https?:\/\/[^"\s\\]+/g)) {
@@ -102,7 +103,7 @@ test('the download manifest agrees with the feed, file by file', () => {
   // said they were.
   assert.equal(releases.version, updates.version);
   const available = releases.artifacts.filter((entry) => entry.available === true);
-  assert.equal(available.length, 6, 'six files were measured and published');
+  assert.equal(available.length, 8, 'eight files were measured and published');
   assert.equal(Object.keys(updates.artifacts).length, available.length);
   for (const entry of available) {
     // updates.json maps file name to SHA-256 (that is all the app needs to tell a user
@@ -119,12 +120,12 @@ test('the download manifest agrees with the feed, file by file', () => {
 
 // ---------------------------------------------------------------------- the decision
 
-test('an installed 0.1.13 is told it is up to date, not offered an update', () => {
+test('an installed 0.1.14 is told it is up to date, not offered an update', () => {
   const verdict = decideUpdate({ current: appVersion, manifest: updates, now: NOW });
   assert.equal(verdict.state, 'current');
-  assert.equal(verdict.current, '0.1.13');
-  assert.equal(verdict.latest, '0.1.13');
-  assert.equal(verdict.reason, 'you are up to date at 0.1.13');
+  assert.equal(verdict.current, '0.1.14');
+  assert.equal(verdict.latest, '0.1.14');
+  assert.equal(verdict.reason, 'you are up to date at 0.1.14');
   // The release page travels with the verdict, but a current install is not offered it as
   // an update: the state, not the presence of a url, is what the window acts on.
   assert.equal(verdict.url, RELEASE_PAGE);
@@ -134,9 +135,9 @@ test('the three states are the only answers, and the committed feed reaches two 
   const older = decideUpdate({ current: '0.1.0', manifest: updates, now: NOW });
   assert.equal(older.state, 'available');
   assert.equal(older.url, RELEASE_PAGE, 'an older install is given the release page');
-  assert.match(older.reason, /0\.1\.13 is available/);
+  assert.match(older.reason, /0\.1\.14 is available/);
 
-  const same = decideUpdate({ current: '0.1.13', manifest: updates, now: NOW });
+  const same = decideUpdate({ current: '0.1.14', manifest: updates, now: NOW });
   assert.equal(same.state, 'current');
 
   const nothing = decideUpdate({ current: '0.1.0', manifest: null, now: NOW });
@@ -158,10 +159,10 @@ test('a newer version without a release page is unknown, never "available"', () 
 });
 
 test('an installed version newer than the feed is still "current"', () => {
-  const verdict = decideUpdate({ current: '0.1.14', manifest: updates, now: NOW });
+  const verdict = decideUpdate({ current: '0.1.15', manifest: updates, now: NOW });
   assert.equal(verdict.state, 'current');
-  assert.match(verdict.reason, /newer than the published 0\.1\.13/);
-  assert.equal(compareVersions('0.1.14', updates.version), 1);
+  assert.match(verdict.reason, /newer than the published 0\.1\.14/);
+  assert.equal(compareVersions('0.1.15', updates.version), 1);
 });
 
 test('the feed is checked at most every six hours, and on demand', () => {
@@ -214,7 +215,7 @@ test('the page still offers no download link of its own', () => {
 test('the notice for the committed feed announces it, with one link to the release page', () => {
   const html = renderUpdatesNotice(updates);
   assert.match(html, /data-updates-state="available"/);
-  assert.match(html, /0\.1\.13/);
+  assert.match(html, /0\.1\.14/);
   assert.equal((html.match(/<a\b/g) ?? []).length, 1, 'exactly one link, so the block is not a second download list');
   assert.match(html, new RegExp(`href="${RELEASE_PAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));
   assert.match(html, /rel="noopener noreferrer"/);

@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "product": "Rosalena Harness",
-  "version": "0.1.13",
-  "updated": "2026-11-08",
+  "version": "0.1.14",
+  "updated": "2026-11-09",
   "generatedBy": "packaging/release/manifest.mjs",
   "summary": "One entry per downloadable file. available:true means the release workflow produced exactly this file and measured its size and SHA-256; available:false means no such file exists yet, and the download page shows no link for it.",
   "platforms": [
@@ -23,6 +23,15 @@
       "availableCount": 4,
       "artifactCount": 4,
       "note": "Unsigned and not notarized: no Apple Developer certificate was available when this was built, so macOS quarantines the download. Right-click the app, choose Open, then Open again, or run xattr -dr com.apple.quarantine \"/Applications/Rosalena Harness.app\" once."
+    },
+    {
+      "id": "linux",
+      "label": "Linux",
+      "requirement": "64-bit Linux (x86_64): the AppImage runs on most distributions, the .deb installs on Debian and Ubuntu",
+      "status": "available",
+      "availableCount": 2,
+      "artifactCount": 2,
+      "note": "Not signed. AppImage: run chmod +x Rosalena-Harness-0.1.14-x86_64.AppImage, then open it (Ubuntu 22.04 and newer need FUSE 2: sudo apt install libfuse2t64 on 24.04, libfuse2 on 22.04); it updates itself from inside the app. .deb: sudo apt install ./Rosalena-Harness-0.1.14-amd64.deb; a .deb install updates by installing the next .deb from this page."
     }
   ],
   "artifacts": [
@@ -31,12 +40,12 @@
       "platform": "windows",
       "arch": "x64",
       "kind": "installer",
-      "fileName": "Rosalena-Harness-Setup-0.1.13-x64.exe",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-Setup-0.1.14-x64.exe",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-Setup-0.1.13-x64.exe",
-      "sha256": "35ae539af77307f96cc4890e6ccfa4cf4efc600caa5fd6428af5a4d6dcbec61b",
-      "size": 112945038,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-Setup-0.1.14-x64.exe",
+      "sha256": "dad6ba2eebbdd13515b2535f332b7766f6d642fec0476b5f4da66e3b524e5ab0",
+      "size": 113346199,
       "note": ""
     },
     {
@@ -44,12 +53,12 @@
       "platform": "windows",
       "arch": "x64",
       "kind": "portable",
-      "fileName": "Rosalena-Harness-0.1.13-x64-portable.exe",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-0.1.14-x64-portable.exe",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64-portable.exe",
-      "sha256": "5d873ab3ccb0cfd3f62f9e0d5c23cb67ac14651ecaad3325c07a1de2e7395ab7",
-      "size": 112732147,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-x64-portable.exe",
+      "sha256": "b8a5d64d0c6a322397cb2cfbc1b7486ddbdc4f6caa5a5b77182a3b82f43831e5",
+      "size": 113060068,
       "note": ""
     },
     {
@@ -57,12 +66,12 @@
       "platform": "macos",
       "arch": "arm64",
       "kind": "dmg",
-      "fileName": "Rosalena-Harness-0.1.13-arm64.dmg",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-0.1.14-arm64.dmg",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-arm64.dmg",
-      "sha256": "1f6b787a7f545ae219af45b9781d020629478934324e9881619859fc0cce8d0a",
-      "size": 130513131,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-arm64.dmg",
+      "sha256": "bef9b1d9511d1e91ddd31c94fba9cb5eaa8cc90409fd5b8bac4403854469834e",
+      "size": 131488782,
       "note": ""
     },
     {
@@ -70,12 +79,12 @@
       "platform": "macos",
       "arch": "arm64",
       "kind": "zip",
-      "fileName": "Rosalena-Harness-0.1.13-arm64.zip",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-0.1.14-arm64.zip",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-arm64.zip",
-      "sha256": "dcf514d8b0fe549ee4876f7f6d34d3e88ad0ad650477ce071d205e1c63e47f09",
-      "size": 130787925,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-arm64.zip",
+      "sha256": "f56b3cac4b021352888fe08704285b7eb62e62f5dde30de9ad2db10b5bf789a2",
+      "size": 131384010,
       "note": ""
     },
     {
@@ -83,12 +92,12 @@
       "platform": "macos",
       "arch": "x64",
       "kind": "dmg",
-      "fileName": "Rosalena-Harness-0.1.13-x64.dmg",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-0.1.14-x64.dmg",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64.dmg",
-      "sha256": "6e7b42423182aba70fca80b45d1728c085d37e95ff6da86518c97ed711a4a031",
-      "size": 134287067,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-x64.dmg",
+      "sha256": "8eb88ce21e7865b923c97cfd64ed6131d0187093e8ecc3c55486678b1e816fbf",
+      "size": 135254867,
       "note": ""
     },
     {
@@ -96,12 +105,38 @@
       "platform": "macos",
       "arch": "x64",
       "kind": "zip",
-      "fileName": "Rosalena-Harness-0.1.13-x64.zip",
-      "version": "0.1.13",
+      "fileName": "Rosalena-Harness-0.1.14-x64.zip",
+      "version": "0.1.14",
       "available": true,
-      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.13/Rosalena-Harness-0.1.13-x64.zip",
-      "sha256": "4b0bcf62db23d7509841100ab201ed9c8b8a289b2741a216f5bc51209efcc9de",
-      "size": 134591806,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-x64.zip",
+      "sha256": "41077e281f1f171fb4bc6bd18fb7bacb3232a588c0e3589686c722ba7d8bede2",
+      "size": 135187891,
+      "note": ""
+    },
+    {
+      "id": "linux-x64-appimage",
+      "platform": "linux",
+      "arch": "x64",
+      "kind": "appimage",
+      "fileName": "Rosalena-Harness-0.1.14-x86_64.AppImage",
+      "version": "0.1.14",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-x86_64.AppImage",
+      "sha256": "c311820fe2e50ede8f62abec57b11af52e348e746e02b6fc9b2506cf9171155b",
+      "size": 128249274,
+      "note": ""
+    },
+    {
+      "id": "linux-x64-deb",
+      "platform": "linux",
+      "arch": "x64",
+      "kind": "deb",
+      "fileName": "Rosalena-Harness-0.1.14-amd64.deb",
+      "version": "0.1.14",
+      "available": true,
+      "url": "https://github.com/Jviat0r/rosalena-harness-downloads/releases/download/v0.1.14/Rosalena-Harness-0.1.14-amd64.deb",
+      "sha256": "4e4d916d5ccd568108fa9310ec0f333609b7b76b68b30775e41a19342b4dbd98",
+      "size": 102067776,
       "note": ""
     }
   ]

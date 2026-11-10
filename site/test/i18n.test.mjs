@@ -288,7 +288,9 @@ test('download.js: the Spanish table mirrors the English one and the page render
   const updates = JSON.parse(read('download/updates.json'));
   for (const platform of releases.platforms) {
     for (const text of [platform.requirement, platform.note].filter(Boolean)) {
-      assert.ok(mod.MANIFEST_ES[text], `MANIFEST_ES has no Spanish for "${text}"`);
+      // A sentence naming versioned files is keyed with its version written {v}.
+      const known = mod.MANIFEST_ES[text] ?? mod.MANIFEST_ES[text.replace(/\b\d+\.\d+\.\d+\b/g, '{v}')];
+      assert.ok(known, `MANIFEST_ES has no Spanish for "${text}"`);
     }
   }
   const englishRows = mod.renderRows(releases.artifacts);
@@ -296,14 +298,21 @@ test('download.js: the Spanish table mirrors the English one and the page render
     mod.setLang('es');
     const rows = mod.renderRows(releases.artifacts);
     assert.match(rows, />Disponible</);
-    assert.match(rows, /112,945,038 bytes/, 'the byte counts are the same figures');
+    const setup = releases.artifacts.find((a) => a.kind === 'installer');
+    assert.ok(rows.includes(`${Number(setup.size).toLocaleString('en-US')} bytes`), 'the byte counts are the same figures');
     assert.equal(rows.replace(/>Disponible</g, '><').replace(/Disponible/g, ''), englishRows.replace(/>Available</g, '><'), 'only the words change');
     const cards = mod.platformsFor(releases).map((p) => mod.renderPlatform(p, releases.artifacts)).join('\n');
     assert.match(cards, /Windows 10 u 11, 64 bits/);
-    assert.match(cards, /Aún no compilado: el AppImage/);
-    assert.match(cards, /Descargar 107\.7 MB/);
+    assert.ok(cards.includes(`Descargar ${mod.formatBytes(setup.size)}`), 'the download button is in Spanish with the real size');
+    // Linux is in the manifest since 0.1.14: its card carries the Spanish install note, with
+    // this release's version filled into the file names.
+    assert.ok(cards.includes(`Sin firmar. AppImage: corre chmod +x Rosalena-Harness-${releases.version}-x86_64.AppImage`), 'the Linux note is in Spanish');
+    // A manifest without Linux still gets the pending Linux card, in Spanish.
+    const withoutLinux = { ...releases, platforms: releases.platforms.filter((p) => p.id !== 'linux') };
+    const pending = mod.platformsFor(withoutLinux).map((p) => mod.renderPlatform(p, [])).join('\n');
+    assert.match(pending, /Aún no compilado: el AppImage/);
     assert.equal(/Not built yet|Available|Download \d/.test(cards), false, 'no English left on the cards');
-    assert.match(mod.renderUpdatesNotice(updates), /Publicada ahora: versión <span class="num">0\.1\.13<\/span>/);
+    assert.match(mod.renderUpdatesNotice(updates), /Publicada ahora: versión <span class="num">0\.1\.14<\/span>/);
     assert.match(mod.kindLabel('dmg'), /^Imagen de disco \(\.dmg\)$/);
   } finally {
     mod.setLang('en');
